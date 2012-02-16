@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<script type="text/javascript">
+		var logKeys = false;
+		var registerKeyLogHandlers = true;
+		
+		// ** Event handlers **
+
+		function onLoad() {
+			withErrorLogger( function() {
+				evalBtn.addEventListener("click", evalBtn_onClick);
+				
+				inputBox.addEventListener("keypress", inputBox_onKeyPress);
+
+				if(registerKeyLogHandlers){
+					
+					inputBox.addEventListener("keydown",  keyEventLogger);
+					inputBox.addEventListener("keypress", keyEventLogger);
+					inputBox.addEventListener("keyup",    keyEventLogger);
+				}
+
+				addOutput("onLoad done");
+			});
+		}
+
+		function evalBtn_onClick() {
+			var inputBox = document.getElementById("inputBox");
+			var input = inputBox.value;
+
+			addOutput("");
+			addOutput(" > " + input);
+
+			var outputString;
+
+			withErrorLogger( function() {
+				pushHistoryCommand(input);
+				
+				var output = eval(input);
+				var outputString = prettyPrint(output);
+				addOutput(outputString);
+				
+				resetHistoryIndex();
+			});
+
+			return false;
+		}
+
+		lastKeyWasEscapeKey = false;
+
+		escapeKeyCode = 35; // '#'
+		
+		escapedKeyMapping = {
+			35:   '#', // was '#' -- for escape key
+			107:  '[', // was 'k'
+			108:  ']', // was 'l'
+			110:  '{', // was 'n'
+			109:  '}', // was 'm'
+			163:  '<', // was pound sign  = symshift+n
+			8364: '>', // was euro symbol = symshift+m
+
+			104:  function(){ scrollInputBoxHistory(+1); }, // was 'h'
+			121:  function(){ scrollInputBoxHistory(-1); }  // was 'y'
+		};
+
+		function inputBox_onKeyPress(event) {
+			var isEnter = event.charCode == 13;
+			var isEscapeKey = event.charCode == escapeKeyCode;
+
+			if(isEnter) {
+				evalBtn.click();
+				// inputBox.value = "";
+				event.returnValue = false;
+				return;
+			}
+			else if(lastKeyWasEscapeKey){
+				var newChar =
+					escapedKeyMapping[event.charCode];
+
+				if(typeof(newChar) === 'string') {
+					inputBox.value += newChar;
+				}
+				else if(typeof(newChar) === 'function') {
+					newChar();
+				}
+
+				lastKeyWasEscapeKey = false;
+				event.returnValue = false;
+
+				return;
+			}
+			else if(isEscapeKey) {
+				lastKeyWasEscapeKey = true;
+				
+				event.returnValue = false;
+				
+				return;
+			}
+			else {
+				return;
+			}
+		}
+
+		function scrollInputBoxHistory(historyOffset) {
+			var historyCommand = scrollHistory(historyOffset);
+			inputBox.value = historyCommand;
+		}
+
+		function keyEventLogger(event) {
+			withErrorLogger( function() {
+				if(!logKeys) {
+					return;
+				}
+
+				var loggedProperties = {
+					charCode	 : event.charCode,
+					keyCode		 : event.keyCode,
+					which		 : event.which,
+					type		 : event.type,
+					altGraphKey	 : event.altGraphKey,
+					altKey		 : event.altKey,
+					ctrlKey		 : event.ctrlKey,
+					metaKey		 : event.metaKey,
+					shiftKey	 : event.shiftKey
+				}
+
+				addOutput(prettyPrint(loggedProperties));
+			});
+		}
+
+		// ** Error handling **
+
+		function withErrorLogger(fn) {
+			try {
+				var output = fn();
+				return output;
+			}
+			catch(ex) {
+				var errString = "An exception occurred. It has been saved in __err\n" + ex.toString()
+				addOutput(errString);
+				__err = ex;
+
+				throw "Terminating the call stack."
+			}
+		}
+
+		// ** Pretty print **
+
+		var indent = "    ";
+		
+		function prettyPrint(obj) {
+			return prettyPrintInternal(obj, " < " + indent, 0)
+		}
+
+		function prettyPrintInternal(obj, linePrefix, recDepthLeft) {
+			var objTypeStr = typeof(obj);
+			
+			var strOutput = linePrefix + "'" + obj + "' is " + objTypeStr;
+
+			if(	objTypeStr == "string"  ||
+				objTypeStr == "number"  ||
+				objTypeStr == "boolean" ||
+				objTypeStr == "undefined") {
+				
+				// No more output required for these
+				// primitive types.
+			}
+			else {
+				strOutput += "\n" + linePrefix + " = { \n";
+		
+				propertyKeysArray = getObjectPropertyKeysArray(obj);
+
+				for(var ixPropKey = 0; ixPropKey < propertyKeysArray.length; ixPropKey++) {
+					
+					var propKey = propertyKeysArray[ixPropKey];
+					
+					var propValue;
+					
+					try {
+						propValue = obj[propKey];
+					}
+					catch(ex) {
+						propValue = ex;
+					}
+
+					if(recDepthLeft <= 0) {
+						strOutput += linePrefix + indent + propKey + " = '" + propValue + "' is " + typeof(propValue) + "\n";
+					}
+					else {
+						strOutput += linePrefix + indent + propKey + " = \n" + prettyPrintInternal(propValue, linePrefix + indent + indent, recDepthLeft - 1);
+					}
+				}
+
+				strOutput += linePrefix + "}";
+			}
+
+			return strOutput;
+		}
+
+		function getObjectPropertyKeysArray(obj) {
+			var keys = new Array;
+
+			for(propKey in obj) {
+				keys.push(propKey);
+			}
+
+			keys.sort();
+
+			return keys;
+		}
+		
+		// ** History **
+
+		var currentHistoryIndex = 0;
+		var historyCommands = [];
+
+		function scrollHistory(historyOffset) {
+			
+		}
+
+		function resetHistoryIndex() {
+			currentHistoryIndex = 0;
+		}
+
+		function pushHistoryCommand(commandStr) {
+			
+		}
+
+		// ** Output view **
+
+		function addOutput(strOutput) {
+			var newOutput = strOutput + "\n" + getOutput();
+			setOutput(newOutput);
+		}
+
+		function getOutput() {
+			var outDiv = document.getElementById("output");
+			return outDiv.innerText;
+		}
+
+		function setOutput(strOutput) {
+			var outDiv = document.getElementById("output");
+			outDiv.innerText = strOutput;
+		}
+	</script>
+</head>
+<body>
+	<input id="inputBox"   type="text" />
+	<input id="evalBtn"    type="submit" value="Eval" />
+	<pre id="output"></pre>
+
+
+	<script type="text/javascript">
+		onLoad();
+		addOutput("End of body script block done.");
+	</script>
+</body>
+</html>
