@@ -215,15 +215,36 @@
 		var historyCommands = [];
 
 		function scrollHistory(historyOffset) {
-			
+			var newHistoryIndex =
+				currentHistoryIndex + historyOffset;
+
+			if(newHistoryIndex < 0) {
+				newHistoryIndex = 0;
+			}
+			else if(newHistoryIndex >= historyCommands.length) {
+				newHistoryIndex = historyCommands.length -1;
+			}
+
+			currentHistoryIndex = newHistoryIndex;
+
+			var historyCommand =
+				historyCommands[currentHistoryIndex];
+
+			if(	historyCommand === undefined ||
+				historyCommand === null) {
+				historyCommand = "";
+			}
+
+			return historyCommand;
 		}
 
 		function resetHistoryIndex() {
-			currentHistoryIndex = 0;
+			currentHistoryIndex =
+				historyCommands.length - 1;
 		}
 
 		function pushHistoryCommand(commandStr) {
-			
+			historyCommands.push(commandStr);		
 		}
 
 		// ** Output view **
