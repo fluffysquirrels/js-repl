@@ -35,7 +35,9 @@
 
 			withErrorLogger( function() {
 				pushHistoryCommand(input);
-				
+			
+				inputBox.value = "";
+
 				var output = eval(input);
 				var outputString = prettyPrint(output);
 				addOutput(outputString);
@@ -59,8 +61,8 @@
 			163:  '<', // was pound sign  = symshift+n
 			8364: '>', // was euro symbol = symshift+m
 
-			104:  function(){ scrollInputBoxHistory(+1); }, // was 'h'
-			121:  function(){ scrollInputBoxHistory(-1); }  // was 'y'
+			42:   function(){ scrollInputBoxHistory(+1); }, // was '*'
+			54:   function(){ scrollInputBoxHistory(-1); }  // was '6'
 		};
 
 		function inputBox_onKeyPress(event) {
@@ -184,7 +186,7 @@
 					}
 
 					if(recDepthLeft <= 0) {
-						strOutput += linePrefix + indent + propKey + " = '" + propValue + "' is " + typeof(propValue) + "\n";
+						strOutput += linePrefix + indent + "'" + propKey + "' = '" + propValue + "' is " + typeof(propValue) + "\n";
 					}
 					else {
 						strOutput += linePrefix + indent + propKey + " = \n" + prettyPrintInternal(propValue, linePrefix + indent + indent, recDepthLeft - 1);
@@ -207,6 +209,20 @@
 			keys.sort();
 
 			return keys;
+		}
+
+		// ** Utilities **
+
+		function showCharCodes(str) {
+			var ret = {};
+			
+			for(ixChar = 0; ixChar < str.length; ixChar++) {
+				var charStr = str[ixChar];
+				var charCode = charStr.charCodeAt(0);
+				ret[charStr] = charCode;
+			}
+
+			return ret;
 		}
 		
 		// ** History **
@@ -240,7 +256,7 @@
 
 		function resetHistoryIndex() {
 			currentHistoryIndex =
-				historyCommands.length - 1;
+				historyCommands.length;
 		}
 
 		function pushHistoryCommand(commandStr) {
