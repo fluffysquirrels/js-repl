@@ -2,6 +2,7 @@
 <html>
 <head>
 	<script type="text/javascript" src="jsrepl.pp.js"></script>
+	<script type="text/javascript" src="jsrepl.cmdhist.js"></script>
 	
 	<script type="text/javascript">
 		var jsrepl = jsrepl || {};
@@ -38,7 +39,7 @@
 			var outputString;
 
 			withErrorLogger( function() {
-				pushHistoryCommand(input);
+				jsrepl.cmdhist.pushHistoryCommand(input);
 			
 				inputBox.value = "";
 
@@ -46,7 +47,7 @@
 				var outputString = jsrepl.pp.prettyPrint(output);
 				addOutput(outputString);
 				
-				resetHistoryIndex();
+				jsrepl.cmdhist.resetHistoryIndex();
 			});
 
 			return false;
@@ -108,7 +109,7 @@
 		}
 
 		function scrollInputBoxHistory(historyOffset) {
-			var historyCommand = scrollHistory(historyOffset);
+			var historyCommand = jsrepl.cmdhist.scrollHistory(historyOffset);
 			inputBox.value = historyCommand;
 		}
 
@@ -164,44 +165,6 @@
 			return ret;
 		}
 		
-		// ** History **
-
-		var currentHistoryIndex = 0;
-		var historyCommands = [];
-
-		function scrollHistory(historyOffset) {
-			var newHistoryIndex =
-				currentHistoryIndex + historyOffset;
-
-			if(newHistoryIndex < 0) {
-				newHistoryIndex = 0;
-			}
-			else if(newHistoryIndex >= historyCommands.length) {
-				newHistoryIndex = historyCommands.length -1;
-			}
-
-			currentHistoryIndex = newHistoryIndex;
-
-			var historyCommand =
-				historyCommands[currentHistoryIndex];
-
-			if(	historyCommand === undefined ||
-				historyCommand === null) {
-				historyCommand = "";
-			}
-
-			return historyCommand;
-		}
-
-		function resetHistoryIndex() {
-			currentHistoryIndex =
-				historyCommands.length;
-		}
-
-		function pushHistoryCommand(commandStr) {
-			historyCommands.push(commandStr);		
-		}
-
 		// ** Output view **
 		
 		var outputMaxChars = 30000
