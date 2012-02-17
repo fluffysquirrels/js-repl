@@ -2,6 +2,8 @@
 <html>
 <head>
 	<script type="text/javascript">
+		var jsrepl = jsrepl || {};
+
 		var logKeys = false;
 		var registerKeyLogHandlers = true;
 		
@@ -39,7 +41,7 @@
 				inputBox.value = "";
 
 				var output = eval(input);
-				var outputString = prettyPrint(output);
+				var outputString = jsrepl.pp.prettyPrint(output);
 				addOutput(outputString);
 				
 				resetHistoryIndex();
@@ -126,7 +128,7 @@
 					shiftKey	 : event.shiftKey
 				}
 
-				addOutput(prettyPrint(loggedProperties));
+				addOutput(jsrepl.pp.prettyPrint(loggedProperties));
 			});
 		}
 
@@ -147,69 +149,79 @@
 		}
 
 		// ** Pretty print **
-
-		var indent = "    ";
-		
-		function prettyPrint(obj) {
-			return prettyPrintInternal(obj, " < " + indent, 0)
-		}
-
-		function prettyPrintInternal(obj, linePrefix, recDepthLeft) {
-			var objTypeStr = typeof(obj);
-			
-			var strOutput = linePrefix + "'" + obj + "' is " + objTypeStr;
-
-			if(	objTypeStr == "string"  ||
-				objTypeStr == "number"  ||
-				objTypeStr == "boolean" ||
-				objTypeStr == "undefined") {
-				
-				// No more output required for these
-				// primitive types.
+		jsrepl.pp = function() {
+			var indent = "    ";
+			var propValueMaxChars = 200
+			function prettyPrint(obj) {
+				return prettyPrintInternal(obj, " < " + indent, 0)
 			}
-			else {
-				strOutput += "\n" + linePrefix + " = { \n";
-		
-				propertyKeysArray = getObjectPropertyKeysArray(obj);
 
-				for(var ixPropKey = 0; ixPropKey < propertyKeysArray.length; ixPropKey++) {
+			function prettyPrintInternal(obj, linePrefix, recDepthLeft) {
+				var objTypeStr = typeof(obj);
+				
+				var strOutput = linePrefix + "'" + obj + "' is " + objTypeStr;
+
+				if(	objTypeStr == "string"  ||
+					objTypeStr == "number"  ||
+					objTypeStr == "boolean" ||
+					objTypeStr == "undefined") {
 					
-					var propKey = propertyKeysArray[ixPropKey];
-					
-					var propValue;
-					
-					try {
-						propValue = obj[propKey];
-					}
-					catch(ex) {
-						propValue = ex;
+					// No more output required for these
+					// primitive types.
+				}
+				else {
+					strOutput += "\n" + linePrefix + " = { \n";
+			
+					propertyKeysArray = getObjectPropertyKeysArray(obj);
+
+					for(var ixPropKey = 0; ixPropKey < propertyKeysArray.length; ixPropKey++) {
+						
+						var propKey = propertyKeysArray[ixPropKey];
+						
+						var propValue;
+						
+						try {
+							propValue = obj[propKey];
+						}
+						catch(ex) {
+							propValue = ex;
+						}
+
+						if(recDepthLeft <= 0) {
+							strOutput += linePrefix + indent + "'" + propKey + "' = '" + asString(propValue).substring(0, propValueMaxChars) + "' is " + typeof(propValue) + "\n";
+						}
+						else {
+							strOutput += linePrefix + indent + propKey + " = \n" + prettyPrintInternal(propValue, linePrefix + indent + indent, recDepthLeft - 1);
+						}
 					}
 
-					if(recDepthLeft <= 0) {
-						strOutput += linePrefix + indent + "'" + propKey + "' = '" + propValue + "' is " + typeof(propValue) + "\n";
-					}
-					else {
-						strOutput += linePrefix + indent + propKey + " = \n" + prettyPrintInternal(propValue, linePrefix + indent + indent, recDepthLeft - 1);
-					}
+					strOutput += linePrefix + "}";
 				}
 
-				strOutput += linePrefix + "}";
+				return strOutput;
 			}
 
-			return strOutput;
-		}
-
-		function getObjectPropertyKeysArray(obj) {
-			var keys = new Array;
-
-			for(propKey in obj) {
-				keys.push(propKey);
+			function asString(obj) {
+				return "" + obj;
 			}
 
-			keys.sort();
+			function getObjectPropertyKeysArray(obj) {
+				var keys = new Array;
 
-			return keys;
-		}
+				for(propKey in obj) {
+					keys.push(propKey);
+				}
+
+				keys.sort();
+
+				return keys;
+			}
+
+			var pub = {
+					prettyPrint: prettyPrint
+				};
+			return pub;
+		}();
 
 		// ** Utilities **
 
@@ -264,6 +276,8 @@
 		}
 
 		// ** Output view **
+		
+		var outputMaxChars = 30000
 
 		function addOutput(strOutput) {
 			var newOutput = strOutput + "\n" + getOutput();
@@ -277,15 +291,20 @@
 
 		function setOutput(strOutput) {
 			var outDiv = document.getElementById("output");
-			outDiv.innerText = strOutput;
+			outDiv.innerText = strOutput.substring(0, outputMaxChars);
 		}
 	</script>
+
+	<style type="text/css">
+		#inputBox {
+			width: 375px;
+		}
+	</style>
 </head>
 <body>
-	<input id="inputBox"   type="text" />
-	<input id="evalBtn"    type="submit" value="Eval" />
+	<input id="inputBox" type="text" />
+	<input id="evalBtn"  type="submit" value="Eval" />
 	<pre id="output"></pre>
-
 
 	<script type="text/javascript">
 		onLoad();
