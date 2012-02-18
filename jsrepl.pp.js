@@ -6,7 +6,7 @@ jsrepl.pp = function() {
 	var indent = "    ";
 	var propValueMaxChars = 200
 	function prettyPrint(obj) {
-		return prettyPrintInternal(obj, " < " + indent, 0)
+		return prettyPrintInternal(obj, "< " + indent, 0)
 	}
 
 	function prettyPrintInternal(obj, linePrefix, recDepthLeft) {

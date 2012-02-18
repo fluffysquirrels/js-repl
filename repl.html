@@ -3,17 +3,22 @@
 <head>
 	<script type="text/javascript" src="jsrepl.pp.js"></script>
 	<script type="text/javascript" src="jsrepl.cmdhist.js"></script>
+	<script type="text/javascript" src="jsrepl.err.js"></script>
 	<script type="text/javascript" src="jsrepl.main.js"></script>
 
 	<style type="text/css">
 		#inputBox {
-			width: 375px;
+			width: 350px;
 		}
 	</style>
 </head>
 <body>
 	<input id="inputBox" type="text" />
 	<input id="evalBtn"  type="submit" value="Eval" />
+
+	<div id="customButtons">
+	</div>
+
 	<pre id="output"></pre>
 
 	<script type="text/javascript">

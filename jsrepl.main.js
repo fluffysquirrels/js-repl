@@ -1,5 +1,6 @@
 // Required : "jsrepl.pp.js"
 // Required : "jsrepl.cmdhist.js"
+// Required : "jsrepl.err.js"
 
 var jsrepl = jsrepl || {};
 
@@ -7,10 +8,37 @@ jsrepl.main = function() {
 	var logKeys = false;
 	var registerKeyLogHandlers = true;
 	
+	var _withErrorHandler =
+		function() {
+			var errorHandler = new jsrepl.err.ErrorHandler(addOutput);
+			return function(fn) {
+				return errorHandler.withErrorHandler(fn);
+			};
+		}();
+
+	// ** Output view **
+	
+	var outputMaxChars = 30000
+
+	function addOutput(strOutput) {
+		var newOutput = strOutput + "\n" + getOutput();
+		setOutput(newOutput);
+	}
+
+	function getOutput() {
+		var outDiv = document.getElementById("output");
+		return outDiv.innerText;
+	}
+
+	function setOutput(strOutput) {
+		var outDiv = document.getElementById("output");
+		outDiv.innerText = strOutput.substring(0, outputMaxChars);
+	}
+
 	// ** Event handlers **
 
 	function onLoad() {
-		withErrorLogger( function() {
+		_withErrorHandler( function() {
 			evalBtn.addEventListener("click", evalBtn_onClick);
 			
 			inputBox.addEventListener("keypress", inputBox_onKeyPress);
@@ -31,20 +59,19 @@ jsrepl.main = function() {
 		var input = inputBox.value;
 
 		addOutput("");
-		addOutput(" > " + input);
+		addOutput("> " + input);
 
 		var outputString;
 
-		withErrorLogger( function() {
+		_withErrorHandler( function() {
 			jsrepl.cmdhist.pushHistoryCommand(input);
 		
 			inputBox.value = "";
+			jsrepl.cmdhist.resetHistoryIndex();
 
 			var output = eval(input);
 			var outputString = jsrepl.pp.prettyPrint(output);
 			addOutput(outputString);
-			
-			jsrepl.cmdhist.resetHistoryIndex();
 		});
 
 		return false;
@@ -111,7 +138,7 @@ jsrepl.main = function() {
 	}
 
 	function keyEventLogger(event) {
-		withErrorLogger( function() {
+		_withErrorHandler( function() {
 			if(!logKeys) {
 				return;
 			}
@@ -127,27 +154,45 @@ jsrepl.main = function() {
 				metaKey		 : event.metaKey,
 				shiftKey	 : event.shiftKey
 			}
-
 			addOutput(jsrepl.pp.prettyPrint(loggedProperties));
 		});
 	}
 
-	// ** Error handling **
-
-	function withErrorLogger(fn) {
-		try {
-			var output = fn();
-			return output;
+	function addCustomBtn(clickHandler, btnText) {
+		if(!btnText) {
+			btnText = "Do it!";
 		}
-		catch(ex) {
-			var errString = "An exception occurred. It has been saved in __err\n" + ex.toString()
-			addOutput(errString);
-			__err = ex;
 
-			throw "Terminating the call stack."
+		var clickHandlerFn = null;
+
+		if(typeof(clickHandler) === "string") {
+			clickHandlerFn = function () {
+					return eval(clickHandler);
+				};
 		}
+		else if(typeof(clickHandler) === "function") {
+			clickHandlerFn = clickHandler;
+		}
+		else {
+			assertParameterType('clickHandler', clickHandler);
+		}
+
+		var wrappedClickHandler = function() {
+			_withErrorHandler(jsrepl.main.addOutput(jsrepl.pp.prettyPrint(clickHandlerFn())));
+			return false;
+		};
+
+
+		var btn = document.createElement('input');
+		btn.type = 'submit';
+		btn.value = btnText;
+		btn.addEventListener(
+			'click',
+			wrappedClickHandler);
+
+		customButtons.appendChild(btn);
 	}
-
+	
 	// ** Utilities **
 
 	function showCharCodes(str) {
@@ -162,28 +207,10 @@ jsrepl.main = function() {
 		return ret;
 	}
 	
-	// ** Output view **
-	
-	var outputMaxChars = 30000
-
-	function addOutput(strOutput) {
-		var newOutput = strOutput + "\n" + getOutput();
-		setOutput(newOutput);
-	}
-
-	function getOutput() {
-		var outDiv = document.getElementById("output");
-		return outDiv.innerText;
-	}
-
-	function setOutput(strOutput) {
-		var outDiv = document.getElementById("output");
-		outDiv.innerText = strOutput.substring(0, outputMaxChars);
-	}
-	
 	var pub = {
-		onLoad 		: onLoad,
-		addOutput 	: addOutput,
+		onLoad 				: onLoad,
+		addOutput 			: addOutput,
+		withErrorHandler 	: _withErrorHandler
 	};
 
 	return pub;
