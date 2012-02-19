@@ -23,6 +23,8 @@
 
 	<script type="text/javascript">
 		jsrepl.main.onLoad();
+		jsrepl.main.addCustomBtn("var ib = inputBox; var o = { end: ib.selectionEnd, start: ib.selectionStart, length: ib.value.length }; o", "selection");
+		jsrepl.main.addCustomBtn("__err", "err");
 		jsrepl.main.addOutput("End of body script block done.");
 	</script>
 </body>

@@ -77,11 +77,10 @@ jsrepl.main = function() {
 		return false;
 	}
 
-	lastKeyWasEscapeKey = false;
-
-	escapeKeyCode = 35; // '#'
+	// ** Key constants **
+	var escapeKeyCode = 35; // '#'
 	
-	escapedKeyMapping = {
+	var escapedKeyMapping = {
 		35:   '#', // was '#' -- for escape key
 		107:  '[', // was 'k'
 		108:  ']', // was 'l'
@@ -93,23 +92,29 @@ jsrepl.main = function() {
 		42:   function(){ scrollInputBoxHistory(+1); }, // was '*'
 		54:   function(){ scrollInputBoxHistory(-1); }  // was '6'
 	};
+	
+	// ** / Key constants **
 
+	// ** Key state
+	var lastKeyWasEscapeKey = false;
+	var lastSelectionRange = null;
+	
 	function inputBox_onKeyPress(event) {
 		var isEnter = event.charCode == 13;
 		var isEscapeKey = event.charCode == escapeKeyCode;
 
 		if(isEnter) {
 			evalBtn.click();
-			// inputBox.value = "";
 			event.returnValue = false;
-			return;
 		}
 		else if(lastKeyWasEscapeKey){
+			restoreLastSelectionRange();
+
 			var newChar =
 				escapedKeyMapping[event.charCode];
 
 			if(typeof(newChar) === 'string') {
-				inputBox.value += newChar;
+				insertTextBoxString(inputBox, newChar);
 			}
 			else if(typeof(newChar) === 'function') {
 				newChar();
@@ -117,24 +122,57 @@ jsrepl.main = function() {
 
 			lastKeyWasEscapeKey = false;
 			event.returnValue = false;
-
-			return;
 		}
 		else if(isEscapeKey) {
 			lastKeyWasEscapeKey = true;
-			
+
 			event.returnValue = false;
-			
-			return;
 		}
-		else {
-			return;
-		}
+		else
+		{}
+
+		setLastSelectionRange();
+	}
+
+	function setLastSelectionRange() {
+		lastSelectionRange =
+			{
+				selectionStart	: inputBox.selectionStart,
+				selectionEnd	: inputBox.selectionEnd
+			};
+	}
+	
+	function restoreLastSelectionRange() {
+		inputBox.setSelectionRange(
+			lastSelectionRange.selectionStart,
+			lastSelectionRange.selectionEnd);
 	}
 
 	function scrollInputBoxHistory(historyOffset) {
 		var historyCommand = jsrepl.cmdhist.scrollHistory(historyOffset);
 		inputBox.value = historyCommand;
+		setTextBoxSelectionToEnd(inputBox);
+	}
+
+	function insertTextBoxString(textBox, str) {
+		var oldValue = textBox.value;
+		var newValue =
+			oldValue.substring(0, textBox.selectionStart) +
+			str +
+			oldValue.substring(textBox.selectionEnd, oldValue.length);
+		var newSelectionIndex =
+			textBox.selectionStart +
+			str.length - 1;
+
+		textBox.value = newValue;
+		textBox.setSelectionRange(
+			newSelectionIndex,
+			newSelectionIndex);
+	}
+
+	function setTextBoxSelectionToEnd(textBox) {
+		var selIndex = textBox.value.length;
+		textBox.setSelectionRange(selIndex, selIndex);
 	}
 
 	function keyEventLogger(event) {
@@ -144,15 +182,19 @@ jsrepl.main = function() {
 			}
 
 			var loggedProperties = {
-				charCode	 : event.charCode,
-				keyCode		 : event.keyCode,
-				which		 : event.which,
-				type		 : event.type,
-				altGraphKey	 : event.altGraphKey,
-				altKey		 : event.altKey,
-				ctrlKey		 : event.ctrlKey,
-				metaKey		 : event.metaKey,
-				shiftKey	 : event.shiftKey
+				charCode	 	: event.charCode,
+				keyCode		 	: event.keyCode,
+				which		 	: event.which,
+				type		 	: event.type,
+				altGraphKey	 	: event.altGraphKey,
+				altKey		 	: event.altKey,
+				ctrlKey		 	: event.ctrlKey,
+				metaKey		 	: event.metaKey,
+				shiftKey	 	: event.shiftKey,
+
+				selectionStart 	: inputBox.selectionStart,
+				selectionEnd	: inputBox.selectionEnd,
+				textBoxValue	: inputBox.value
 			}
 			addOutput(jsrepl.pp.prettyPrint(loggedProperties));
 		});
@@ -178,7 +220,12 @@ jsrepl.main = function() {
 		}
 
 		var wrappedClickHandler = function() {
-			_withErrorHandler(jsrepl.main.addOutput(jsrepl.pp.prettyPrint(clickHandlerFn())));
+			_withErrorHandler(
+				function() {
+					jsrepl.main.addOutput(
+						jsrepl.pp.prettyPrint(
+							clickHandlerFn()));
+				});
 			return false;
 		};
 
@@ -210,6 +257,7 @@ jsrepl.main = function() {
 	var pub = {
 		onLoad 				: onLoad,
 		addOutput 			: addOutput,
+		addCustomBtn		: addCustomBtn,
 		withErrorHandler 	: _withErrorHandler
 	};
 
