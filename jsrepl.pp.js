@@ -4,7 +4,7 @@ var jsrepl = jsrepl || {}
 
 jsrepl.pp = function() {
 	var indent = "    ";
-	var propValueMaxChars = 200
+	var propValueMaxChars = 400
 	function prettyPrint(obj) {
 		return prettyPrintInternal(obj, "< " + indent, 0)
 	}
@@ -41,7 +41,7 @@ jsrepl.pp = function() {
 				}
 
 				if(recDepthLeft <= 0) {
-					strOutput += linePrefix + indent + "'" + propKey + "' = '" + asString(propValue).substring(0, propValueMaxChars) + "' is " + typeof(propValue) + "\n";
+					strOutput += linePrefix + indent + "'" + propKey + "' = '" + asString(propValue).substring(0, propValueMaxChars).replace(/\n/g, "\n" + linePrefix + indent + indent) + "' is " + typeof(propValue) + "\n";
 				}
 				else {
 					strOutput += linePrefix + indent + propKey + " = \n" + prettyPrintInternal(propValue, linePrefix + indent + indent, recDepthLeft - 1);

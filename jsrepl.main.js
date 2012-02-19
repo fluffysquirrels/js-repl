@@ -81,13 +81,14 @@ jsrepl.main = function() {
 	var escapeKeyCode = 35; // '#'
 	
 	var escapedKeyMapping = {
-		35:   '#', // was '#' -- for escape key
-		107:  '[', // was 'k'
-		108:  ']', // was 'l'
-		110:  '{', // was 'n'
-		109:  '}', // was 'm'
-		163:  '<', // was pound sign  = symshift+n
-		8364: '>', // was euro symbol = symshift+m
+		35:   '#', 	// was '#' -- for escape key
+		107:  '[', 	// was 'k'
+		108:  ']', 	// was 'l'
+		110:  '{', 	// was 'n'
+		109:  '}', 	// was 'm'
+		122:  "\\",	// was 'z'
+		163:  '<', 	// was pound sign  = symshift+n
+		8364: '>', 	// was euro symbol = symshift+m
 
 		42:   function(){ scrollInputBoxHistory(+1); }, // was '*'
 		54:   function(){ scrollInputBoxHistory(-1); }  // was '6'
