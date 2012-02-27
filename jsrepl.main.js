@@ -75,6 +75,7 @@ jsrepl.main = function() {
 
 			var evaluator = getEvaluator();
 			var output = evaluator.eval(input);
+			__last = output;
 
 			var outputString = jsrepl.pp.prettyPrint(output);
 			addOutput(outputString);

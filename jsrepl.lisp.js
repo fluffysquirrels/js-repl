@@ -1,5 +1,7 @@
 var jsrepl = jsrepl || {};
+
 jsrepl.lisp = function() {
+
 	function LispEvaluator() {
 		this.eval = LispEvaluator_eval;
 	}
@@ -9,9 +11,38 @@ jsrepl.lisp = function() {
 	}
 
 	function parseSExpr(str) {
-		//var ret = [];
+		var tokens = tokenise(str);
 
-		return tokenise(str);
+		var nestLevels = [[]];
+
+		for(var ixToken = 0; ixToken < tokens.length; ixToken++) 
+		{
+			var currToken = tokens[ixToken];
+
+			if(currToken === "(") {
+				nestLevels.push([]);
+			}
+			else if(currToken === ")") {
+				if(nestLevels.length === 1) {
+					throw "Encountered ')' when no nestLevels were on the stack!";
+				}
+
+				var doneLevel = nestLevels.pop();
+
+				nestLevels[nestLevels.length-1].push(doneLevel);
+				
+			}
+			else {
+				// Non-bracket token
+				nestLevels[nestLevels.length-1].push(currToken);
+			}
+		} // for each token
+
+		if(nestLevels.length !== 1) {
+			throw ("Unbalanced brackets at end of parse; nestLevels.length = " + nestLevels.length.toString());
+		}
+
+		return nestLevels[0];
 	}
 
 	function tokenise(str) {
