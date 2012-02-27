@@ -50,6 +50,8 @@ jsrepl.main = function() {
 				inputBox.addEventListener("keyup",    keyEventLogger);
 			}
 
+			lang_js.checked = true;
+
 			addOutput("onLoad done");
 		});
 	}
@@ -69,7 +71,9 @@ jsrepl.main = function() {
 			inputBox.value = "";
 			jsrepl.cmdhist.resetHistoryIndex();
 
-			var output = eval(input);
+			var evaluator = getEvaluator();
+			var output = evaluator.eval(input);
+
 			var outputString = jsrepl.pp.prettyPrint(output);
 			addOutput(outputString);
 		});
@@ -77,11 +81,36 @@ jsrepl.main = function() {
 		return false;
 	}
 
+	var _jsEvaluator = {
+			eval: function(cmd) {
+				return window.eval(cmd);
+			}
+		};
+	
+	var _lispEvaluator = {
+			eval: function() {
+				return "nom nom nom! I love brackets!";
+			}
+		};
+
+	function getEvaluator() {
+		if(lang_js.checked) {
+			return _jsEvaluator;
+		}
+		else if(lang_lisp.checked) {
+			return _lispEvaluator;
+		}
+		else {
+			throw "No known evaluator selected!";
+		}
+	}
+
 	// ** Key constants **
 	var escapeKeyCode = 35; // '#'
 	
 	var escapedKeyMapping = {
 		35:   '#', 	// was '#' -- for escape key
+		102:  'function(){}', // was 'f'
 		107:  '[', 	// was 'k'
 		108:  ']', 	// was 'l'
 		110:  '{', 	// was 'n'

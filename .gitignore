@@ -1,1 +1,2 @@
-.*.swp
+# Vim temp files
+.*.sw[op]
