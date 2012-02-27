@@ -1,6 +1,8 @@
 // Required : "jsrepl.pp.js"
 // Required : "jsrepl.cmdhist.js"
 // Required : "jsrepl.err.js"
+// Required : "jsrepl.lisp.js"
+
 
 var jsrepl = jsrepl || {};
 
@@ -87,11 +89,8 @@ jsrepl.main = function() {
 			}
 		};
 	
-	var _lispEvaluator = {
-			eval: function() {
-				return "nom nom nom! I love brackets!";
-			}
-		};
+	var _lispEvaluator = 
+		new jsrepl.lisp.LispEvaluator();
 
 	function getEvaluator() {
 		if(lang_js.checked) {
