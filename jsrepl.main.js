@@ -74,7 +74,7 @@ jsrepl.main = function() {
 			jsrepl.cmdhist.resetHistoryIndex();
 
 			var evaluator = getEvaluator();
-			var output = evaluator.eval(input);
+			var output = evaluator.readEval(input);
 			__last = output;
 
 			var outputString = jsrepl.pp.prettyPrint(output);
@@ -85,7 +85,7 @@ jsrepl.main = function() {
 	}
 
 	var _jsEvaluator = {
-			eval: function(cmd) {
+			readEval: function(cmd) {
 				return window.eval(cmd);
 			}
 		};

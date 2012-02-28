@@ -3,14 +3,64 @@ var jsrepl = jsrepl || {};
 jsrepl.lisp = function() {
 
 	function LispEvaluator() {
-		this.eval = LispEvaluator_eval;
+		var priv = {
+			_vars = {},
+			_this = this
+		}
+
+		priv._vars["hello"] = "world!";
+
+		this.readEval = function(cmdString) {
+			LispEvaluator_readEval(priv, cmdString);
+		}
+
+		this.evalOneExpr = function(expr) {
+			LispEvaluator_evalOneExpr(priv, expr);
+		}
 	}
 
-	function LispEvaluator_eval(cmd) {
-		return parseSExpr(cmd);
+	function LispEvaluator_readEval(priv, cmdString) {
+		var exprs = parseSExprs(cmdString);
+		
+		if(exprs.length === 0) {
+			throw "Empty expression.";
+		}
+
+		var result = undefined;
+		// eval all expressions, keeping last result
+		for(var ixExpr = 0; ixExpr < expr.length; ixExpr++) {
+			var currExpr = exprs[ixExpr];
+			var currResult = this.evalOneExpr(currExpr);
+			result = currResult;
+		}
+
+		return result;
+	}
+	
+	function LispEvaluator_evalOneExpr(priv, expr) {
+		if(typeof(expr) === "LispSymbol")
+		{
+			return priv._vars[expr.name];
+		}
+		
+		if(isArray(expr)) {
+			throw "Evaluating functions is not yet supported."
+		}
+		
+		// assert(expr is array)
+		if(expr.length === 0) {
+			throw "Cannot evaluate empty expression";
+		}
+		else if (expr.length === 1) {
+			
+		}
 	}
 
-	function parseSExpr(str) {
+	function LispSymbol(name) {
+		this.name = name;
+	}
+
+	function parseSExprs(str) {
 		var tokens = tokenise(str);
 
 		var nestLevels = [[]];
@@ -43,7 +93,7 @@ jsrepl.lisp = function() {
 		}
 
 		return nestLevels[0];
-	}
+	} // function parseSExpr
 
 	function tokenise(str) {
 		var tokens = [];
@@ -51,7 +101,10 @@ jsrepl.lisp = function() {
 		var currToken = emptyCurrToken;
 		
 		function pushCurrToken() {
-			tokens.push(currToken);
+			// Assume all tokens are symbols for now.
+			var tokenObject = new LispSymbol(currToken);
+			
+			tokens.push(tokenObject);
 			currToken = emptyCurrToken;
 		}
 
@@ -68,8 +121,7 @@ jsrepl.lisp = function() {
 					pushCurrToken();
 				}
 				
-				currToken = ch;
-				pushCurrToken();
+				tokens.push(ch);
 			}
 			else {
 				currToken =
@@ -84,7 +136,7 @@ jsrepl.lisp = function() {
 		}
 
 		return tokens;
-	}
+	} // function tokenise
 
 	function isWhiteSpace(ch) {
 		return 	ch === " "  ||
