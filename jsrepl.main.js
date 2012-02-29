@@ -4,7 +4,7 @@
 // Required : "jsrepl.lisp.js"
 
 
-var jsrepl = jsrepl || {};
+jsrepl = jsrepl || {};
 
 jsrepl.main = function() {
 	var logKeys = false;
@@ -89,9 +89,15 @@ jsrepl.main = function() {
 				return window.eval(cmd);
 			}
 		};
-	
+
+	var _lispLogFn = function(msgString) {
+		var logLine = "LL: " + msgString;
+		addOutput(logLine);
+	}
+
 	var _lispEvaluator = 
-		new jsrepl.lisp.LispEvaluator();
+		new jsrepl.lisp.LispEvaluator(
+			_lispLogFn);
 
 	function getEvaluator() {
 		if(lang_js.checked) {

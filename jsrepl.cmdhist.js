@@ -1,6 +1,7 @@
 // ** Command history store and scroll logic **
 //
-var jsrepl = jsrepl || {};
+jsrepl = jsrepl || {};
+
 jsrepl.cmdhist = function() {
 	var currentHistoryIndex = 0;
 	var historyCommands = [];

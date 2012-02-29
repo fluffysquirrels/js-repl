@@ -1,6 +1,6 @@
 // ** JavaScript object pretty printer **
 
-var jsrepl = jsrepl || {}
+jsrepl = jsrepl || {}
 
 jsrepl.pp = function() {
 	var indent = "    ";
@@ -10,14 +10,14 @@ jsrepl.pp = function() {
 	}
 
 	function prettyPrintInternal(obj, linePrefix, recDepthLeft) {
-		var objTypeStr = typeof(obj);
+		var objTypeStr = utils.getTypeOf(obj);
 		
 		var strOutput = linePrefix + "'" + obj + "' is " + objTypeStr;
 
-		if(	objTypeStr == "string"  ||
-			objTypeStr == "number"  ||
-			objTypeStr == "boolean" ||
-			objTypeStr == "undefined") {
+		if(	objTypeStr === "string"  ||
+			objTypeStr === "number"  ||
+			objTypeStr === "boolean" ||
+			objTypeStr === "undefined") {
 			
 			// No more output required for these
 			// primitive types.
@@ -41,7 +41,7 @@ jsrepl.pp = function() {
 				}
 
 				if(recDepthLeft <= 0) {
-					strOutput += linePrefix + indent + "'" + propKey + "' = '" + asString(propValue).substring(0, propValueMaxChars).replace(/\n/g, "\n" + linePrefix + indent + indent) + "' is " + typeof(propValue) + "\n";
+					strOutput += linePrefix + indent + "'" + propKey + "' = '" + asString(propValue).substring(0, propValueMaxChars).replace(/\n/g, "\n" + linePrefix + indent + indent) + "' is " + utils.getTypeOf(propValue) + "\n";
 				}
 				else {
 					strOutput += linePrefix + indent + propKey + " = \n" + prettyPrintInternal(propValue, linePrefix + indent + indent, recDepthLeft - 1);
