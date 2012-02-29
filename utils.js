@@ -9,9 +9,12 @@ utils = function(){
 		}
 
 		// typeof operator only told us obj was an
-		// object. Return the name of the object's 
+		// object. Return 'null' or the name of the object's 
 		// constructor, which may tell more.
-		
+		if(obj === null) {
+			return 'null';
+		}
+
 		return obj.constructor.name;
 	};
 
@@ -53,6 +56,28 @@ utils = function(){
 		});
 
 		return ret;
+	};
+
+	pub.cloneArray = function(arr) {
+		var ret = [];
+
+		pub.each(arr, function(elt) {
+			ret.push(elt);
+		});
+
+		return ret;
+	};
+
+	pub.assertType = function(name, value, expectedType) {
+		var actualType = pub.getTypeOf(value);
+
+		if(actualType !== expectedType) {
+			throw "Expected variable '" + name + "' to be of type " + expectedType + ", but it was '" + value + "', of type " + actualType;
+		}
+	}
+
+	pub.isIntegerString = function(str) {
+		return /^[0-9]+$/.test(str);
 	};
 
 	return pub;

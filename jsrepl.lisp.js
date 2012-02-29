@@ -76,23 +76,43 @@ jsrepl.lisp = function() {
 
 		if(exprType === "LispSymbol")
 		{
-			return priv._vars[expr.name];
+			var symbolValue = priv._vars[expr.name];
+			if(symbolValue === undefined) {
+				throw "There is no variable to take the value of with name '" + expr.name + "'.";
+			}
+
+			return symbolValue;
 		}
-		
-		if(exprType === "LispExpression") {
-			throw "Evaluating functions is not yet supported."
-		
-			// assert(expr is array)
-			if(expr.length === 0) {
+		else if(exprType === "number") {
+			return expr;
+		}
+		else if(exprType === "LispExpression") {
+			var exprArray = expr.list;
+
+			if(exprArray.length === 0) {
 				throw "Cannot evaluate empty expression";
 			}
-			else if (expr.length === 1) {
-				
-			}
+
+			var funcName = exprArray[0];
+			var funcArgDefinitions = utils.cloneArray(exprArray).splice(1);
+			
+			var funcArgs =
+				utils.map(
+					funcArgDefinitions,
+					priv._this.evalOneExpr);
+
+
+			var func = priv._vars[funcName];
+			var funcType = utils.getTypeOf(func);
+
+			utils.assertType(funcName, func, "LispFunction");
+
+			var result = func.func.apply(funcArgs);
+
+			return result;
 		}
 		else {
-			throw expr;
-			throw "Cannot eval object '" + expr + "' of unknown type " + typeof(expr);
+			throw "Cannot eval object '" + expr + "' of unknown type " + utils.getTypeOf(expr);
 		}
 	}
 
@@ -110,6 +130,11 @@ jsrepl.lisp = function() {
 				utils.join(" ", this.list) +
 				")";
 		}
+	}
+
+	function LispFunction(func) {
+		utils.assertType("func", func, "function");
+		this.func = func;
 	}
 
 	function LispEvaluator_read(priv,str) {
@@ -159,9 +184,18 @@ jsrepl.lisp = function() {
 		var currToken = emptyCurrToken;
 		
 		function pushCurrToken() {
-			// Assume all tokens are symbols for now.
-			var tokenObject = new LispSymbol(currToken);
+			var tokenObject;
 			
+			if(utils.isIntegerString(currToken)) {
+				tokenObject = parseInt(currToken);
+			}
+			else if(isSymbolString(currToken)) {
+				tokenObject = new LispSymbol(currToken);
+			}
+			else {
+				throw "Unrecognised token: '" + currToken + "'";
+			}
+
 			tokens.push(tokenObject);
 			currToken = emptyCurrToken;
 		}
@@ -196,6 +230,10 @@ jsrepl.lisp = function() {
 		priv.debugLog("tokenise() parsed tokens: '" + tokens + "'");
 		return tokens;
 	} // function tokenise
+
+	function isSymbolString(str) {
+		return /[a-z=_+*?!<>/\-][a-z=_+*?!<>/\-0-9]*/i.test(str);
+	}
 
 	function isWhiteSpace(ch) {
 		return 	ch === " "  ||
