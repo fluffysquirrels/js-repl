@@ -1,4 +1,5 @@
 // Required : "utils.js"
+// Required : "jsrepl.pp.js"
 
 var jsrepl = jsrepl || {};
 
@@ -16,7 +17,9 @@ jsrepl.lisp = function() {
 		priv["debugLog"] = this.bindMethod(priv, LispEvaluator_debugLog);
 		priv["tokenise"] = this.bindMethod(priv, LispEvaluator_tokenise);
 
+		// * Set initial _vars *
 		priv._vars["hello"] = "world!";
+		priv._vars["+"] = new LispFunction(Lib_plus);
 
 		this.readEval =
 			this.bindMethod(priv, LispEvaluator_readEval);
@@ -94,47 +97,27 @@ jsrepl.lisp = function() {
 			}
 
 			var funcName = exprArray[0];
-			var funcArgDefinitions = utils.cloneArray(exprArray).splice(1);
+			var funcArgDefinitions = exprArray.slice(1);
 			
 			var funcArgs =
 				utils.map(
 					funcArgDefinitions,
 					priv._this.evalOneExpr);
 
-
 			var func = priv._vars[funcName];
 			var funcType = utils.getTypeOf(func);
 
 			utils.assertType(funcName, func, "LispFunction");
 
-			var result = func.func.apply(funcArgs);
+			priv.debugLog("Running " + funcName + " with args:\n" + jsrepl.pp.prettyPrint(funcArgs));
+
+			var result = func.func.apply(this, funcArgs);
 
 			return result;
 		}
 		else {
 			throw "Cannot eval object '" + expr + "' of unknown type " + utils.getTypeOf(expr);
 		}
-	}
-
-	function LispSymbol(name) {
-		this.name = name;
-		this.toString = function() {
-			return name;
-		};
-	}
-
-	function LispExpression(list) {
-		this.list = list || [];
-		this.toString = function() {
-			return "(" +
-				utils.join(" ", this.list) +
-				")";
-		}
-	}
-
-	function LispFunction(func) {
-		utils.assertType("func", func, "function");
-		this.func = func;
 	}
 
 	function LispEvaluator_read(priv,str) {
@@ -231,6 +214,19 @@ jsrepl.lisp = function() {
 		return tokens;
 	} // function tokenise
 
+	// ** Library functions **
+
+	function Lib_plus() {
+		var ret = 0;
+
+		utils.each(arguments, function(elt) {
+			utils.assertType("argument for +:", elt, "number");
+			ret += elt;
+		});
+
+		return ret;
+	}
+
 	function isSymbolString(str) {
 		return /[a-z=_+*?!<>/\-][a-z=_+*?!<>/\-0-9]*/i.test(str);
 	}
@@ -241,6 +237,31 @@ jsrepl.lisp = function() {
 				ch === "\t" ||
 				ch === "\r";
 	}
+
+	// ** Types ** //
+
+	function LispSymbol(name) {
+		this.name = name;
+		this.toString = function() {
+			return name;
+		};
+	}
+
+	function LispExpression(list) {
+		this.list = list || [];
+		this.toString = function() {
+			return "(" +
+				utils.join(" ", this.list) +
+				")";
+		}
+	}
+
+	function LispFunction(func) {
+		utils.assertType("func", func, "function");
+		this.func = func;
+	}
+
+	// ** /Types ** //
 
 	var pub = {
 		LispEvaluator: LispEvaluator
