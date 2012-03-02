@@ -19,7 +19,8 @@ function LispEvaluator(logFn) {
 		"+": 		new LispFunction(Lib_plus),
 		"*": 		new LispFunction(Lib_multiply),
 		"set":		new LispMacro(Lib_set),
-		"quot":		new LispMacro(Lib_quot)
+		"quot":		new LispMacro(Lib_quot),
+		"func":		new LispMacro(Lib_function)
 	};
 
 	// Vars >>
@@ -82,11 +83,7 @@ function LispEvaluator(logFn) {
 			}
 
 			var firstEltType = utils.getTypeOf(exprArray[0]);
-
-			if(firstEltType === "LispSymbol" && exprArray[0].name === functionDefinitionKeyword) {
-				return createLispFunctionFromExpression(scope, expr);
-			}
-
+			
 			var firstValue =
 				evalOneExpr(scope, exprArray[0]);
 
@@ -222,19 +219,15 @@ function LispEvaluator(logFn) {
 		return scope;
 	}
 
-	function createLispFunctionFromExpression(defnScope, expr) {
-		utils.assertType("expr", expr, "LispExpression");
+	// ** Library functions **
 
-		if(expr.list.length < 3) {
-			throw "Function expressions must contain at least 3 items";
+	function Lib_function(defnScope, args) {
+		if(args.length < 2) {
+			throw "Function definitions must have at least 2 arguments";
 		}
 
-		if(expr.list[0].name !== functionDefinitionKeyword) {
-			throw "Function expression started with '" + expr.list[0] + "', not the function definition keyword '" + functionDefinitionKeyword + "'.";
-		}
-
-		var argNames = expr.list[1];
-		var funcBody = expr.list.slice(2);
+		var argNames = args[0];
+		var funcBody = args.slice(1);
 
 		utils.assertType("argNames", argNames, "LispExpression");
 
@@ -261,10 +254,6 @@ function LispEvaluator(logFn) {
 
 		return new LispFunction(func);
 	}
-
-	var functionDefinitionKeyword = "func";
-
-	// ** Library functions **
 
 	function Lib_plus(scope, args) {
 		var ret = 0;
