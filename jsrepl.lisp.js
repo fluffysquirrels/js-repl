@@ -5,36 +5,40 @@ var jsrepl = jsrepl || {};
 
 jsrepl.lisp = function() {
 
-	function LispEvaluator(logFn) {
-		this.bindMethod = bindMethod;
-		
-		var priv = {};	
-		
-		priv["_globalScopeFrame"] = new LispScopeFrame(); 
-		priv["_this"] = this; 
-		priv["_debugLogging"] = true; 
-		priv["logFn"] = logFn; 
-		priv["debugLog"] = this.bindMethod(priv, LispEvaluator_debugLog);
-		priv["tokenise"] = this.bindMethod(priv, LispEvaluator_tokenise);
-		priv["createNewScope"] = this.bindMethod(priv, LispEvaluator_createNewScope);
-		priv.evalOneExpr = this.bindMethod(priv, LispEvaluator_evalOneExpr);
+function LispEvaluator(logFn) {
+	this.bindMethod = bindMethod;
+	
+	var priv = {};	
+	
+	priv._globalScopeFrame = new LispScopeFrame(); 
+	priv._this = this; 
+	priv._debugLogging = true; 
+	priv.logFn = logFn; 
+	priv.debugLog = this.bindMethod(priv, LispEvaluator_debugLog);
+	priv.tokenise = this.bindMethod(priv, LispEvaluator_tokenise);
+	priv.createNewScope = this.bindMethod(priv, LispEvaluator_createNewScope);
+	priv.evalOneExpr = this.bindMethod(priv, LispEvaluator_evalOneExpr);
 
-		priv.createLispFunctionFromExpression = this.bindMethod(priv, LispEvaluator_createLispFunctionFromExpression);
+	priv.createLispFunctionFromExpression = this.bindMethod(priv, LispEvaluator_createLispFunctionFromExpression);
 
-		// * Set initial global vars *
-		priv._globalScopeFrame.vars["hello"] = "world!";
-		priv._globalScopeFrame.vars["+"] = new LispFunction(Lib_plus);
-		priv._globalScopeFrame.vars["*"] = new LispFunction(Lib_multiply);
+	// * Set initial global vars *
+	priv._globalScopeFrame.vars = {
+		"hello": 	"world!",
+		"+": 		new LispFunction(Lib_plus),
+		"*": 		new LispFunction(Lib_multiply),
+		"set":		new LispMacro(Lib_set),
+		"quot":		new LispMacro(Lib_quot)
+	};
 
-		this.readEval =
-			this.bindMethod(priv, LispEvaluator_readEval);
-		this.eval =
-			this.bindMethod(priv, LispEvaluator_eval);
-		this.read =
-			this.bindMethod(priv, LispEvaluator_read);
+	this.readEval =
+		this.bindMethod(priv, LispEvaluator_readEval);
+	this.eval =
+		this.bindMethod(priv, LispEvaluator_eval);
+	this.read =
+		this.bindMethod(priv, LispEvaluator_read);
 
-		delete this.bindMethod;
-	}
+	delete this.bindMethod;
+
 
 	function bindMethod(priv, method) {
 		return function() {
@@ -106,24 +110,37 @@ jsrepl.lisp = function() {
 				throw "Cannot evaluate empty expression";
 			}
 
-			var funcName = exprArray[0];
-			var funcArgDefinitions = exprArray.slice(1);
-			
-			var funcArgs =
+			var firstEltType = utils.getTypeOf(exprArray[0]);
+
+			if(firstEltType === "LispSymbol" && exprArray[0].name === functionDefinitionKeyword) {
+				return priv.createLispFunctionFromExpression(scope, expr);
+			}
+
+			var firstValue =
+				priv.evalOneExpr(scope, exprArray[0]);
+
+			if(utils.getTypeOf(firstValue) === "LispMacro") {
+				return firstValue.apply(
+							scope,
+							exprArray.slice(1));
+			}
+
+			var exprValues =
 				utils.map(
-					funcArgDefinitions,
-					function(argDefn) {
-						return priv.evalOneExpr(scope, argDefn);
+					exprArray,
+					function(exprDefn) {
+						return priv.evalOneExpr(scope, exprDefn);
 					});
 
-			var func = scope.lookUp(funcName);
-			var funcType = utils.getTypeOf(func);
+			var funcDefn = exprArray[0];
+			var func = exprValues[0];
+			var funcArgs = exprValues.slice(1);
 
-			utils.assertType(funcName, func, "LispFunction");
+			utils.assertType("func", func, "LispFunction");
 
-			priv.debugLog("Running " + funcName + " with args:\n" + jsrepl.pp.prettyPrint(funcArgs));
+			priv.debugLog("Running " + funcDefn + " with args:\n" + jsrepl.pp.prettyPrint(funcArgs));
 
-			var result = func.func.apply(this, funcArgs);
+			var result = func.apply(scope, funcArgs);
 
 			return result;
 		}
@@ -203,7 +220,9 @@ jsrepl.lisp = function() {
 					pushCurrToken();
 				}
 			}
-			else if(ch === "(" || ch === ")") {
+			else if(ch === "(" ||
+					ch === ")" ||
+					ch === "\\") {
 				if(currToken !== emptyCurrToken) {
 					pushCurrToken();
 				}
@@ -239,53 +258,47 @@ jsrepl.lisp = function() {
 			throw "Function expressions must contain at least 3 items";
 		}
 
-		if(expr.list[0] !== functionDefinitionKeyword) {
+		if(expr.list[0].name !== functionDefinitionKeyword) {
 			throw "Function expression started with '" + expr.list[0] + "', not the function definition keyword '" + functionDefinitionKeyword + "'.";
 		}
 
-		var argsDefnList = expr.list[1];
+		var argNames = expr.list[1];
 		var funcBody = expr.list.slice(2);
 
-		utils.assertType("argsDefnList", argsDefnList, "LispExpression");
+		utils.assertType("argNames", argNames, "LispExpression");
 
-		var numArgsRequired = argsDefnList.list.length;
+		var numArgsRequired = argNames.list.length;
 
-		var func = function() {
-			if(numArgsRequired !== arguments.length) {
-				throw "Function required " + numArgsRequired + " args but received " + y + " args."
-			}
-		
+		var func = function(invocationScope, args) {
+			assertNumArgs(args, numArgsRequired);
+
 			var execScope = defnScope.copy();
 
 			// Push function evaluation scope frame.
 			execScope.pushFrame(new LispScopeFrame());
 			
-			utils.each(argsDefnList.list, function(argDefn, ix) {
-				utils.assertType("argDefn", argDefn, "LispExpression");
-				if(argDefn.list.length !== 2) {
-					throw "Function argument definitions must contain two elements; received: '" + argDefn + "'.";
-				}
+			utils.each(argNames.list, function(argName, ix) {
+				utils.assertType("argName", argName, "LispSymbol");
 
-				var argName = argDefn.list[0];
-				var argValue = arguments[ix];
+				var argValue = args[ix];
 
-				execScope.set(argName, argValue);
+				execScope.set(argName.name, argValue);
 			});
-
-			return priv.eval(execScope, funcBody);
+			
+			return priv._this.eval(funcBody, execScope);
 		};
 
 		return new LispFunction(func);
 	}
 
-	var functionDefinitionKeyword = "\\";
+	var functionDefinitionKeyword = "func";
 
 	// ** Library functions **
 
-	function Lib_plus() {
+	function Lib_plus(scope, args) {
 		var ret = 0;
 
-		utils.each(arguments, function(elt) {
+		utils.each(args, function(elt) {
 			utils.assertType("argument for +:", elt, "number");
 			ret += elt;
 		});
@@ -293,18 +306,43 @@ jsrepl.lisp = function() {
 		return ret;
 	}
 
-	function Lib_multiply() {
+	function Lib_multiply(scope, args) {
 		var ret = 1;
 
-		utils.each(arguments, function(elt) {
+		utils.each(args, function(elt) {
 			utils.assertType("argument for +:", elt, "number");
 			ret *= elt;
 		});
 
 		return ret;
 	}
-	
+
+	function Lib_set(scope, args) {
+		assertNumArgs(args, 2);
+
+		var varName 		= args[0];
+		var varValueDefn	= args[1];
+
+		utils.assertType("varName", varName, "LispSymbol");
+
+		var varValue = priv.evalOneExpr(scope, varValueDefn);
+
+		scope.setGlobal(varName.name, varValue);
+		return varValue;
+	}
+
+	function Lib_quot(scope, args) {
+		var ret = new LispExpression(args);
+		return ret;
+	}
+
 	// ** / Library functions **
+
+	function assertNumArgs(args, numArgsRequired) {
+		if(numArgsRequired !== args.length) {
+			throw "Function required " + numArgsRequired + " args but received " + args.length + " args.";
+		}
+	}
 
 	function isSymbolString(str) {
 		return /[a-z=_+*?!<>/\-][a-z=_+*?!<>/\-0-9]*/i.test(str);
@@ -337,26 +375,56 @@ jsrepl.lisp = function() {
 
 	function LispFunction(func) {
 		utils.assertType("func", func, "function");
-		this.func = func;
+		var _func = func;
+		this.apply = function(scope, args) {
+			return _func(scope, args);
+		}
+	}
+
+	function LispMacro(func) {
+		utils.assertType("func", func, "function");
+		var _func = func;
+		this.apply = function(scope, args) {
+			return _func(scope, args);
+		}
 	}
 
 	function LispScope() {
 		var frames = [];
-
-		this.set = function(varName, varValue) {
-			if(frames.length === 0) {
-				throw "Cannot set variable '" + varName + "' in a scope with no frames.";
-			}
-
-			var topFrame = frames[frames.length - 1];
-			topFrame.vars[varName] = varValue;
-		};
 
 		this.pushFrame = function(frame) {
 			utils.assertType("frame", frame, "LispScopeFrame");
 
 			frames.push(frame);
 		};
+
+		this.copy = function() {
+			var ret = new LispScope();
+
+			utils.each(frames, function(frame) {
+				ret.pushFrame(frame);
+			});
+
+			return ret;
+		};
+
+		this.set = function(varName, varValue) {
+			assertHasFrames();
+			var topFrame = frames[frames.length - 1];
+			topFrame.vars[varName] = varValue;
+		};
+
+		this.setGlobal = function(varName, varValue) {
+			assertHasFrames();
+			var bottomFrame = frames[0];
+			bottomFrame.vars[varName] = varValue;
+		};
+
+		function assertHasFrames() {
+			if(frames.length === 0) {
+				throw "Cannot set variable in a scope with no frames.";
+			}
+		}
 
 		this.lookUp = function(varName) {
 			var ret;
@@ -387,6 +455,8 @@ jsrepl.lisp = function() {
 	}
 
 	// ** / Types ** //
+
+}
 
 	var pub = {
 		LispEvaluator: LispEvaluator
