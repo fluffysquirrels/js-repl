@@ -2,6 +2,8 @@
 <html>
 <head>
 	<script type="text/javascript" src="utils.js"></script>
+	<script type="text/javascript" src="ioc.js"></script>
+	<script type="text/javascript" src="jsrepl.log.js"></script>
 	<script type="text/javascript" src="jsrepl.lisp.js"></script>
 	<script type="text/javascript" src="jsrepl.pp.js"></script>
 	<script type="text/javascript" src="jsrepl.cmdhist.js"></script>
@@ -43,7 +45,7 @@
 		jsrepl.main.onLoad();
 		jsrepl.main.addCustomBtn("var ib = inputBox; var o = { end: ib.selectionEnd, start: ib.selectionStart, length: ib.value.length }; o", "selection");
 		jsrepl.main.addCustomBtn("__err", "err");
-		jsrepl.main.addOutput("End of body script block done.");
+		jsrepl.log.addOutput("End of body script block done.");
 	</script>
 </body>
 </html>

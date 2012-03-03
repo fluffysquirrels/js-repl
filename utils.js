@@ -1,4 +1,4 @@
-utils = function(){
+var utils = function(){
 	var pub = {};
 	
 	pub.getTypeOf = function(obj) {

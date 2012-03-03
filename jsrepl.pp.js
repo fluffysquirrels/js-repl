@@ -1,6 +1,6 @@
 // ** JavaScript object pretty printer **
 
-jsrepl = jsrepl || {};
+var jsrepl = jsrepl || {};
 
 jsrepl.pp = function() {
 	var indent = "    ";

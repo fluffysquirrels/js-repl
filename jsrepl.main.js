@@ -1,9 +1,11 @@
+//
+// Required : "jsrepl.log.js"
 // Required : "jsrepl.pp.js"
 // Required : "jsrepl.cmdhist.js"
 // Required : "utils.err.js"
 // Required : "jsrepl.lisp.js"
 
-jsrepl = jsrepl || {};
+var jsrepl = jsrepl || {};
 
 jsrepl.main = function() {
 	var logKeys = false;
@@ -11,30 +13,12 @@ jsrepl.main = function() {
 	
 	var _withErrorHandler =
 		function() {
-			var errorHandler = new utils.err.ErrorHandler(addOutput);
+			var errorHandler =
+				new utils.err.ErrorHandler(jsrepl.log.addOutput);
 			return function(fn) {
 				return errorHandler.withErrorHandler(fn);
 			};
 		}();
-
-	// ** Output view **
-	
-	var outputMaxChars = 30000
-
-	function addOutput(strOutput) {
-		var newOutput = strOutput + "\n" + getOutput();
-		setOutput(newOutput);
-	}
-
-	function getOutput() {
-		var outDiv = document.getElementById("output");
-		return outDiv.innerText;
-	}
-
-	function setOutput(strOutput) {
-		var outDiv = document.getElementById("output");
-		outDiv.innerText = strOutput.substring(0, outputMaxChars);
-	}
 
 	// ** Event handlers **
 
@@ -53,7 +37,7 @@ jsrepl.main = function() {
 
 			lang_js.checked = true;
 
-			addOutput("onLoad done");
+			jsrepl.log.addOutput("onLoad done");
 		});
 	}
 
@@ -61,8 +45,8 @@ jsrepl.main = function() {
 		var inputBox = document.getElementById("inputBox");
 		var input = inputBox.value;
 
-		addOutput("");
-		addOutput("> " + input);
+		jsrepl.log.addOutput("");
+		jsrepl.log.addOutput("> " + input);
 
 		var outputString;
 
@@ -77,7 +61,7 @@ jsrepl.main = function() {
 			__last = output;
 
 			var outputString = jsrepl.pp.prettyPrint(output);
-			addOutput(outputString);
+			jsrepl.log.addOutput(outputString);
 		});
 
 		return false;
@@ -91,7 +75,7 @@ jsrepl.main = function() {
 
 	var _lispLogFn = function(msgString) {
 		var logLine = "LL: " + msgString;
-		addOutput(logLine);
+		jsrepl.log.addOutput(logLine);
 	}
 
 	var _lispEvaluator = 
@@ -231,7 +215,7 @@ jsrepl.main = function() {
 				selectionEnd	: inputBox.selectionEnd,
 				textBoxValue	: inputBox.value
 			}
-			addOutput(jsrepl.pp.prettyPrint(loggedProperties));
+			jsrepl.log.addOutput(jsrepl.pp.prettyPrint(loggedProperties));
 		});
 	}
 
@@ -257,7 +241,7 @@ jsrepl.main = function() {
 		var wrappedClickHandler = function() {
 			_withErrorHandler(
 				function() {
-					jsrepl.main.addOutput(
+					jsrepl.log.addOutput(
 						jsrepl.pp.prettyPrint(
 							clickHandlerFn()));
 				});
@@ -290,7 +274,6 @@ jsrepl.main = function() {
 	
 	var pub = {
 		onLoad 				: onLoad,
-		addOutput 			: addOutput,
 		addCustomBtn		: addCustomBtn,
 		withErrorHandler 	: _withErrorHandler
 	};

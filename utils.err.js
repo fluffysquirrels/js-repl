@@ -1,5 +1,5 @@
 // ** Error handling **
-utils = utils || {};
+var utils = utils || {};
 
 utils.err = function() {
 
