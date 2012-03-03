@@ -1,3 +1,6 @@
+var jsrepl = jsrepl || {};
+jsrepl.lisp = jsrepl.lisp || {};
+
 jsrepl.lisp.LispScope =
 	function LispScope() {
 		var frames = [];
