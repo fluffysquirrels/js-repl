@@ -73,14 +73,8 @@ jsrepl.main = function() {
 			}
 		};
 
-	var _lispLogFn = function(msgString) {
-		var logLine = "LL: " + msgString;
-		jsrepl.log.addOutput(logLine);
-	}
-
 	var _lispEvaluator = 
-		new jsrepl.lisp.LispEvaluator(
-			_lispLogFn);
+		new jsrepl.lisp.LispEvaluator();
 
 	function getEvaluator() {
 		if(lang_js.checked) {

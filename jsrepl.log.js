@@ -33,7 +33,9 @@ jsrepl.log = function() {
 		};
 		
 		this.debug = function(str) {
-			writeMessage("DEBUG", str);
+			if(_debugLogging) {
+				writeMessage("DEBUG", str);
+			}
 		};
 
 		this.withDebug = function(enabled) {

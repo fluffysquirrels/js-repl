@@ -5,13 +5,13 @@ var jsrepl = jsrepl || {};
 
 jsrepl.lisp = function() {
 
-function LispEvaluator(logFn) {
+	var _logger = ioc.createLogger("lisp").withDebug(true)
+
+function LispEvaluator() {
 	// << Vars
 	
 	var _globalScopeFrame = new LispScopeFrame(); 
 	var _this = this; 
-	var _debugLogging = true; 
-	var _logFn = logFn; 
 
 	// * Set initial global vars *
 	_globalScopeFrame.vars = {
@@ -25,14 +25,6 @@ function LispEvaluator(logFn) {
 	};
 
 	// Vars >>
-
-	function debugLog(msgString) {
-		if(_debugLogging !== true) {
-			return;
-		}
-
-		_logFn(msgString);
-	}
 
 	this.readEval = function(cmdString) {
 		var exprs = this.read(cmdString);
@@ -62,7 +54,7 @@ function LispEvaluator(logFn) {
 	function evalOneExpr(scope, expr) {
 		var exprType = utils.getTypeOf(expr);
 		
-		debugLog("evalOneExpr called on '" + expr + "', of type " + exprType);
+		_logger.debug("evalOneExpr called on '" + expr + "', of type " + exprType);
 
 		if(exprType === "LispSymbol")
 		{
@@ -107,7 +99,7 @@ function LispEvaluator(logFn) {
 
 			utils.assertType("func", func, "LispFunction");
 
-			debugLog("Running " + funcDefn + " with args:\n" + jsrepl.pp.prettyPrint(funcArgs));
+			_logger.debug("Running " + funcDefn + " with args:\n" + jsrepl.pp.prettyPrint(funcArgs));
 
 			var result = func.apply(scope, funcArgs);
 
@@ -154,7 +146,7 @@ function LispEvaluator(logFn) {
 		// into an array.
 		var exprs = nestLevels[0].list;
 
-		debugLog("parsed: " + exprs.toString());
+		_logger.debug("parsed: " + exprs.toString());
 
 		return exprs;
 	} // function read
@@ -210,7 +202,7 @@ function LispEvaluator(logFn) {
 			pushCurrToken();
 		}
 		
-		debugLog("tokenise() parsed tokens: '" + tokens + "'");
+		_logger.debug("tokenise() parsed tokens: '" + tokens + "'");
 		return tokens;
 	} // function tokenise
 
@@ -438,11 +430,9 @@ function LispEvaluator(logFn) {
 
 }
 
-
-
 	var pub = {
 		LispEvaluator: LispEvaluator,
-		logger: ioc.createLogger("lisp").withDebug(true)
+		logger: _logger
 	};
 
 	return pub;
