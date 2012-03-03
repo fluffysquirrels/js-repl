@@ -84,5 +84,11 @@ var utils = function(){
 		return /^[0-9]+$/.test(str);
 	};
 
+	pub.assertNumArgs = function(args, numArgsRequired) {
+		if(numArgsRequired !== args.length) {
+			throw "Function required " + numArgsRequired + " args but received " + args.length + " args.";
+		}
+	}
+
 	return pub;
 }();

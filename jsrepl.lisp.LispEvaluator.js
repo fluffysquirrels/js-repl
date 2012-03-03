@@ -137,7 +137,7 @@ function LispEvaluator() {
 		var numArgsRequired = argNames.list.length;
 
 		var func = function(invocationScope, args) {
-			assertNumArgs(args, numArgsRequired);
+			utils.assertNumArgs(args, numArgsRequired);
 
 			var execScope = defnScope.copy();
 
@@ -199,7 +199,7 @@ function LispEvaluator() {
 				scope,
 				args,
 				setFn) {
-		assertNumArgs(args, 2);
+		utils.assertNumArgs(args, 2);
 
 		var varName 		= args[0];
 		var varValueDefn	= args[1];
@@ -216,13 +216,4 @@ function LispEvaluator() {
 		var ret = new jsrepl.lisp.LispExpression(args);
 		return ret;
 	}
-
-	// ** / Library functions **
-
-	function assertNumArgs(args, numArgsRequired) {
-		if(numArgsRequired !== args.length) {
-			throw "Function required " + numArgsRequired + " args but received " + args.length + " args.";
-		}
-	}
-
 }
