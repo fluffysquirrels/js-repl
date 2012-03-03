@@ -18,7 +18,8 @@ function LispEvaluator(logFn) {
 		"hello": 	"world!",
 		"+": 		new LispFunction(Lib_plus),
 		"*": 		new LispFunction(Lib_multiply),
-		"set":		new LispMacro(Lib_set),
+		"setg":		new LispMacro(Lib_setGlobal),
+		"setl":		new LispMacro(Lib_setLocal),
 		"quot":		new LispMacro(Lib_quot),
 		"func":		new LispMacro(Lib_function)
 	};
@@ -277,7 +278,25 @@ function LispEvaluator(logFn) {
 		return ret;
 	}
 
-	function Lib_set(scope, args) {
+	function Lib_setGlobal(scope, args) {
+		return Lib_setInternal(
+				scope,
+				args,
+				scope.setGlobal);
+	}
+
+	function Lib_setLocal(scope, args) {
+		return Lib_setInternal(
+				scope,
+				args,
+				scope.set);
+	}
+
+
+	function Lib_setInternal(
+				scope,
+				args,
+				setFn) {
 		assertNumArgs(args, 2);
 
 		var varName 		= args[0];
@@ -287,7 +306,7 @@ function LispEvaluator(logFn) {
 
 		var varValue = evalOneExpr(scope, varValueDefn);
 
-		scope.setGlobal(varName.name, varValue);
+		setFn(varName.name, varValue);
 		return varValue;
 	}
 
