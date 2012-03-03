@@ -217,6 +217,7 @@ function LispEvaluator(logFn) {
 	function createNewScope() {
 		var scope = new LispScope();
 		scope.pushFrame(_globalScopeFrame);
+		scope.pushFrame(new LispScopeFrame());
 		return scope;
 	}
 
