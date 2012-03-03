@@ -8,5 +8,4 @@ Break up jsrepl.lisp.cs
    - parser
    - eval
  - Must
-   - Expose logging globally
    - A local logger per component

@@ -25,6 +25,8 @@ jsrepl.log = function() {
 
 	var Logger = function(componentName) {
 		var _componentName = componentName;
+		var _debugLogging = false;
+		var _this = this;
 
 		this.info = function(str) {
 			writeMessage(" INFO", str);
@@ -33,6 +35,11 @@ jsrepl.log = function() {
 		this.debug = function(str) {
 			writeMessage("DEBUG", str);
 		};
+
+		this.withDebug = function(enabled) {
+			_debugLogging = enabled;
+			return _this;
+		}
 		
 		function writeMessage(logLevelStr, msgContentStr) {
 			var msg = getMessage(logLevelStr, msgContentStr);

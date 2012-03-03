@@ -438,8 +438,11 @@ function LispEvaluator(logFn) {
 
 }
 
+
+
 	var pub = {
-		LispEvaluator: LispEvaluator
+		LispEvaluator: LispEvaluator,
+		logger: ioc.createLogger("lisp").withDebug(true)
 	};
 
 	return pub;
