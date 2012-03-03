@@ -1,27 +1,31 @@
 // Required : "utils.js"
 // Required : "jsrepl.pp.js"
+// Required : "jsrepl.lisp.langTypes.js"
+// Required : "jsrepl.lisp.scopeTypes.js"
 
 var jsrepl = jsrepl || {};
 
-jsrepl.lisp = function() {
+jsrepl.lisp = jsrepl.lisp || {}
 
-	var _logger = ioc.createLogger("lisp").withDebug(true)
+jsrepl.lisp.logger  = ioc.createLogger("lisp").withDebug(true);
 
-function LispEvaluator() {
+jsrepl.lisp.LispEvaluator =
+function () {
 	// << Vars
 	
-	var _globalScopeFrame = new LispScopeFrame(); 
-	var _this = this; 
+	var _globalScopeFrame = new jsrepl.lisp.LispScopeFrame(); 
+	var _this = this;
+	var _logger = jsrepl.lisp.logger;
 
 	// * Set initial global vars *
 	_globalScopeFrame.vars = {
 		"hello": 	"world!",
-		"+": 		new LispFunction(Lib_plus),
-		"*": 		new LispFunction(Lib_multiply),
-		"setg":		new LispMacro(Lib_setGlobal),
-		"setl":		new LispMacro(Lib_setLocal),
-		"quot":		new LispMacro(Lib_quot),
-		"func":		new LispMacro(Lib_function)
+		"+": 		new jsrepl.lisp.LispFunction(Lib_plus),
+		"*": 		new jsrepl.lisp.LispFunction(Lib_multiply),
+		"setg":		new jsrepl.lisp.LispMacro(Lib_setGlobal),
+		"setl":		new jsrepl.lisp.LispMacro(Lib_setLocal),
+		"quot":		new jsrepl.lisp.LispMacro(Lib_quot),
+		"func":		new jsrepl.lisp.LispMacro(Lib_function)
 	};
 
 	// Vars >>
@@ -113,14 +117,14 @@ function LispEvaluator() {
 	this.read = function(str) {
 		var tokens = tokenise(str);
 
-		var nestLevels = [new LispExpression()];
+		var nestLevels = [new jsrepl.lisp.LispExpression()];
 
 		for(var ixToken = 0; ixToken < tokens.length; ixToken++) 
 		{
 			var currToken = tokens[ixToken];
 
 			if(currToken === "(") {
-				nestLevels.push(new LispExpression());
+				nestLevels.push(new jsrepl.lisp.LispExpression());
 			}
 			else if(currToken === ")") {
 				if(nestLevels.length === 1) {
@@ -163,7 +167,7 @@ function LispEvaluator() {
 				tokenObject = parseInt(currToken);
 			}
 			else if(isSymbolString(currToken)) {
-				tokenObject = new LispSymbol(currToken);
+				tokenObject = new jsrepl.lisp.LispSymbol(currToken);
 			}
 			else {
 				throw "Unrecognised token: '" + currToken + "'";
@@ -207,9 +211,9 @@ function LispEvaluator() {
 	} // function tokenise
 
 	function createNewScope() {
-		var scope = new LispScope();
+		var scope = new jsrepl.lisp.LispScope();
 		scope.pushFrame(_globalScopeFrame);
-		scope.pushFrame(new LispScopeFrame());
+		scope.pushFrame(new jsrepl.lisp.LispScopeFrame());
 		return scope;
 	}
 
@@ -233,7 +237,7 @@ function LispEvaluator() {
 			var execScope = defnScope.copy();
 
 			// Push function evaluation scope frame.
-			execScope.pushFrame(new LispScopeFrame());
+			execScope.pushFrame(new jsrepl.lisp.LispScopeFrame());
 			
 			utils.each(argNames.list, function(argName, ix) {
 				utils.assertType("argName", argName, "LispSymbol");
@@ -246,7 +250,7 @@ function LispEvaluator() {
 			return _this.eval(funcBody, execScope);
 		};
 
-		return new LispFunction(func);
+		return new jsrepl.lisp.LispFunction(func);
 	}
 
 	function Lib_plus(scope, args) {
@@ -304,7 +308,7 @@ function LispEvaluator() {
 	}
 
 	function Lib_quot(scope, args) {
-		var ret = new LispExpression(args);
+		var ret = new jsrepl.lisp.LispExpression(args);
 		return ret;
 	}
 
@@ -326,114 +330,4 @@ function LispEvaluator() {
 				ch === "\t" ||
 				ch === "\r";
 	}
-
-	// ** Types ** //
-
-	function LispSymbol(name) {
-		this.name = name;
-		this.toString = function() {
-			return name;
-		};
-	}
-
-	function LispExpression(list) {
-		this.list = list || [];
-		this.toString = function() {
-			return "(" +
-				utils.join(" ", this.list) +
-				")";
-		}
-	}
-
-	function LispFunction(func) {
-		utils.assertType("func", func, "function");
-		var _func = func;
-		this.apply = function(scope, args) {
-			return _func(scope, args);
-		}
-	}
-
-	function LispMacro(func) {
-		utils.assertType("func", func, "function");
-		var _func = func;
-		this.apply = function(scope, args) {
-			return _func(scope, args);
-		}
-	}
-
-	function LispScope() {
-		var frames = [];
-
-		this.pushFrame = function(frame) {
-			utils.assertType("frame", frame, "LispScopeFrame");
-
-			frames.push(frame);
-		};
-
-		this.copy = function() {
-			var ret = new LispScope();
-
-			utils.each(frames, function(frame) {
-				ret.pushFrame(frame);
-			});
-
-			return ret;
-		};
-
-		this.set = function(varName, varValue) {
-			assertHasFrames();
-			var topFrame = frames[frames.length - 1];
-			topFrame.vars[varName] = varValue;
-		};
-
-		this.setGlobal = function(varName, varValue) {
-			assertHasFrames();
-			var bottomFrame = frames[0];
-			bottomFrame.vars[varName] = varValue;
-		};
-
-		function assertHasFrames() {
-			if(frames.length === 0) {
-				throw "Cannot set variable in a scope with no frames.";
-			}
-		}
-
-		this.lookUp = function(varName) {
-			var ret;
-
-			// Take the value from each frame, hence
-			// finishing with the value from the top frame
-			// that contains the variable.
-			utils.each(frames, function(frame) {
-				var frameVar = frame.vars[varName];
-				if(frameVar !== undefined) {
-					ret = frameVar;
-				}
-			});
-
-			if(ret === undefined) {
-				throw {
-					message: "Couldn't find variable '" + varName + "'.",
-					frames: frames
-				};
-			}
-
-			return ret;
-		};
-	}
-
-	function LispScopeFrame() {
-		this.vars = {};
-	}
-
-	// ** / Types ** //
-
 }
-
-	var pub = {
-		LispEvaluator: LispEvaluator,
-		logger: _logger
-	};
-
-	return pub;
-}();
