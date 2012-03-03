@@ -1,6 +1,6 @@
 // Required : "jsrepl.pp.js"
 // Required : "jsrepl.cmdhist.js"
-// Required : "jsrepl.err.js"
+// Required : "utils.err.js"
 // Required : "jsrepl.lisp.js"
 
 jsrepl = jsrepl || {};
@@ -11,7 +11,7 @@ jsrepl.main = function() {
 	
 	var _withErrorHandler =
 		function() {
-			var errorHandler = new jsrepl.err.ErrorHandler(addOutput);
+			var errorHandler = new utils.err.ErrorHandler(addOutput);
 			return function(fn) {
 				return errorHandler.withErrorHandler(fn);
 			};

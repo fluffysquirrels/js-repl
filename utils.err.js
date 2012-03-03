@@ -1,7 +1,7 @@
 // ** Error handling **
-jsrepl = jsrepl || {};
+utils = utils || {};
 
-jsrepl.err = function() {
+utils.err = function() {
 
 	function ErrorHandler(errorLogFn) {
 		utils.assertType("errorLogFn", errorLogFn, "function");
