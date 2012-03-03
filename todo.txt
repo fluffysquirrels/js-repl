@@ -1,0 +1,12 @@
+Fix setGlobal, setLocal to function differently.
+ - Add logging
+
+Break up jsrepl.lisp.cs
+ - Bits
+   - Core types
+   - Lib functions
+   - parser
+   - eval
+ - Must
+   - Expose logging globally
+   - A local logger per component

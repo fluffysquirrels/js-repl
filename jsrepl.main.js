@@ -251,7 +251,7 @@ jsrepl.main = function() {
 			clickHandlerFn = clickHandler;
 		}
 		else {
-			assertParameterType('clickHandler', clickHandler);
+			utils.assertType('clickHandler', clickHandler);
 		}
 
 		var wrappedClickHandler = function() {
@@ -263,7 +263,6 @@ jsrepl.main = function() {
 				});
 			return false;
 		};
-
 
 		var btn = document.createElement('input');
 		btn.type = 'submit';

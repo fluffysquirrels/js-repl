@@ -71,6 +71,10 @@ utils = function(){
 	pub.assertType = function(name, value, expectedType) {
 		var actualType = pub.getTypeOf(value);
 
+		if(!expectedType) {
+			throw "Variable '" + name + "' was '" + value + "', of unexpected type " + actualType;
+		}
+
 		if(actualType !== expectedType) {
 			throw "Expected variable '" + name + "' to be of type " + expectedType + ", but it was '" + value + "', of type " + actualType;
 		}
