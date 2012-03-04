@@ -67,7 +67,7 @@ function LispEvaluator() {
 		// eval all expressions, keeping last result
 		for(var ixExpr = 0; ixExpr < exprs.length; ixExpr++) {
 			var currExpr = exprs[ixExpr];
-			var currResult = this.evalOneExpr(scope, currExpr);
+			var currResult = evalOneExpr(scope, currExpr);
 			result = currResult;
 		}
 
@@ -101,7 +101,7 @@ function LispEvaluator() {
 			var firstEltType = utils.getTypeOf(exprArray[0]);
 			
 			var firstValue =
-				this.evalOneExpr(scope, exprArray[0]);
+				evalOneExpr(scope, exprArray[0]);
 
 			if(utils.getTypeOf(firstValue) === "LispMacro") {
 				return firstValue.apply(
@@ -113,7 +113,7 @@ function LispEvaluator() {
 				utils.map(
 					exprArray,
 					function(exprDefn) {
-						return this.evalOneExpr(scope, exprDefn);
+						return evalOneExpr(scope, exprDefn);
 					});
 
 			var funcDefn = exprArray[0];
@@ -132,8 +132,6 @@ function LispEvaluator() {
 			throw "Cannot eval object '" + expr + "' of unknown type " + utils.getTypeOf(expr);
 		}
 	}
-
-	this.evalOneExpr = evalOneExpr;
 	
 	function createNewScope() {
 		var scope = new jsrepl.lisp.LispScope();
@@ -194,7 +192,7 @@ function LispEvaluator() {
 	function Lib_minus(scope, args) {
 		assertTwoNumberArgs(args);
 		
-		return first - second;
+		return args[0] - args[1];
 	}
 
 	function Lib_multiply(scope, args) {
@@ -212,32 +210,32 @@ function LispEvaluator() {
 		assertTwoNumberArgs(args);
 
 		// NB: Let JavaScript runtime throw on divide by zero.
-		return first / second;
+		return args[0] / args[1];
 	}
 
 	function Lib_eq(scope, args) {
 		assertTwoNumberArgs(args);
-		return first === second;
+		return args[0] === args[1];
 	}
 
 	function Lib_gt(scope, args) {
 		assertTwoNumberArgs(args);
-		return first > second;
+		return args[0] > args[1];
 	}
 
 	function Lib_lt(scope, args) {
 		assertTwoNumberArgs(args);
-		return first < second;
+		return args[0] < args[1];
 	}
 
 	function Lib_ge(scope, args) {
 		assertTwoNumberArgs(args);
-		return first >= second;
+		return args[0] >= args[1];
 	}
 
 	function Lib_le(scope, args) {
 		assertTwoNumberArgs(args);
-		return first <= second;
+		return args[0] <= args[1];
 	}
 
 	function assertTwoNumberArgs(args) {

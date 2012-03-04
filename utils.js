@@ -81,7 +81,7 @@ var utils = function(){
 	}
 
 	pub.isIntegerString = function(str) {
-		return /^[0-9]+$/.test(str);
+		return /^(\+|\-)?[0-9]+$/.test(str);
 	};
 
 	pub.assertNumArgs = function(args, numArgsRequired) {
