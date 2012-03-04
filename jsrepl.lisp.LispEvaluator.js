@@ -21,12 +21,30 @@ function LispEvaluator() {
 	// * Set initial global vars *
 	_globalScopeFrame.vars = {
 		"hello": 	"world!",
+		"true":		true,
+		"false":	false,
+
 		"+": 		new jsrepl.lisp.LispFunction(Lib_plus),
+		"-": 		new jsrepl.lisp.LispFunction(Lib_minus),
 		"*": 		new jsrepl.lisp.LispFunction(Lib_multiply),
+		"/": 		new jsrepl.lisp.LispFunction(Lib_divide),
+
+		"=":		new jsrepl.lisp.LispFunction(Lib_eq),
+		"<=":		new jsrepl.lisp.LispFunction(Lib_le),
+		">=":		new jsrepl.lisp.LispFunction(Lib_ge),
+		"<":		new jsrepl.lisp.LispFunction(Lib_lt),
+		">":		new jsrepl.lisp.LispFunction(Lib_gt),
+
+		// "idx":		new jsrepl.lisp.LispFunction(Lib_arrayIndex),
+		// "list":		new jsrepl.lisp.LispFunction(Lib_newArray),
+		// "car":		new jsrepl.lisp.LispFunction(Lib_arrayCar),
+		// "cdr":		new jsrepl.lisp.LispFunction(Lib_arrayCdr),
+
 		"setg":		new jsrepl.lisp.LispMacro(Lib_setGlobal),
 		"setl":		new jsrepl.lisp.LispMacro(Lib_setLocal),
 		"quot":		new jsrepl.lisp.LispMacro(Lib_quot),
-		"func":		new jsrepl.lisp.LispMacro(Lib_function)
+		"func":		new jsrepl.lisp.LispMacro(Lib_function),
+		"if":		new jsrepl.lisp.LispMacro(Lib_if)
 	};
 
 	// Vars >>
@@ -49,14 +67,14 @@ function LispEvaluator() {
 		// eval all expressions, keeping last result
 		for(var ixExpr = 0; ixExpr < exprs.length; ixExpr++) {
 			var currExpr = exprs[ixExpr];
-			var currResult = evalOneExpr(scope, currExpr);
+			var currResult = this.evalOneExpr(scope, currExpr);
 			result = currResult;
 		}
 
 		return result;
 	}
 	
-	this.evalOneExpr = function evalOneExpr(scope, expr) {
+	function evalOneExpr(scope, expr) {
 		var exprType = utils.getTypeOf(expr);
 		
 		_logger.debug("evalOneExpr called on '" + expr + "', of type " + exprType);
@@ -83,7 +101,7 @@ function LispEvaluator() {
 			var firstEltType = utils.getTypeOf(exprArray[0]);
 			
 			var firstValue =
-				evalOneExpr(scope, exprArray[0]);
+				this.evalOneExpr(scope, exprArray[0]);
 
 			if(utils.getTypeOf(firstValue) === "LispMacro") {
 				return firstValue.apply(
@@ -95,7 +113,7 @@ function LispEvaluator() {
 				utils.map(
 					exprArray,
 					function(exprDefn) {
-						return evalOneExpr(scope, exprDefn);
+						return this.evalOneExpr(scope, exprDefn);
 					});
 
 			var funcDefn = exprArray[0];
@@ -115,6 +133,8 @@ function LispEvaluator() {
 		}
 	}
 
+	this.evalOneExpr = evalOneExpr;
+	
 	function createNewScope() {
 		var scope = new jsrepl.lisp.LispScope();
 		scope.pushFrame(_globalScopeFrame);
@@ -122,6 +142,8 @@ function LispEvaluator() {
 		return scope;
 	}
 
+	
+	
 	// ** Library functions **
 
 	function Lib_function(defnScope, args) {
@@ -162,22 +184,70 @@ function LispEvaluator() {
 		var ret = 0;
 
 		utils.each(args, function(elt) {
-			utils.assertType("argument for +:", elt, "number");
+			utils.assertType("argument for +", elt, "number");
 			ret += elt;
 		});
 
 		return ret;
 	}
 
+	function Lib_minus(scope, args) {
+		assertTwoNumberArgs(args);
+		
+		return first - second;
+	}
+
 	function Lib_multiply(scope, args) {
 		var ret = 1;
 
 		utils.each(args, function(elt) {
-			utils.assertType("argument for +:", elt, "number");
+			utils.assertType("argument for *", elt, "number");
 			ret *= elt;
 		});
 
 		return ret;
+	}
+
+	function Lib_divide(scope, args) {
+		assertTwoNumberArgs(args);
+
+		// NB: Let JavaScript runtime throw on divide by zero.
+		return first / second;
+	}
+
+	function Lib_eq(scope, args) {
+		assertTwoNumberArgs(args);
+		return first === second;
+	}
+
+	function Lib_gt(scope, args) {
+		assertTwoNumberArgs(args);
+		return first > second;
+	}
+
+	function Lib_lt(scope, args) {
+		assertTwoNumberArgs(args);
+		return first < second;
+	}
+
+	function Lib_ge(scope, args) {
+		assertTwoNumberArgs(args);
+		return first >= second;
+	}
+
+	function Lib_le(scope, args) {
+		assertTwoNumberArgs(args);
+		return first <= second;
+	}
+
+	function assertTwoNumberArgs(args) {
+		utils.assertNumArgs(args, 2);
+
+		var first 	= args[0];
+		var second 	= args[1];
+
+		utils.assertType("first argument", first, "number");
+		utils.assertType("second argument", second, "number");
 	}
 
 	function Lib_setGlobal(scope, args) {
@@ -215,5 +285,30 @@ function LispEvaluator() {
 	function Lib_quot(scope, args) {
 		var ret = new jsrepl.lisp.LispExpression(args);
 		return ret;
+	}
+
+	function Lib_if(scope, args) {
+		var numArgs = args.length;
+
+		if(numArgs !== 2 && numArgs !== 3) {
+			throw "Invalid number of arguments for 'if'. Expected 2 or 3 but got " + numArgs + ".";
+		}
+
+		var condExpr = args[0];
+		var thenExpr = args[1];
+		var elseExpr = args[2];
+
+		var condValue = evalOneExpr(scope, condExpr);
+
+		utils.assertType("condValue", condValue, "boolean");
+
+		if(condValue) {
+			return evalOneExpr(scope, thenExpr);
+		}
+		else {
+			if (elseExpr !== undefined) {
+				return evalOneExpr(scope, elseExpr);
+			}
+		}
 	}
 }
