@@ -56,7 +56,7 @@ function LispEvaluator() {
 		return result;
 	}
 	
-	function evalOneExpr(scope, expr) {
+	this.evalOneExpr = function evalOneExpr(scope, expr) {
 		var exprType = utils.getTypeOf(expr);
 		
 		_logger.debug("evalOneExpr called on '" + expr + "', of type " + exprType);
@@ -203,7 +203,7 @@ function LispEvaluator() {
 
 		var varName 		= args[0];
 		var varValueDefn	= args[1];
-
+		
 		utils.assertType("varName", varName, "LispSymbol");
 
 		var varValue = evalOneExpr(scope, varValueDefn);
