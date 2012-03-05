@@ -39,6 +39,7 @@ function LispEvaluator() {
 		// "list":		new jsrepl.lisp.LispFunction(Lib_newArray),
 		// "car":		new jsrepl.lisp.LispFunction(Lib_arrayCar),
 		// "cdr":		new jsrepl.lisp.LispFunction(Lib_arrayCdr),
+		// "cons"
 
 		"setg":		new jsrepl.lisp.LispMacro(Lib_setGlobal),
 		"setl":		new jsrepl.lisp.LispMacro(Lib_setLocal),

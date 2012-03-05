@@ -4,4 +4,7 @@ Fix setGlobal, setLocal to function differently.
 Break up jsrepl.lisp.cs further
  - Bits
    - Lib functions
-   - eval
+     - eval is exposed as a Lisp function
+	 - scope has reference to LispEvaluator.
+
+Array support.

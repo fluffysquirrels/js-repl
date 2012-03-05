@@ -92,12 +92,14 @@ jsrepl.main = function() {
 	var escapeKeyCode = 35; // '#'
 	
 	var escapedKeyMapping = {
-		35:   '#', 	// was '#' -- for escape key
+		35:   '#', 	// was '#' -- for escape Key
+		98:   '>',  // was 'b'
 		102:  'function(){}', // was 'f'
 		107:  '[', 	// was 'k'
 		108:  ']', 	// was 'l'
 		110:  '{', 	// was 'n'
 		109:  '}', 	// was 'm'
+		118:  '<',  // was 'v'
 		122:  "\\",	// was 'z'
 		163:  '<', 	// was pound sign  = symshift+n
 		8364: '>', 	// was euro symbol = symshift+m
@@ -269,7 +271,8 @@ jsrepl.main = function() {
 	var pub = {
 		onLoad 				: onLoad,
 		addCustomBtn		: addCustomBtn,
-		withErrorHandler 	: _withErrorHandler
+		withErrorHandler 	: _withErrorHandler,
+		showCharCodes		: showCharCodes
 	};
 
 	return pub;
