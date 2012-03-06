@@ -28,8 +28,8 @@ jsrepl.lisp.LispFunction =
 		}
 	}
 
-jsrepl.lisp.LispMacro =
-	function LispMacro(func) {
+jsrepl.lisp.LispKeyword =
+	function LispKeyword(func) {
 		utils.assertType("func", func, "function");
 		var _func = func;
 		this.apply = function(scope, args) {

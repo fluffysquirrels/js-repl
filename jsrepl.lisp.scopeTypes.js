@@ -2,19 +2,26 @@ var jsrepl = jsrepl || {};
 jsrepl.lisp = jsrepl.lisp || {};
 
 jsrepl.lisp.LispScope =
-	function LispScope() {
-		var frames = [];
+	function LispScope(evaluator) {
+		utils.assertType("evaluator", evaluator, "LispEvaluator");
+
+		var _evaluator = evaluator;
+		var _frames = [];
+
+		this.getEvaluator = function() {
+			return _evaluator;
+		}
 
 		this.pushFrame = function(frame) {
 			utils.assertType("frame", frame, "LispScopeFrame");
 
-			frames.push(frame);
+			_frames.push(frame);
 		};
 
 		this.copy = function() {
-			var ret = new LispScope();
+			var ret = new LispScope(_evaluator);
 
-			utils.each(frames, function(frame) {
+			utils.each(_frames, function(frame) {
 				ret.pushFrame(frame);
 			});
 
@@ -23,18 +30,18 @@ jsrepl.lisp.LispScope =
 
 		this.set = function(varName, varValue) {
 			assertHasFrames();
-			var topFrame = frames[frames.length - 1];
+			var topFrame = _frames[_frames.length - 1];
 			topFrame.vars[varName] = varValue;
 		};
 
 		this.setGlobal = function(varName, varValue) {
 			assertHasFrames();
-			var bottomFrame = frames[0];
+			var bottomFrame = _frames[0];
 			bottomFrame.vars[varName] = varValue;
 		};
 
 		function assertHasFrames() {
-			if(frames.length === 0) {
+			if(_frames.length === 0) {
 				throw "Cannot set variable in a scope with no frames.";
 			}
 		}
@@ -45,7 +52,7 @@ jsrepl.lisp.LispScope =
 			// Take the value from each frame, hence
 			// finishing with the value from the top frame
 			// that contains the variable.
-			utils.each(frames, function(frame) {
+			utils.each(_frames, function(frame) {
 				var frameVar = frame.vars[varName];
 				if(frameVar !== undefined) {
 					ret = frameVar;
@@ -55,7 +62,7 @@ jsrepl.lisp.LispScope =
 			if(ret === undefined) {
 				throw {
 					message: "Couldn't find variable '" + varName + "'.",
-					frames: frames
+					frames: _frames
 				};
 			}
 

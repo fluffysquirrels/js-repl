@@ -21,6 +21,7 @@ function LispEvaluator() {
 	// * Set initial global vars *
 	_globalScopeFrame.vars = {
 		"hello": 	"world!",
+
 		"true":		true,
 		"false":	false,
 
@@ -41,11 +42,11 @@ function LispEvaluator() {
 		// "cdr":		new jsrepl.lisp.LispFunction(Lib_arrayCdr),
 		// "cons"
 
-		"setg":		new jsrepl.lisp.LispMacro(Lib_setGlobal),
-		"setl":		new jsrepl.lisp.LispMacro(Lib_setLocal),
-		"quot":		new jsrepl.lisp.LispMacro(Lib_quot),
-		"func":		new jsrepl.lisp.LispMacro(Lib_function),
-		"if":		new jsrepl.lisp.LispMacro(Lib_if)
+		"setg":		new jsrepl.lisp.LispKeyword(Lib_setGlobal),
+		"setl":		new jsrepl.lisp.LispKeyword(Lib_setLocal),
+		"quot":		new jsrepl.lisp.LispKeyword(Lib_quot),
+		"func":		new jsrepl.lisp.LispKeyword(Lib_function),
+		"if":		new jsrepl.lisp.LispKeyword(Lib_if)
 	};
 
 	// Vars >>
@@ -99,12 +100,10 @@ function LispEvaluator() {
 				throw "Cannot evaluate empty expression";
 			}
 
-			var firstEltType = utils.getTypeOf(exprArray[0]);
-			
 			var firstValue =
 				evalOneExpr(scope, exprArray[0]);
 
-			if(utils.getTypeOf(firstValue) === "LispMacro") {
+			if(utils.getTypeOf(firstValue) === "LispKeyword") {
 				return firstValue.apply(
 							scope,
 							exprArray.slice(1));
@@ -135,7 +134,7 @@ function LispEvaluator() {
 	}
 	
 	function createNewScope() {
-		var scope = new jsrepl.lisp.LispScope();
+		var scope = new jsrepl.lisp.LispScope(_this);
 		scope.pushFrame(_globalScopeFrame);
 		scope.pushFrame(new jsrepl.lisp.LispScopeFrame());
 		return scope;
