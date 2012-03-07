@@ -37,6 +37,11 @@ jsrepl.main = function() {
 
 			lang_js.checked = true;
 
+
+		// addCustomBtn("var ib = inputBox; var o = { end: ib.selectionEnd, start: ib.selectionStart, length: ib.value.length }; o", "selection");
+		addCustomBtn("__err", "err");
+		addCustomBtn("jsrepl.lisp.runTests()", "lisp.tests");
+
 			jsrepl.log.addOutput("onLoad done");
 		});
 	}
