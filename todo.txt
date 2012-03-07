@@ -8,3 +8,8 @@ Break up jsrepl.lisp.cs further
 	 - scope has reference to LispEvaluator.
 
 Array support.
+
+Unit tests
+ - quot
+ - func
+ - if
