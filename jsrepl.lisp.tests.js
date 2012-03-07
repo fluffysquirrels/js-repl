@@ -1,8 +1,11 @@
+// Requires: jstest.js
 
 var jsrepl = jsrepl || {};
 jsrepl.lisp = jsrepl.lisp || {};
 
 jsrepl.lisp.runTests = function() {
+	var logger = ioc.createLogger("lisp.tests");
+	
 	var lispTests = [
 		new LispTest("(setl si (func (x) (if (= x 1) 1 (+ x (si (- x 1)))  ))) (si 20)", 210),
 	
@@ -65,7 +68,7 @@ jsrepl.lisp.runTests = function() {
 			
 			var evaluator = new jsrepl.lisp.LispEvaluator();
 			var result = evaluator.readEval(lispStr);
-			assertEqual(
+			jstest.assertEqual(
 				result,
 				expectedResult,
 				"Incorrect LispTest result.");
@@ -75,113 +78,8 @@ jsrepl.lisp.runTests = function() {
 			"Lisp code '" + lispStr +
 			"' should return '" + expectedResult + "'";
 
-		return new Test(testFunc, description);
+		return new jstest.Test(testFunc, description);
 	}
 
-	function Test(testFunc, testDescription) {
-		this.func = testFunc;
-		this.description = testDescription;
-		this.toString = function() {
-			return "Test: '" + testDescription + "'";
-		}
-	}
-
-	function assertEqual(
-		actualValue,
-		expectedValue,
-		customErrorMessage) {
-		
-		if(actualValue !== expectedValue) {
-			errorMessage =
-				customErrorMessage + "\n" +
-				"    Expected: '" + expectedValue + "' \n" +
-				"    Actual: '" + actualValue + "' \n";
-			throw new Error(errorMessage);
-		}
-	}
-
-	var logger = ioc.createLogger("lisp.tests").withDebug(false);
-
-	function runTests(tests) {
-		
-		var testResults =
-			utils.map(
-				tests,
-				runTest);
-		
-		printTotals(testResults);
-	}
-
-	function runTest(test) {
-		utils.assertType("test", test, "Test");
-		var testException = null;
-		
-		try {
-			test.func();
-			logger.debug("Test passed.");
-		}
-		catch (ex) {
-			logger.debug("Test failed");
-			testException = ex;
-		}
-
-		var testResult = new TestResult(
-			test,
-			testException);
-
-		logger.debug("testResult.passed = '" + testResult.passed + "'.");
-
-		if(testResult.passed === false) {
-			printTestError(testResult);
-		}
-
-		return testResult;
-	}
-
-	function TestResult(test, exception) {
-		utils.assertType("test", test, "Test");
-		
-		this.test = test;
-		this.passed = (exception === null);
-		this.exception = exception;
-	}
-	
-	function printTestError(testResult) {
-		var message =
-			"Test failed.\n" +
-			testResult.test.toString() + "\n" +
-			getExceptionString(testResult.exception);
-
-		logger.info(message);
-	}
-
-	function getExceptionString(ex) {
-		if(ex.toString) {
-			return ex.toString();
-		}
-		else {
-			return "" + ex;
-		}
-	}
-
-	function printTotals(testResults) {
-		var passed = 0;
-		var failed = 0;
-
-		utils.each(
-			testResults,
-			function(testResult) {
-				if(testResult.passed) {
-					passed += 1;
-				}
-				else {
-					failed += 1;
-				}
-			});
-
-		logger.info("Tests passed: " + passed);
-		logger.info("Tests failed: " + failed);
-	}
-
-	runTests(lispTests);
+	jstest.runTests(lispTests);
 }
