@@ -1,15 +1,16 @@
-Fix setGlobal, setLocal to function differently.
- - Add logging
+Lib
+ - macro
+ - let
+ - *? -- cons?, num?, sym?, func?, bool?, string?, null?
 
-Break up jsrepl.lisp.cs further
- - Bits
-   - Lib functions
-     - eval is exposed as a Lisp function
-	 - scope has reference to LispEvaluator.
-
-Array support.
+Prologue
+ - cond
+ - eq
+ - while
+ - for
+ - and, or, not, xor
 
 Unit tests
- - quot
- - func
- - if
+ - aeq
+
+Strings

@@ -90,5 +90,30 @@ var utils = function(){
 		}
 	}
 
+	pub.beginLoadFile = function(path, callback) {
+		if(!/^lisp\/[a-z.0-9]+\.lisp$/.test(path)) {
+			throw new Error("Possibly dodgy path requested: '" + path + "'.");
+		}
+
+		var iframeLoad = function() {
+			var pageContent =
+				loaderIFrame.contentDocument.body.innerHTML;
+			document.body.removeChild(loaderIFrame);
+
+			callback(pageContent);
+			return;
+		}
+
+		var loaderIFrame = document.createElement("iframe");
+		loaderIFrame.style.display = "none";
+		loaderIFrame.addEventListener("load", iframeLoad);
+		loaderIFrame.src = path;
+	
+		document.body.appendChild(loaderIFrame);
+
+
+		return;
+	}
+
 	return pub;
 }();

@@ -21,7 +21,7 @@ function LispEvaluator() {
 	var _logger =
 		ioc.createLogger(
 			"lisp.LispEvaluator").withDebug(false);
-
+	this.logger = _logger;
 
 	this.readEval = function(cmdString) {
 		var exprs = jsrepl.lisp.parser.read(cmdString);
@@ -51,7 +51,7 @@ function LispEvaluator() {
 	this.evalOneExpr = function(scope, expr) {
 		var exprType = utils.getTypeOf(expr);
 		
-		_logger.debug("evalOneExpr called on '" + expr + "', of type " + exprType);
+		// _logger.debug("evalOneExpr called on '" + expr + "', of type " + exprType);
 
 		if(exprType === "LispSymbol")
 		{

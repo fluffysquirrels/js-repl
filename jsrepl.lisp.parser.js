@@ -37,7 +37,7 @@ jsrepl.lisp.parser = function() {
 		} // for each token
 
 		if(nestLevels.length !== 1) {
-			throw ("Unbalanced brackets at end of parse; nestLevels.length = " + nestLevels.length.toString());
+			throw ((nestLevels.length - 1) + " unbalanced bracket(s) at end of parse");
 		}
 
 		// Total hack: unwrap the top-level LispExpression

@@ -10,6 +10,7 @@ var jsrepl = jsrepl || {};
 jsrepl.main = function() {
 	var logKeys = false;
 	var registerKeyLogHandlers = true;
+	var logger = ioc.createLogger("jsrepl.main");
 	
 	var _withErrorHandler =
 		function() {
@@ -38,9 +39,16 @@ jsrepl.main = function() {
 			lang_js.checked = true;
 
 
-		// addCustomBtn("var ib = inputBox; var o = { end: ib.selectionEnd, start: ib.selectionStart, length: ib.value.length }; o", "selection");
-		addCustomBtn("__err", "err");
-		addCustomBtn("jsrepl.lisp.runTests()", "lisp.tests");
+			// addCustomBtn("var ib = inputBox; var o = { end: ib.selectionEnd, start: ib.selectionStart, length: ib.value.length }; o", "selection");
+			addCustomBtn("__err", "err");
+			addCustomBtn("jsrepl.lisp.runTests()", "lisp.tests");
+
+			utils.beginLoadFile(
+				"lisp/prologue.lisp",
+				function(lispStr) {
+					logger.debug("Lisp prologue: \n'" + lispStr + "'");
+					_lispEvaluator.readEval(lispStr);
+				});
 
 			jsrepl.log.addOutput("onLoad done");
 		});
