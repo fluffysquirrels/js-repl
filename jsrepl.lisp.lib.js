@@ -2,8 +2,9 @@ var jsrepl = jsrepl || {};
 jsrepl.lisp = jsrepl.lisp || {};
 
 jsrepl.lisp.getLib = function() {
+	var lib;
 
-	var lib = {
+	function createLib(){ return {
 		"hello": 	"world!",
 
 		"true":		true,
@@ -17,13 +18,23 @@ jsrepl.lisp.getLib = function() {
 		"*": 		new jsrepl.lisp.LispFunction(Lib_multiply),
 		"/": 		new jsrepl.lisp.LispFunction(Lib_divide),
 
-		"=":		new jsrepl.lisp.LispFunction(Lib_eq),
-		"<=":		new jsrepl.lisp.LispFunction(Lib_le),
-		">=":		new jsrepl.lisp.LispFunction(Lib_ge),
-		"<":		new jsrepl.lisp.LispFunction(Lib_lt),
-		">":		new jsrepl.lisp.LispFunction(Lib_gt),
+		"=":		new jsrepl.lisp.LispFunction(Lib_num_eq),
+		"<=":		new jsrepl.lisp.LispFunction(Lib_num_le),
+		">=":		new jsrepl.lisp.LispFunction(Lib_num_ge),
+		"<":		new jsrepl.lisp.LispFunction(Lib_num_lt),
+		">":		new jsrepl.lisp.LispFunction(Lib_num_gt),
 
-		"js=":		new jsrepl.lisp.LispFunction(Lib_jseq),
+		"js=":		new jsrepl.lisp.LispFunction(Lib_js_eq),
+		"jstypeof":	new jsrepl.lisp.LispFunction(Lib_js_typeof),
+
+		"sym=":		new jsrepl.lisp.LispFunction(Lib_sym_eq),
+
+		"cons?":	new jsrepl.lisp.LispFunction(Lib_is_cons),
+		"num?":		new jsrepl.lisp.LispFunction(Lib_is_num),
+		"sym?":		new jsrepl.lisp.LispFunction(Lib_is_sym),
+		"func?":	new jsrepl.lisp.LispFunction(Lib_is_func),
+		"bool?":	new jsrepl.lisp.LispFunction(Lib_is_bool),
+		"null?":	new jsrepl.lisp.LispFunction(Lib_is_null),
 
 		"car":		new jsrepl.lisp.LispFunction(Lib_arrayCar),
 		"cdr":		new jsrepl.lisp.LispFunction(Lib_arrayCdr),
@@ -35,7 +46,7 @@ jsrepl.lisp.getLib = function() {
 		"eval":		new jsrepl.lisp.LispFunction(Lib_eval),
 		"func":		new jsrepl.lisp.LispKeyword(Lib_function),
 		"if":		new jsrepl.lisp.LispKeyword(Lib_if)
-	};
+	};};
 
 	function Lib_function(defnScope, args) {
 		if(args.length < 2) {
@@ -106,27 +117,27 @@ jsrepl.lisp.getLib = function() {
 		return args[0] / args[1];
 	}
 
-	function Lib_eq(scope, args) {
+	function Lib_num_eq(scope, args) {
 		assertTwoNumberArgs(args);
 		return args[0] === args[1];
 	}
 
-	function Lib_gt(scope, args) {
+	function Lib_num_gt(scope, args) {
 		assertTwoNumberArgs(args);
 		return args[0] > args[1];
 	}
 
-	function Lib_lt(scope, args) {
+	function Lib_num_lt(scope, args) {
 		assertTwoNumberArgs(args);
 		return args[0] < args[1];
 	}
 
-	function Lib_ge(scope, args) {
+	function Lib_num_ge(scope, args) {
 		assertTwoNumberArgs(args);
 		return args[0] >= args[1];
 	}
 
-	function Lib_le(scope, args) {
+	function Lib_num_le(scope, args) {
 		assertTwoNumberArgs(args);
 		return args[0] <= args[1];
 	}
@@ -141,10 +152,50 @@ jsrepl.lisp.getLib = function() {
 		utils.assertType("second argument", second, "number");
 	}
 	
-	function Lib_jseq(scope, args) {
+	function Lib_js_eq(scope, args) {
 		utils.assertNumArgs(args, 2);
 
 		return args[0] === args [1];
+	}
+
+	function Lib_js_typeof(scope, args) {
+		utils.assertNumArgs(args, 1);
+
+		var typeString = utils.getTypeOf(args[0]);
+		var typeSym = new jsrepl.lisp.LispSymbol(typeString);
+
+		return typeSym;
+	}
+
+	function Lib_sym_eq(scope, args) {
+		utils.assertNumArgs(args, 2);
+
+		utils.assertType("first", args[0], "LispSymbol");
+		utils.assertType("second", args[1], "LispSymbol");
+
+		return  args[0].name ===
+				args[1].name;
+	}
+
+	var Lib_is_cons = create_is_T("LispExpression");
+	var Lib_is_num  = create_is_T("number");
+	var Lib_is_sym  = create_is_T("LispSymbol");
+	var Lib_is_func = create_is_T("LispFunction");
+	var Lib_is_bool = create_is_T("boolean");
+	var Lib_is_null = create_is_T("null");
+
+	function create_is_T(T) {
+		function is_T(scope, args) {
+			utils.assertNumArgs(args, 1);
+
+			var arg = args[0];
+			var typeString = utils.getTypeOf(arg);
+			var isType = typeString === T;
+
+			return isType;
+		};
+
+		return is_T;
 	}
 
 	function Lib_arrayCar(scope, args) {
@@ -285,6 +336,7 @@ jsrepl.lisp.getLib = function() {
 			}
 		}
 	}
-
+	
+	lib = createLib();
 	return lib;
 };

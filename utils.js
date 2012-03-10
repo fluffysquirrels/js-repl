@@ -76,7 +76,7 @@ var utils = function(){
 		}
 
 		if(actualType !== expectedType) {
-			throw "Expected variable '" + name + "' to be of type " + expectedType + ", but it was '" + value + "', of type " + actualType;
+			throw new Error("Expected variable '" + name + "' to be of type " + expectedType + ", but it was '" + value + "', of type " + actualType);
 		}
 	}
 

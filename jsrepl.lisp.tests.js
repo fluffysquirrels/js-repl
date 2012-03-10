@@ -45,6 +45,34 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(>= 5 5)", 	true),
 		new LispTest("(>= 6 5)", 	true),
 
+		// js=
+		new LispTest("(js= 5 5)", 	true),
+		new LispTest("(js= 5 6)", 	false),
+		new LispTest("(js= true true)", true),
+		new LispTest("(js= 5 false)", false),
+		new LispTest("(js= (quot a) (quot a))", false),
+
+		// jstypeof
+		new LispTest("(sym= (jstypeof 5) (quot number))", true),
+		new LispTest("(sym= (jstypeof 5) (quot boolean))", false),
+		new LispTest("(sym= (jstypeof true) (quot boolean))", true),
+		new LispTest("(sym= (jstypeof null) (quot null))", true),
+		new LispTest("(sym= (jstypeof (quot somesymbol)) (quot LispSymbol))", true),
+		new LispTest("(sym= (jstypeof (quot (1 2 3))) (quot LispExpression))", true),
+		new LispTest("(sym= (jstypeof (func () true)) (quot LispFunction))", true),
+
+		// sym=
+		new LispTest("(sym= (quot a) (quot a))", true),
+		new LispTest("(sym= (quot a) (quot b))", false),
+
+		// (?<type>\w+)?
+		new LispTest("(cons? (quot ()))", 	true),
+		new LispTest("(num?  5)", 			true),
+		new LispTest("(sym?  (quot a))", 	true),
+		new LispTest("(func? (func () 6))", true),
+		new LispTest("(bool? true)", 		true),
+		new LispTest("(null? (cdr (quot ())))", true),
+
 		// Assignment
 		new LispTest("(setg abra 5) abra", 5),
 		new LispTest("(setl abra 5) abra", 5),

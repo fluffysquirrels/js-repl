@@ -66,6 +66,7 @@ var jstest = function() {
 	}
 
 	function getExceptionString(ex) {
+		return jsrepl.pp.prettyPrint(ex);
 		if(ex.toString) {
 			return ex.toString();
 		}

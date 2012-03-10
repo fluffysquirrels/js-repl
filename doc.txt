@@ -1,0 +1,8 @@
+Types
+=====
+ - LispExpression
+ - LispFunction
+ - LispSymbol
+ - number
+ - boolean
+ - null
