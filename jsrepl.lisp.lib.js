@@ -53,33 +53,95 @@ jsrepl.lisp.getLib = function() {
 			throw "Function definitions must have at least 2 arguments";
 		}
 
-		var argNames = args[0];
+		var argDefns = args[0];
 		var funcBody = args.slice(1);
 
-		utils.assertType("argNames", argNames, "LispExpression");
+		utils.assertType("argDefns", argDefns, "LispExpression");
 
-		var numArgsRequired = argNames.list.length;
+		var argsSpec = parseArgDefns(argDefns.list);
 
 		var func = function(invocationScope, args) {
-			utils.assertNumArgs(args, numArgsRequired);
-
 			var execScope = defnScope.copy();
 
 			// Push function evaluation scope frame.
 			execScope.pushFrame(new jsrepl.lisp.LispScopeFrame());
-			
-			utils.each(argNames.list, function(argName, ix) {
-				utils.assertType("argName", argName, "LispSymbol");
-
-				var argValue = args[ix];
-
-				execScope.set(argName.name, argValue);
-			});
+			argsSpec.bindArgs(execScope, args);
 			
 			return defnScope.getEvaluator().eval(funcBody, execScope);
 		};
 
 		return new jsrepl.lisp.LispFunction(func);
+	}
+
+	var isValidArgRegex = /^\*?([a-z0-9_]+)$/;
+	var isVarArgRegex =    /^\*([a-z0-9_]+)$/;
+
+	function parseArgDefns(argDefnsArray) {
+		var argsSpec = {};
+
+		var positionalArgs = [];
+		var varArgsSymbol = null;
+
+		utils.each(argDefnsArray,
+			function(argDefn, ix) {
+				var argName = argDefn.name;
+				
+				if(!isVarArgDefn(argName)) {
+					positionalArgs.push(argDefn);
+				}
+				else {
+					// isVarArgDefn
+					if(ix !== argDefnsArray.length - 1) {
+						throw new Error("Varags symbols must come at the end of a function's arguments list. '" + argName + "' came at index " + ix + " of an arguments list of length " + argDefnsArray.length + ".");
+					}
+
+					varArgsSymbol = argDefn;
+				}
+			});
+
+		function isVarArgDefn(argName) {
+			var match = isValidArgRegex.exec(argName);
+
+			if(match === null) {
+				throw new Error("Not a valid argument name: '" + argName + "'.");
+			}
+
+			return isVarArgRegex.test(argName);
+		}
+
+		argsSpec.bindArgs = function(execScope, args) {
+			var extraArgs = args.length > positionalArgs.length;
+			
+			if(extraArgs &&
+				varArgsSymbol === null) {
+				
+				throw new Error("Too many arguments passed to non-variadic function. Expected " + positionalArgs.length + " positional arguments but only got " + args.length + " arguments.");
+			}
+
+			utils.each(positionalArgs, function(argName, ix) {
+				utils.assertType("argName", argName, "LispSymbol");
+
+				var argValue = args[ix];
+
+				if(argValue === undefined) {
+					throw new Error("Not enough arguments. Expected " + positionalArgs.length + " positional arguments but only got " + args.length + " arguments.");
+				}
+
+				execScope.set(argName.name, argValue);
+			}); // bind each positional argument.
+
+			if(varArgsSymbol !== null) {
+				var varArgsArray =
+					args.slice(positionalArgs.length);
+				var varArgsValue =
+					new jsrepl.lisp.LispExpression(varArgsArray);
+				execScope.set(
+					varArgsSymbol.name,
+					varArgsValue);
+			}
+		};
+
+		return argsSpec;
 	}
 
 	function Lib_plus(scope, args) {

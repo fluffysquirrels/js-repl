@@ -45,6 +45,11 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(>= 5 5)", 	true),
 		new LispTest("(>= 6 5)", 	true),
 
+		// divrem
+		new LispTest("(eq (divrem 3 2)  (quot (1 1)))", true),
+		new LispTest("(eq (divrem 8 4)  (quot (2 0)))", true),
+		new LispTest("(eq (divrem 29 7) (quot (4 1)))", true),
+
 		// js=
 		new LispTest("(js= 5 5)", 	true),
 		new LispTest("(js= 5 6)", 	false),
@@ -83,6 +88,23 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("((func (x y) (* x y)) 4 5)", 20),
 		new LispTest("(setl myfunc (func (x y) (* x y)))(myfunc 4 5)", 20),
 
+		// func with varags
+		new LispTest("((func (x y *args) (* x y)) 4 5)", 20),
+		new LispTest("((func (x y *args) (* x y)) 4 5 6)", 20),
+		new LispTest("((func (x y *args) (* x y)) 4 5 6 7)", 20),
+		new LispTest(
+			"(eq " +
+				"((func (x y *args) (cons (* x y) *args)) 4 5)" +
+				"(quot (20)))", true),
+		new LispTest(
+			"(eq " +
+				"((func (x y *args) (cons (* x y) *args)) 4 5 6)" +
+				"(quot (20 6)))", true),
+		new LispTest(
+			"(eq " +
+				"((func (x y *args) (cons (* x y) *args)) 4 5 6 7)" +
+				"(quot (20 6 7)))", true),
+
 		// car
 		new LispTest("(car (quot ()))", null),
 		new LispTest("(car (quot (2)))", 2),
@@ -102,7 +124,12 @@ jsrepl.lisp.runTests = function() {
 		
 		new LispTest("(car (cons 1))", 1),
 		new LispTest("(cdr (cons 1))", null),
-		
+
+		// list
+		new LispTest("(eq (list)     (quot ()))", true),
+		new LispTest("(eq (list 1)   (quot (1)))", true),
+		new LispTest("(eq (list 1 2) (quot (1 2)))", true),
+
 		// quot
 		new LispTest("(quot 5)", 5),
 		new LispTest("(eval (quot (+ 2 3)))", 5), // incl eval

@@ -49,7 +49,11 @@
 	)
 )
 
-
+(setg list
+	(func (*values)
+		*values
+	)
+)
 
 (setg eq
 	(func (a b)

@@ -1,15 +1,15 @@
+Lang
+ - comments
+ - macros
+ - strings
+
 Lib
- - macro
  - let
  - do
 
 Prologue
- - cond
- - while
- - for
+ - cond -- that works!!
  - fast divrem
 
 Unit tests
- - eq
-
-Strings
+ - divrem

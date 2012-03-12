@@ -4,7 +4,8 @@ var jsrepl = jsrepl || {};
 
 jsrepl.pp = function() {
 	var indent = "    ";
-	var propValueMaxChars = 400
+	var propValueMaxChars = 400;
+
 	function prettyPrint(obj) {
 		return prettyPrintInternal(obj, "< " + indent, 0)
 	}
