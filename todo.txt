@@ -1,16 +1,15 @@
 Lib
  - macro
  - let
- - *? -- cons?, num?, sym?, func?, bool?, string?, null?
+ - do
 
 Prologue
  - cond
- - eq
  - while
  - for
- - and, or, not, xor
+ - fast divrem
 
 Unit tests
- - aeq
+ - eq
 
 Strings

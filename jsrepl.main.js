@@ -45,9 +45,20 @@ jsrepl.main = function() {
 
 			utils.beginLoadFile(
 				"lisp/prologue.lisp",
+
 				function(lispStr) {
-					logger.debug("Lisp prologue: \n'" + lispStr + "'");
-					_lispEvaluator.readEval(lispStr);
+					_withErrorHandler(function() {
+						logger.debug("Lisp prologue: \n'" + lispStr + "'");
+						ioc.lispInitScripts = [lispStr];
+						ioc.createLispEvaluator = function() {
+							var le = new jsrepl.lisp.LispEvaluator();
+							le.runScripts(ioc.lispInitScripts);
+
+							return le;
+						}
+
+						_lispEvaluator = ioc.createLispEvaluator();
+					});
 				});
 
 			jsrepl.log.addOutput("onLoad done");
@@ -86,8 +97,7 @@ jsrepl.main = function() {
 			}
 		};
 
-	var _lispEvaluator = 
-		new jsrepl.lisp.LispEvaluator();
+	var _lispEvaluator;
 
 	function getEvaluator() {
 		if(lang_js.checked) {

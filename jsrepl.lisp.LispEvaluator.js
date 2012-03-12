@@ -10,6 +10,7 @@ var jsrepl = jsrepl || {};
 jsrepl.lisp = jsrepl.lisp || {}
 
 jsrepl.lisp.logger = ioc.createLogger("lisp").withDebug(true);
+jsrepl.lisp.initScripts = [];
 
 jsrepl.lisp.LispEvaluator =
 function LispEvaluator() {
@@ -62,7 +63,8 @@ function LispEvaluator() {
 
 			return symbolValue;
 		}
-		else if(exprType === "number") {
+		else if(exprType === "number" ||
+				exprType === "boolean") {
 			return expr;
 		}
 		else if(exprType === "LispExpression") {
@@ -112,5 +114,13 @@ function LispEvaluator() {
 		scope.pushFrame(_globalScopeFrame);
 		scope.pushFrame(new jsrepl.lisp.LispScopeFrame());
 		return scope;
+	}
+
+	this.runScripts = function(scripts) {
+		utils.each(
+			scripts,
+			function(script) {
+				_this.readEval(script);
+			});
 	}
 }

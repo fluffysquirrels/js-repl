@@ -97,7 +97,7 @@ var utils = function(){
 
 		var iframeLoad = function() {
 			var pageContent =
-				loaderIFrame.contentDocument.body.innerHTML;
+				loaderIFrame.contentDocument.body.innerText;
 			document.body.removeChild(loaderIFrame);
 
 			callback(pageContent);

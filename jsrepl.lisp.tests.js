@@ -119,14 +119,37 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(if false 5 6)", 6),
 		new LispTest("(if true 5 (throwError))", 5),
 		new LispTest("(if false (throwError) 6)", 6),
-		new LispTest("(if true (* 4 6) 1)", 24)
+		new LispTest("(if true (* 4 6) 1)", 24),
+
+		// condf
+		new LispTest("(condf (quot ((false 4)(true 5))))", 5),
+		new LispTest("(condf (quot ((true 4) (true 5))))", 4),
+		new LispTest("(condf (quot (((< 2 3) 4) (true 5))))", 4),
+		new LispTest("(setl x 5)(condf (quot ((true x))))", 5),
+
+		// not
+		new LispTest("(not true)",  false),
+		new LispTest("(not false)", true),
+
+		// and
+		new LispTest("(and false false)",  false),
+		new LispTest("(and false true )",  false),
+		new LispTest("(and true  false)",  false),
+		new LispTest("(and true  true )",  true ),
+		
+		// or
+		new LispTest("(or false false)",  false),
+		new LispTest("(or false true )",  true ),
+		new LispTest("(or true  false)",  true ),
+		new LispTest("(or true  true )",  true )
+
 	]; // / lispTests
 
 	function LispTest(lispStr, expectedResult) {
 		function testFunc() {
 			logger.debug("Running lisp code '" + lispStr + "'");
 			
-			var evaluator = new jsrepl.lisp.LispEvaluator();
+			var evaluator = ioc.createLispEvaluator();
 			var result = evaluator.readEval(lispStr);
 			jstest.assertEqual(
 				result,
