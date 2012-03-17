@@ -45,12 +45,25 @@ jsrepl.lisp.getLib = function() {
 		"quot":		new jsrepl.lisp.LispKeyword(Lib_quot),
 		"eval":		new jsrepl.lisp.LispFunction(Lib_eval),
 		"func":		new jsrepl.lisp.LispKeyword(Lib_function),
+		"macro":	new jsrepl.lisp.LispKeyword(Lib_macro),
 		"if":		new jsrepl.lisp.LispKeyword(Lib_if)
 	};};
 
 	function Lib_function(defnScope, args) {
+		var func = createFunctionBody(defnScope, args);
+
+		return new jsrepl.lisp.LispFunction(func);
+	}
+
+	function Lib_macro(defnScope, args) {
+		var func = createFunctionBody(defnScope, args);
+
+		return new jsrepl.lisp.LispMacro(func);
+	}
+
+	function createFunctionBody(defnScope, args) {
 		if(args.length < 2) {
-			throw "Function definitions must have at least 2 arguments";
+			throw new Error("Function definitions must have at least 2 arguments");
 		}
 
 		var argDefns = args[0];
@@ -67,10 +80,10 @@ jsrepl.lisp.getLib = function() {
 			execScope.pushFrame(new jsrepl.lisp.LispScopeFrame());
 			argsSpec.bindArgs(execScope, args);
 			
-			return defnScope.getEvaluator().eval(funcBody, execScope);
+			return execScope.getEvaluator().eval(funcBody, execScope);
 		};
 
-		return new jsrepl.lisp.LispFunction(func);
+		return func;
 	}
 
 	var isValidArgRegex = /^\*?([a-z0-9_]+)$/;
@@ -115,7 +128,7 @@ jsrepl.lisp.getLib = function() {
 			if(extraArgs &&
 				varArgsSymbol === null) {
 				
-				throw new Error("Too many arguments passed to non-variadic function. Expected " + positionalArgs.length + " positional arguments but only got " + args.length + " arguments.");
+				throw new Error("Too many arguments passed to non-variadic function. Expected " + positionalArgs.length + " positional arguments but got " + args.length + " arguments.");
 			}
 
 			utils.each(positionalArgs, function(argName, ix) {

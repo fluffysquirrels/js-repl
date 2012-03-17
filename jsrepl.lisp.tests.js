@@ -140,6 +140,7 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(eval 2 3 4 5)", 5),
 		new LispTest("(eval (cons (quot *) (quot (2 3))))", 6),
 		new LispTest("(eval (setl testVar 7) testVar)", 7),
+		new LispTest("(eval (list (func () 12)))", 12),
 
 		// if
 		new LispTest("(if true 5 6)", 5),
@@ -149,10 +150,9 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(if true (* 4 6) 1)", 24),
 
 		// condf
-		new LispTest("(condf (quot ((false 4)(true 5))))", 5),
-		new LispTest("(condf (quot ((true 4) (true 5))))", 4),
-		new LispTest("(condf (quot (((< 2 3) 4) (true 5))))", 4),
-		new LispTest("(setl x 5)(condf (quot ((true x))))", 5),
+		new LispTest("(eq (condf-test 4) (quot (4 lessthan5)))", true),
+		new LispTest("(eq (condf-test 5) (quot (5 equals5)))", true),
+		new LispTest("(eq (condf-test 6) (quot (6 morethan5)))", true),
 
 		// not
 		new LispTest("(not true)",  false),
@@ -168,8 +168,14 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(or false false)",  false),
 		new LispTest("(or false true )",  true ),
 		new LispTest("(or true  false)",  true ),
-		new LispTest("(or true  true )",  true )
+		new LispTest("(or true  true )",  true ),
 
+		// do (a macro)
+		new LispTest("(do (setl x 5) (* x 4))", 20),
+
+		// eval-debug (a macro)
+		new LispTest("(eq (eval-debug (+ 3 4)) (quot ((+ 3 4) = 7) ))", true),
+		new LispTest("(setl x 3)(eq (eval-debug (+ x 4)) (quot ((+ x 4) = 7) ))", true)
 	]; // / lispTests
 
 	function LispTest(lispStr, expectedResult) {

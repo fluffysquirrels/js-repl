@@ -1,15 +1,30 @@
+In progress
+ - prime factors
+   - sqrt-ceil
+   - int-range-infimum
+   - int-pow-2
+
+Code puzzles
+ - primality tests.
+ - Fibonacci with memoization
+ - balanced tree data structures.
+
+Unit tests
+ - lexical closure variable capture
+ - a function's setl shouldn't create variables in the definition scope
+ - macro
+
+Lib
+ - let
+ - apply
+
+Prologue
+ - fast divrem
+ - OO
+
 Lang
  - comments
  - macros
  - strings
-
-Lib
- - let
- - do
-
-Prologue
- - cond -- that works!!
- - fast divrem
-
-Unit tests
- - divrem
+ - pure functions
+ - static typing

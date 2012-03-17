@@ -72,7 +72,7 @@ var utils = function(){
 		var actualType = pub.getTypeOf(value);
 
 		if(!expectedType) {
-			throw "Variable '" + name + "' was '" + value + "', of unexpected type " + actualType;
+			throw new Error("Variable '" + name + "' was '" + value + "', of unexpected type " + actualType);
 		}
 
 		if(actualType !== expectedType) {
@@ -86,7 +86,7 @@ var utils = function(){
 
 	pub.assertNumArgs = function(args, numArgsRequired) {
 		if(numArgsRequired !== args.length) {
-			throw "Function required " + numArgsRequired + " args but received " + args.length + " args.";
+			throw new Error("Function required " + numArgsRequired + " args but received " + args.length + " args.");
 		}
 	}
 

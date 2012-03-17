@@ -7,12 +7,22 @@
 		(setl currCond-cond (car currCond))
 		(setl currCond-res (car (cdr currCond)))
 		
-		(if (eval currCond-cond)
-			(eval currCond-res)
+		(if (currCond-cond)
+			(currCond-res)
 			(condf (cdr conds))
 		)
 	)
 )
+
+(setg condf-test (func (x)
+	(condf
+		(list
+			(list (func () (< x 5)) (func () (list x (quot lessthan5))))
+			(list (func () (> x 5)) (func () (list x (quot morethan5))))
+			(list (func () true) (func () (list x (quot equals5))))
+		)
+	)
+))
 
 (setg not (func (x)
 	(if x
@@ -89,7 +99,6 @@
 	(+ x (si (- x 1))))
 ))
 
-
 (setg num-cmp (func (x y)
 	(if (= x y)
 		0
@@ -99,3 +108,79 @@
 		-1
 		throwError)
 ))))
+
+(setg do
+	(macro (*exprs)
+		(cons
+			(cons (quot func)
+			(cons (quot ())
+				  *exprs
+			))
+		)
+	)
+)
+
+(setg eval-debug
+	(macro (expr)
+		(list
+			(quot list)
+			(list (quot quot) expr)
+			(quot (quot =))
+			expr
+		)
+	)
+)
+
+(setg sqrt-ceil (func (n)
+	(setl is-square-greater-than-n
+		(func (x)
+			(>= (* x x) n)
+		)
+	)
+	(int-range-infimum is-square-greater-than-n)
+))
+
+(setg int-range-infimum
+	(func (predicate)
+		(setl init-max-range (int-pow-2 24))
+		(setl init-min-range (- 0 max-range))
+
+		(setl find-infimum
+			(func (min-range max-range)
+				(if (predicate min-range)
+					(throwMinPassedPredicate))
+				(if (not (predicate max-range))
+					(throwMaxNotPassedPredicate))
+				
+				(setl len-range (- max-range min-range))
+
+				(if (< len-range 1)
+					(throwRangeLengthLessThanOne))
+				(if (= len-range 1)
+					max-range
+					(do
+						(setl mid-range
+							(+ min-range (/ len-range 2)))
+						(if (predicate mid-range)
+							(find-infimum
+								min-range mid-range)
+							(find-infimum
+								mid-range max-range)
+						)
+					)
+				)
+			)
+		)
+
+		(find-infimum init-min-range init-max-range)
+	)
+)
+
+(setg int-pow-2
+	(func (n)
+		(if (<= 0)
+			1
+			(* 2 (int-pow-2 (- n 1)))
+		)
+	)
+)

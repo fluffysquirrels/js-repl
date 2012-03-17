@@ -30,13 +30,17 @@ function LispEvaluator() {
 	}
 
 	this.eval = function(exprs, scope) {
+		utils.assertType("exprs", exprs, "Array");
+		
 		if(exprs.length === 0) {
-			throw "Empty expression.";
+			throw new Error("Cannot eval an empty expression.");
 		}
 
 		if(scope === undefined) {
 			scope = createNewScope();
 		}
+			
+		utils.assertType("scope", scope, "LispScope");
 
 		var result = undefined;
 		// eval all expressions, keeping last result
@@ -52,8 +56,6 @@ function LispEvaluator() {
 	this.evalOneExpr = function(scope, expr) {
 		var exprType = utils.getTypeOf(expr);
 		
-		// _logger.debug("evalOneExpr called on '" + expr + "', of type " + exprType);
-
 		if(exprType === "LispSymbol")
 		{
 			var symbolValue = scope.lookUp(expr.name);
@@ -64,7 +66,9 @@ function LispEvaluator() {
 			return symbolValue;
 		}
 		else if(exprType === "number" ||
-				exprType === "boolean") {
+				exprType === "boolean" ||
+				exprType === "LispFunction" ||
+				exprType === "LispMacro") {
 			return expr;
 		}
 		else if(exprType === "LispExpression") {
@@ -76,33 +80,20 @@ function LispEvaluator() {
 
 			var firstValue =
 				_this.evalOneExpr(scope, exprArray[0]);
+			var firstType = utils.getTypeOf(firstValue);
+			var argDefns = exprArray.slice(1);
 
-			if(utils.getTypeOf(firstValue) === "LispKeyword") {
-				return firstValue.apply(
+			if( firstType === "LispKeyword"  ||
+				firstType === "LispFunction" ||
+				firstType === "LispMacro") {
+				return firstValue.evalWithArgDefns(
 							scope,
-							exprArray.slice(1));
+							argDefns);
 			}
-
-			var exprValues =
-				utils.map(
-					exprArray,
-					function(exprDefn) {
-						return _this.evalOneExpr(
-										scope,
-										exprDefn);
-					});
-
-			var funcDefn = exprArray[0];
-			var func = exprValues[0];
-			var funcArgs = exprValues.slice(1);
-
-			utils.assertType("func", func, "LispFunction");
-
-			_logger.debug("Running " + funcDefn + " with args:\n" + jsrepl.pp.prettyPrint(funcArgs));
-
-			var result = func.apply(scope, funcArgs);
-
-			return result;
+			else
+			{
+				throw new Error("Cannot evaluate LispExpression with first value '" + firstValue + "' of unknown type " + firstType + ".");
+			}
 		}
 		else {
 			throw "Cannot eval object '" + expr + "' of unknown type " + utils.getTypeOf(expr);
