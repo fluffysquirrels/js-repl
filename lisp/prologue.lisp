@@ -132,18 +132,21 @@
 )
 
 (setg sqrt-ceil (func (n)
-	(setl is-square-greater-than-n
+	(setl is-pos-and-square-greater-than-n
 		(func (x)
-			(>= (* x x) n)
+			(and
+				(>= x 0)
+				(>= (* x x) n)
+			)
 		)
 	)
-	(int-range-infimum is-square-greater-than-n)
+	(int-range-infimum is-pos-and-square-greater-than-n)
 ))
 
 (setg int-range-infimum
 	(func (predicate)
 		(setl init-max-range (int-pow-2 24))
-		(setl init-min-range (- 0 max-range))
+		(setl init-min-range (- 0 init-max-range))
 
 		(setl find-infimum
 			(func (min-range max-range)
@@ -178,7 +181,7 @@
 
 (setg int-pow-2
 	(func (n)
-		(if (<= 0)
+		(if (<= n 0)
 			1
 			(* 2 (int-pow-2 (- n 1)))
 		)

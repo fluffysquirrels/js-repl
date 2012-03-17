@@ -87,6 +87,9 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("((func (x) x) 27)", 27),
 		new LispTest("((func (x y) (* x y)) 4 5)", 20),
 		new LispTest("(setl myfunc (func (x y) (* x y)))(myfunc 4 5)", 20),
+		
+		// func - variable capture in lexical scope
+		new LispTest("((do (setl x 5)(func () x)))", 5),
 
 		// func with varags
 		new LispTest("((func (x y *args) (* x y)) 4 5)", 20),
@@ -175,7 +178,21 @@ jsrepl.lisp.runTests = function() {
 
 		// eval-debug (a macro)
 		new LispTest("(eq (eval-debug (+ 3 4)) (quot ((+ 3 4) = 7) ))", true),
-		new LispTest("(setl x 3)(eq (eval-debug (+ x 4)) (quot ((+ x 4) = 7) ))", true)
+		new LispTest("(setl x 3)(eq (eval-debug (+ x 4)) (quot ((+ x 4) = 7) ))", true),
+
+		// int-pow-2
+		new LispTest("(int-pow-2 0)",  1),
+		new LispTest("(int-pow-2 1)",  2),
+		new LispTest("(int-pow-2 15)", 32768),
+		new LispTest("(int-pow-2 24)", 16777216),
+
+		// sqrt-ceil
+		new LispTest("(sqrt-ceil 2)",   2),
+		new LispTest("(sqrt-ceil 99)",  10),
+		new LispTest("(sqrt-ceil 100)", 10),
+		new LispTest("(sqrt-ceil 101)", 11),
+		new LispTest("(sqrt-ceil 16777216)", 4096),
+		new LispTest("(sqrt-ceil 16777217)", 4097),
 	]; // / lispTests
 
 	function LispTest(lispStr, expectedResult) {

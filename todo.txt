@@ -1,8 +1,5 @@
 In progress
  - prime factors
-   - sqrt-ceil
-   - int-range-infimum
-   - int-pow-2
 
 Code puzzles
  - primality tests.
@@ -10,21 +7,22 @@ Code puzzles
  - balanced tree data structures.
 
 Unit tests
- - lexical closure variable capture
  - a function's setl shouldn't create variables in the definition scope
  - macro
 
 Lib
  - let
  - apply
+ - tracing
 
 Prologue
  - fast divrem
  - OO
 
 Lang
+ - debugging
+   - Lisp stack traces on error.
  - comments
- - macros
  - strings
  - pure functions
  - static typing

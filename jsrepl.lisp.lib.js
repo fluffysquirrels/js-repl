@@ -86,8 +86,8 @@ jsrepl.lisp.getLib = function() {
 		return func;
 	}
 
-	var isValidArgRegex = /^\*?([a-z0-9_]+)$/;
-	var isVarArgRegex =    /^\*([a-z0-9_]+)$/;
+	var isValidArgRegex = /^\*?([a-z0-9\-_]+)$/;
+	var isVarArgRegex =    /^\*([a-z0-9\-_]+)$/;
 
 	function parseArgDefns(argDefnsArray) {
 		var argsSpec = {};
@@ -105,6 +105,8 @@ jsrepl.lisp.getLib = function() {
 				else {
 					// isVarArgDefn
 					if(ix !== argDefnsArray.length - 1) {
+						// Also covers the case where two
+						// varargs symbols are provided.
 						throw new Error("Varags symbols must come at the end of a function's arguments list. '" + argName + "' came at index " + ix + " of an arguments list of length " + argDefnsArray.length + ".");
 					}
 
