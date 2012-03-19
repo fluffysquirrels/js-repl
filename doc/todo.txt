@@ -1,5 +1,7 @@
 In progress
  - prime factors
+ - oo
+   - records
 
 Code puzzles
  - primality tests.
@@ -9,11 +11,15 @@ Code puzzles
 Unit tests
  - a function's setl shouldn't create variables in the definition scope
  - macro
+ - record functions
+   - new
+   - with-values
 
 Lib
  - let
  - apply
  - tracing
+ - pp
 
 Prologue
  - fast divrem

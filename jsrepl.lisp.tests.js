@@ -23,6 +23,7 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(* 7 3 8)", 	168),
 		new LispTest("(- 55 42)", 	13),
 		new LispTest("(/ 56 8)", 	7),
+		new LispTest("(/ 12 4)", 	3),
 		new LispTest("(/ 13 4)", 	3.25),
 
 		// Numerical comparisons
@@ -121,17 +122,42 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(cdr (cdr (quot (1 2))))", null),
 
 		// cons
+		new LispTest("(eq (cons) (quot ()))", true),
+		new LispTest("(eq (cons 1) (quot (1)))", true),
+
 		new LispTest("(car      (cons 1 (quot (2))))", 1),
 		new LispTest("(car (cdr (cons 1 (quot (2)))))", 2),
 		new LispTest("(cdr (cdr (cons 1 (quot (2)))))", null),
 		
+		new LispTest("(car (cons 1 null))", 1),
+		new LispTest("(cdr (cons 1 null))", null),
 		new LispTest("(car (cons 1))", 1),
 		new LispTest("(cdr (cons 1))", null),
+		new LispTest("(car (cons))", null),
+		new LispTest("(cdr (cons))", null),
 
 		// list
 		new LispTest("(eq (list)     (quot ()))", true),
 		new LispTest("(eq (list 1)   (quot (1)))", true),
 		new LispTest("(eq (list 1 2) (quot (1 2)))", true),
+
+		// push
+		new LispTest("(eq (push (list 1 2) 8) (quot (1 2 8)))", true),
+
+		// num-seq
+		new LispTest("(eq (num-seq 5 8) (quot (5 6 7)))", true),
+		new LispTest("(eq (num-seq 5 6) (quot (5)))", true),
+		new LispTest("(eq (num-seq 5 5) (quot ()))", true),
+		new LispTest("(eq (num-seq 5 4) (quot ()))", true),
+
+		// filter on numerical sequences
+		new LispTest("(eq (filter (num-seq 5 9) num-even?) (quot (6 8)))", true),
+		new LispTest("(eq (filter (num-seq 5 9) num-odd?)  (quot (5 7)))", true),
+		new LispTest("(eq (filter (quot ()) num-even?) (quot ()))", true),
+		new LispTest("(eq (filter (quot (1 3 5)) num-even?) (quot ()))", true),
+
+		// map on numerical sequences
+		new LispTest("(eq (map (num-seq 1 7) (func (x) (* x x))) (quot (1 4 9 16 25 36)))", true),
 
 		// quot
 		new LispTest("(quot 5)", 5),
@@ -164,6 +190,8 @@ jsrepl.lisp.runTests = function() {
 		// and
 		new LispTest("(and false false)",  false),
 		new LispTest("(and false true )",  false),
+		new LispTest("(and false throwError)",  false),
+		new LispTest("(and false throwError)",  false),
 		new LispTest("(and true  false)",  false),
 		new LispTest("(and true  true )",  true ),
 		
@@ -171,6 +199,7 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(or false false)",  false),
 		new LispTest("(or false true )",  true ),
 		new LispTest("(or true  false)",  true ),
+		new LispTest("(or true  throwError)",  true ),
 		new LispTest("(or true  true )",  true ),
 
 		// do (a macro)

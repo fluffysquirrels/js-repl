@@ -1,0 +1,33 @@
+New functions for records
+	record?
+	is-a
+	typeof
+	get-fields
+	get-field
+	get-values
+	new
+	with-values:
+		e.g. (with-values myrec
+				(	(field1 1)
+					(field2 "2")
+				)
+			)
+		returns new record with just those values changed
+
+New functions for methods
+	.	-- (. my-method my-obj arg1 arg2 arg3)
+
+Redefine func to permit type annotations and check them at run-time.
+
+Ideas
+	modules
+		functions are defined in modules (like namespaces)
+		a class definition is itself a module
+		modules have certain access to members of other modules: generalises internal, public, friend, etc.
+			defined by some overloaded function (can-call member calling-scope)
+		this should be compatible with multi-methods
+		still have a single place where "the class itself" is defined: discoverability, can reason about invariants
+
+		
+
+

@@ -2,6 +2,8 @@ var jsrepl = jsrepl || {};
 jsrepl.lisp = jsrepl.lisp || {};
 
 jsrepl.lisp.getLib = function() {
+	var logger = ioc.createLogger("lisp.lib").withDebug(false);
+	
 	var lib;
 
 	function createLib(){ return {
@@ -74,6 +76,8 @@ jsrepl.lisp.getLib = function() {
 		var argsSpec = parseArgDefns(argDefns.list);
 
 		var func = function(invocationScope, args) {
+			logger.debug("Running function body expecting '\r\n" + jsrepl.pp.prettyPrint(argDefns.list) + "' with arguments '\r\n" + jsrepl.pp.prettyPrint(args)  + "'.");
+
 			var execScope = defnScope.copy();
 
 			// Push function evaluation scope frame.
@@ -308,7 +312,10 @@ jsrepl.lisp.getLib = function() {
 	}
 	
 	function Lib_arrayCons(scope, args) {
-		if(args.length === 1) {
+		if(args.length === 0) {
+			return new jsrepl.lisp.LispExpression([]);
+		}
+		else if(args.length === 1) {
 			return new jsrepl.lisp.LispExpression([args[0]]);
 		}
 		else if(args.length === 2) {
@@ -316,6 +323,10 @@ jsrepl.lisp.getLib = function() {
 			var tail = args[1];
 
 			var tailType = utils.getTypeOf(tail);
+
+			if(tailType === "null") {
+				return Lib_arrayCons(scope, [head]);
+			}
 
 			if(tailType !== "LispExpression") {
 				throw new Error("Using cons with a tail that is not a LispExpression is not currently supported. cons received a tail of type " + tailType + ".");
@@ -335,7 +346,7 @@ jsrepl.lisp.getLib = function() {
 			return retExpr;
 		}
 		else {
-			utils.assertNumArgs(args, "1 or 2");
+			utils.assertNumArgs(args, "0 or 1 or 2");
 		}
 	}
 

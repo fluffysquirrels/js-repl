@@ -2,14 +2,20 @@ var jsrepl = jsrepl || {};
 jsrepl.lisp = jsrepl.lisp || {};
 
 jsrepl.lisp.LispScope =
-	function LispScope(evaluator) {
+	function LispScope(evaluator, thread) {
 		utils.assertType("evaluator", evaluator, "LispEvaluator");
+		utils.assertType("thread", thread, "LispThread");
 
 		var _evaluator = evaluator;
+		var _thread = thread;
 		var _frames = [];
 
 		this.getEvaluator = function() {
 			return _evaluator;
+		}
+
+		this.getThread = function() {
+			return _thread;
 		}
 
 		this.pushFrame = function(frame) {
@@ -19,7 +25,7 @@ jsrepl.lisp.LispScope =
 		};
 
 		this.copy = function() {
-			var ret = new LispScope(_evaluator);
+			var ret = new LispScope(_evaluator, _thread);
 
 			utils.each(_frames, function(frame) {
 				ret.pushFrame(frame);

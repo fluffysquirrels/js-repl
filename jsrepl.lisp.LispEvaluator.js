@@ -21,7 +21,7 @@ function LispEvaluator() {
 	var _this = this;
 	var _logger =
 		ioc.createLogger(
-			"lisp.LispEvaluator").withDebug(false);
+			"lisp.LispEvaluator").withDebug(true);
 	this.logger = _logger;
 
 	this.readEval = function(cmdString) {
@@ -54,6 +54,30 @@ function LispEvaluator() {
 	}
 	
 	this.evalOneExpr = function(scope, expr) {
+		var thread;
+
+		try {
+			thread = scope.getThread();
+			var newStackFrame = new jsrepl.lisp.LispStackFrame(scope, expr);
+			thread.pushFrame(newStackFrame);
+
+			var result = evalOneExpr_body(scope, expr);
+
+			thread.popFrame();
+
+			return result;
+		}
+		catch(ex) {
+			if(utils.getTypeOf(ex) === "LispException") {
+				throw ex;
+			}
+			else {
+				throw new jsrepl.lisp.LispException(thread, ex);
+			}
+		}
+	}
+
+	var evalOneExpr_body = function(scope, expr) {
 		var exprType = utils.getTypeOf(expr);
 		
 		if(exprType === "LispSymbol")
@@ -101,9 +125,12 @@ function LispEvaluator() {
 	}
 	
 	function createNewScope() {
-		var scope = new jsrepl.lisp.LispScope(_this);
+		var thread = new jsrepl.lisp.LispThread(_this);
+		var scope = new jsrepl.lisp.LispScope(_this, thread);
+
 		scope.pushFrame(_globalScopeFrame);
 		scope.pushFrame(new jsrepl.lisp.LispScopeFrame());
+
 		return scope;
 	}
 
