@@ -49,15 +49,35 @@
 
 (setg divrem
 	(func (a b)
-		(setl divrem-int
-			(func (a b acc)
-				(if (< a b)
-					(cons acc (cons a))
-					(divrem-int (- a b) b (+ acc 1))
-				)
+		(setl divrem-internal
+			(func 	(a
+					curr-divisor
+					curr-divisor-multiplier)
+				(if (< a curr-divisor)
+					(list 0 a)
+				(do
+					(setl result-from-larger-divisors
+						(divrem-internal
+							a
+							(+ curr-divisor curr-divisor)
+							(+ curr-divisor-multiplier curr-divisor-multiplier)))
+					(setl remaining-dividend (car (cdr result-from-larger-divisors)))
+					(setl curr-quotient (car result-from-larger-divisors))
+
+					(if (< remaining-dividend curr-divisor)
+						(list curr-quotient remaining-dividend)
+						(list
+							(+ 	curr-quotient
+								curr-divisor-multiplier)
+							(-	remaining-dividend
+								curr-divisor))
+					)
+
+				))
 			)
 		)
-		(divrem-int a b 0) 
+
+		(divrem-internal a b 1)
 	)
 )
 

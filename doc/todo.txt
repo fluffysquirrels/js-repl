@@ -22,12 +22,10 @@ Lib
  - pp
 
 Prologue
- - fast divrem
  - OO
 
 Lang
  - debugging
-   - Lisp stack traces on error.
  - comments
  - strings
  - pure functions
