@@ -1,8 +1,8 @@
 (setg do
 	(macro (*exprs)
 		(cons
-			(cons (quot func)
-			(cons (quot ())
+			(cons 'func
+			(cons '()
 				  *exprs
 			))
 		)
@@ -12,7 +12,7 @@
 (setg null-or-empty-list?
 	(func (a-list)
 		(or (null? a-list)
-			(eq a-list (quot ())))
+			(eq a-list '()))
 	))
 
 (setg condf
@@ -34,9 +34,9 @@
 (setg condf-test (func (x)
 	(condf
 		(list
-			(list (func () (< x 5)) (func () (list x (quot lessthan5))))
-			(list (func () (> x 5)) (func () (list x (quot morethan5))))
-			(list (func () true) (func () (list x (quot equals5))))
+			(list (func () (< x 5)) (func () (list x 'lessthan5)))
+			(list (func () (> x 5)) (func () (list x 'morethan5)))
+			(list (func () true) (func () (list x 'equals5)))
 		)
 	)
 ))
@@ -50,7 +50,7 @@
 
 (setg and (macro (a b)
 	(list
-		(quot if) a
+		'if a
 			b
 			false
 	)
@@ -58,7 +58,7 @@
 
 (setg or (macro (a b)
 	(list
-		(quot if) a
+		'if a
 			true
 			b
 	)
@@ -181,7 +181,7 @@
 (setg num-seq
 	(func (min upper-bound)
 		(if (>= min upper-bound)
-			(quot ())
+			'()
 			(cons
 				min
 				(num-seq
@@ -204,7 +204,7 @@
 
 (setg filter (func (elts pred)
 		(if (null-or-empty-list? elts)
-			(quot ())
+			'()
 		(do
 			(setl curr-elt (car elts))
 			(setl get-rest (func ()
@@ -220,7 +220,7 @@
 
 (setg map (func (elts map-func)
 	(if (null-or-empty-list? elts)
-		(quot ())
+		'()
 	(cons
 		(map-func (car elts))
 		(map (cdr elts) map-func)
@@ -261,9 +261,9 @@
 (setg eval-debug
 	(macro (expr)
 		(list
-			(quot list)
-			(list (quot quot) expr)
-			(quot (quot =))
+			'list
+			(list 'quot expr)
+			'(quot =)
 			expr
 		)
 	)
@@ -363,7 +363,7 @@
 		(func (rec)
 			(setl record-partition
 				(partition rec
-					(is-child-called (quot type-name))))
+					(is-child-called 'type-name)))
 			(setl type-name-part
 				(car (car record-partition)))
 			(car (cdr type-name-part))
@@ -392,7 +392,7 @@
 		(func (rec)
 			(setl record-partition
 				(partition rec
-						(is-child-called (quot fields))))
+						(is-child-called 'fields)))
 		
 			(setl record-fields (cdr (car (car record-partition))))
 			record-fields
@@ -423,8 +423,8 @@
 
 	(setl type-of-type
 		(new-record-internal
-			(quot type)
-			(quot((type-name symbol type)))
+			'type
+			'((type-name symbol type))
 		)
 	)
 
