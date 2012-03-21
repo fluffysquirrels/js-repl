@@ -6,12 +6,42 @@ jsrepl.lisp = jsrepl.lisp || {};
 jsrepl.lisp.parser = function() {
 	var pub = {};
 
-	var _logger = ioc.createLogger("lisp.parser");
+	var _logger = ioc.createLogger("lisp.parser").withDebug(false);
 
 	pub.read = function(str) {
 		var tokens = tokenise(str);
 
 		var nestLevels = [new jsrepl.lisp.LispExpression()];
+
+		function pushToTopLevel(elt) {
+			if(getPrevTokenOnThisLevelWasQuote()) {
+				var quotExpr = new jsrepl.lisp.LispExpression();
+				quotExpr.list.push(
+					new jsrepl.lisp.LispSymbol("quot"));
+				quotExpr.list.push(elt);
+				removePrevTokenOnThisLevelWasQuote();
+				pushToTopLevel(quotExpr);
+			}
+			else {
+				getTopLevel().list.push(elt);
+			}
+		}
+
+		function getPrevTokenOnThisLevelWasQuote() {
+			return getTopLevel().prevTokenWasQuote === true;
+		}
+
+		function removePrevTokenOnThisLevelWasQuote() {
+			delete getTopLevel().prevTokenWasQuote;
+		}
+
+		function setPrevTokenOnThisLevelWasQuote() {
+			getTopLevel().prevTokenWasQuote = true;
+		}
+
+		function getTopLevel(){
+			return nestLevels[nestLevels.length-1];
+		}
 
 		for(var ixToken = 0; ixToken < tokens.length; ixToken++) 
 		{
@@ -27,12 +57,17 @@ jsrepl.lisp.parser = function() {
 
 				var doneLevel = nestLevels.pop();
 
-				nestLevels[nestLevels.length-1].list.push(doneLevel);
-				
+				pushToTopLevel(doneLevel);
+			}
+			else if(getPrevTokenOnThisLevelWasQuote() || currToken !== "'") {
+				// Not a special token
+				pushToTopLevel(currToken);
+			}
+			else if(currToken === "'") {
+				setPrevTokenOnThisLevelWasQuote();
 			}
 			else {
-				// Non-bracket token
-				nestLevels[nestLevels.length-1].list.push(currToken);
+				throw new Error("Not reached.")
 			}
 		} // for each token
 
@@ -80,12 +115,15 @@ jsrepl.lisp.parser = function() {
 				}
 			}
 			else if(ch === "(" ||
-					ch === ")" ||
-					ch === "\\") {
+					ch === ")") {
 				if(currToken !== emptyCurrToken) {
 					pushCurrToken();
 				}
 				
+				tokens.push(ch);
+			}
+			else if(ch === "'" &&
+					currToken === emptyCurrToken) {
 				tokens.push(ch);
 			}
 			else {

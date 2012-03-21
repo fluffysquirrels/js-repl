@@ -80,6 +80,12 @@ var utils = function(){
 		}
 	}
 
+	pub.assertEqual = function(name, value, expectedValue) {
+		if(value !== expecedValue) {
+			throw new Error("Expected variable '" + name + "' to be '" + expectedValue + "', of type " + utils.getTypeOf(expectedValue) + ", but it was '" + value + "', of type " + utils.getTypeOf(value));
+		}
+	}
+
 	pub.isIntegerString = function(str) {
 		return /^(\+|\-)?[0-9]+$/.test(str);
 	};

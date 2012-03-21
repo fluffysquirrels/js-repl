@@ -66,10 +66,7 @@ jsrepl.lisp.LispScope =
 			});
 
 			if(ret === undefined) {
-				throw {
-					message: "Couldn't find variable '" + varName + "'.",
-					frames: _frames
-				};
+				throw "Couldn't find variable '" + varName + "'.";
 			}
 
 			return ret;

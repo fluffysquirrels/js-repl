@@ -50,6 +50,8 @@ jsrepl.main = function() {
 					_withErrorHandler(function() {
 						logger.debug("Lisp prologue: \n'" + lispStr + "'");
 						ioc.lispInitScripts = [lispStr];
+						//ioc.lispInitScripts = [];
+
 						ioc.createLispEvaluator = function() {
 							var le = new jsrepl.lisp.LispEvaluator();
 							le.runScripts(ioc.lispInitScripts);

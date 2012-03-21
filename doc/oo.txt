@@ -1,18 +1,5 @@
 New functions for records
-	record?
-	is-a
-	typeof
-	get-fields
-	get-field
-	get-values
-	new
-	with-values:
-		e.g. (with-values myrec
-				(	(field1 1)
-					(field2 "2")
-				)
-			)
-		returns new record with just those values changed
+	internal - new-record-internal
 
 New functions for methods
 	.	-- (. my-method my-obj arg1 arg2 arg3)
@@ -27,7 +14,3 @@ Ideas
 			defined by some overloaded function (can-call member calling-scope)
 		this should be compatible with multi-methods
 		still have a single place where "the class itself" is defined: discoverability, can reason about invariants
-
-		
-
-

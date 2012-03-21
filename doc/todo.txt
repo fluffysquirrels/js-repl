@@ -1,32 +1,45 @@
 In progress
- - prime factors
  - oo
    - records
+     - with-values throws when run on non-record
+     - is-a
+	 - type-of
+     - new takes a values list
+	 - new and with-values are macros so values list doesn't need quoting
+
+Unit tests
+ - record functions
+   - new
+   - with-values
+   - get-value
+ - '
+ - macro
+
+Speed up unit tests by banning setg in them and only running init scripts once.
+
+Lisp lib
+ - let
+ - apply
+ - cond
+ - data types
+   - dict type -- extract from oo
+ - pp
+ - variadic and, or.
+
+Lang
+ - quasiquoting
+ - load external files
+ - comments
+ - strings
+
+Future ideas
+ - debugging -- eval once
+ - pure functions
+ - static typing
+ - compile to JS
 
 Code puzzles
  - primality tests.
  - Fibonacci with memoization
  - balanced tree data structures.
 
-Unit tests
- - a function's setl shouldn't create variables in the definition scope
- - macro
- - record functions
-   - new
-   - with-values
-
-Lib
- - let
- - apply
- - tracing
- - pp
-
-Prologue
- - OO
-
-Lang
- - debugging
- - comments
- - strings
- - pure functions
- - static typing

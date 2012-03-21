@@ -6,8 +6,16 @@ jsrepl.lisp = jsrepl.lisp || {};
 jsrepl.lisp.runTests = function() {
 	var logger = ioc.createLogger("lisp.tests");
 	
+	function runTestLispCode(lispStr) {
+		logger.debug("Running test lisp code '" + lispStr + "'");
+		
+		var evaluator = ioc.createLispEvaluator();
+		result = evaluator.readEval(lispStr);
+		logger.debug("Result: '" + result + "'");
+		return result;
+	}
+
 	var lispTests = [
-		new LispTest("(setl si (func (x) (if (= x 1) 1 (+ x (si (- x 1)))  ))) (si 20)", 210),
 	
 		// Parsing basic values
 		new LispTest("hello", "world!"),
@@ -15,6 +23,13 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("false", false),
 		new LispTest("5", 5),
 		new LispTest("null", null),
+		
+		// Parsing '
+		new LispTestEq("'true", "(quot true)"),
+		new LispTestEq("'()", "(quot ())"),
+		new LispTestEq("'(1 2 3)", "(quot (1 2 3))"),
+		new LispTestEq("'(1 (2 3) 4)", "(quot (1 (2 3) 4))"),
+		new LispTestEq("'(1 (2 3) 4)", "(list 1 (list 2 3) 4)"),
 
 		// Arithmetic
 		new LispTest("(+ 5 6)", 	11),
@@ -47,40 +62,41 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(>= 6 5)", 	true),
 
 		// divrem
-		new LispTest("(eq (divrem 3 2)  (quot (1 1)))", true),
-		new LispTest("(eq (divrem 8 4)  (quot (2 0)))", true),
-		new LispTest("(eq (divrem 29 7) (quot (4 1)))", true),
+		new LispTest("(eq (divrem 3 2)  '(1 1))", true),
+		new LispTest("(eq (divrem 8 4)  '(2 0))", true),
+		new LispTest("(eq (divrem 29 7) '(4 1))", true),
 
 		// js=
 		new LispTest("(js= 5 5)", 	true),
 		new LispTest("(js= 5 6)", 	false),
 		new LispTest("(js= true true)", true),
 		new LispTest("(js= 5 false)", false),
-		new LispTest("(js= (quot a) (quot a))", false),
+		new LispTest("(js= 'a 'a)", false),
 
 		// jstypeof
-		new LispTest("(sym= (jstypeof 5) (quot number))", true),
-		new LispTest("(sym= (jstypeof 5) (quot boolean))", false),
-		new LispTest("(sym= (jstypeof true) (quot boolean))", true),
-		new LispTest("(sym= (jstypeof null) (quot null))", true),
-		new LispTest("(sym= (jstypeof (quot somesymbol)) (quot LispSymbol))", true),
-		new LispTest("(sym= (jstypeof (quot (1 2 3))) (quot LispExpression))", true),
-		new LispTest("(sym= (jstypeof (func () true)) (quot LispFunction))", true),
+		new LispTest("(sym= (jstypeof 5) 'number)", true),
+		new LispTest("(sym= (jstypeof 5) 'boolean)", false),
+		new LispTest("(sym= (jstypeof true) 'boolean)", true),
+		new LispTest("(sym= (jstypeof null) 'null)", true),
+		new LispTest("(sym= (jstypeof 'somesymbol) 'LispSymbol)", true),
+		new LispTest("(sym= (jstypeof '(1 2 3)) 'LispExpression)", true),
+		new LispTest("(sym= (jstypeof (func () true)) 'LispFunction)", true),
 
 		// sym=
-		new LispTest("(sym= (quot a) (quot a))", true),
-		new LispTest("(sym= (quot a) (quot b))", false),
+		new LispTest("(sym= 'a 'a)", true),
+		new LispTest("(sym= 'a 'b)", false),
 
 		// (?<type>\w+)?
-		new LispTest("(cons? (quot ()))", 	true),
+		new LispTest("(cons? '())", 		true),
 		new LispTest("(num?  5)", 			true),
-		new LispTest("(sym?  (quot a))", 	true),
+		new LispTest("(sym?  'a)", 			true),
 		new LispTest("(func? (func () 6))", true),
 		new LispTest("(bool? true)", 		true),
-		new LispTest("(null? (cdr (quot ())))", true),
+		new LispTest("(null? (cdr '()))", 	true),
+		new LispTest("(null? null)", 		true),
 
 		// Assignment
-		new LispTest("(setg abra 5) abra", 5),
+		new LispTest("(setg abra 0)(setg abra 6) abra", 6),
 		new LispTest("(setl abra 5) abra", 5),
 		
 		// func
@@ -99,35 +115,35 @@ jsrepl.lisp.runTests = function() {
 		new LispTest(
 			"(eq " +
 				"((func (x y *args) (cons (* x y) *args)) 4 5)" +
-				"(quot (20)))", true),
+				"'(20))", true),
 		new LispTest(
 			"(eq " +
 				"((func (x y *args) (cons (* x y) *args)) 4 5 6)" +
-				"(quot (20 6)))", true),
+				"'(20 6))", true),
 		new LispTest(
 			"(eq " +
 				"((func (x y *args) (cons (* x y) *args)) 4 5 6 7)" +
-				"(quot (20 6 7)))", true),
+				"'(20 6 7))", true),
 
 		// car
-		new LispTest("(car (quot ()))", null),
-		new LispTest("(car (quot (2)))", 2),
-		new LispTest("(car (quot (1 2)))", 1),
-		new LispTest("(setl chillax true)(eval (car (quot (chillax))))", true),
+		new LispTest("(car '())", null),
+		new LispTest("(car '(2))", 2),
+		new LispTest("(car '(1 2))", 1),
+		new LispTest("(setl chillax true)(eval (car '(chillax)))", true),
 		
 		// cdr
-		new LispTest("(cdr (quot ()))", null),
-		new LispTest("(cdr (quot (1)))", null),
-		new LispTest("(car (cdr (quot (1 2))))", 2),
-		new LispTest("(cdr (cdr (quot (1 2))))", null),
+		new LispTest("(cdr '())", null),
+		new LispTest("(cdr '(1))", null),
+		new LispTest("(car (cdr '(1 2)))", 2),
+		new LispTest("(cdr (cdr '(1 2)))", null),
 
 		// cons
-		new LispTest("(eq (cons) (quot ()))", true),
-		new LispTest("(eq (cons 1) (quot (1)))", true),
+		new LispTest("(eq (cons) '())", true),
+		new LispTest("(eq (cons 1) '(1))", true),
 
-		new LispTest("(car      (cons 1 (quot (2))))", 1),
-		new LispTest("(car (cdr (cons 1 (quot (2)))))", 2),
-		new LispTest("(cdr (cdr (cons 1 (quot (2)))))", null),
+		new LispTest("(car      (cons 1 '(2)))", 1),
+		new LispTest("(car (cdr (cons 1 '(2))))", 2),
+		new LispTest("(cdr (cdr (cons 1 '(2))))", null),
 		
 		new LispTest("(car (cons 1 null))", 1),
 		new LispTest("(cdr (cons 1 null))", null),
@@ -137,27 +153,36 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(cdr (cons))", null),
 
 		// list
-		new LispTest("(eq (list)     (quot ()))", true),
-		new LispTest("(eq (list 1)   (quot (1)))", true),
-		new LispTest("(eq (list 1 2) (quot (1 2)))", true),
+		new LispTest("(eq (list)     '())", true),
+		new LispTest("(eq (list 1)   '(1))", true),
+		new LispTest("(eq (list 1 2) '(1 2))", true),
 
 		// push
-		new LispTest("(eq (push (list 1 2) 8) (quot (1 2 8)))", true),
+		new LispTest("(eq (push (list 1 2) 8) '(1 2 8))", true),
 
 		// num-seq
-		new LispTest("(eq (num-seq 5 8) (quot (5 6 7)))", true),
-		new LispTest("(eq (num-seq 5 6) (quot (5)))", true),
-		new LispTest("(eq (num-seq 5 5) (quot ()))", true),
-		new LispTest("(eq (num-seq 5 4) (quot ()))", true),
+		new LispTest("(eq (num-seq 5 8) '(5 6 7))", true),
+		new LispTest("(eq (num-seq 5 6) '(5))", true),
+		new LispTest("(eq (num-seq 5 5) '())", true),
+		new LispTest("(eq (num-seq 5 4) '())", true),
 
 		// filter on numerical sequences
-		new LispTest("(eq (filter (num-seq 5 9) num-even?) (quot (6 8)))", true),
-		new LispTest("(eq (filter (num-seq 5 9) num-odd?)  (quot (5 7)))", true),
-		new LispTest("(eq (filter (quot ()) num-even?) (quot ()))", true),
-		new LispTest("(eq (filter (quot (1 3 5)) num-even?) (quot ()))", true),
+		new LispTest("(eq (filter (num-seq 5 9) num-even?) '(6 8))", true),
+		new LispTest("(eq (filter (num-seq 5 9) num-odd?)  '(5 7))", true),
+		new LispTest("(eq (filter '() num-even?) '())", true),
+		new LispTest("(eq (filter '(1 3 5) num-even?) '())", true),
 
 		// map on numerical sequences
-		new LispTest("(eq (map (num-seq 1 7) (func (x) (* x x))) (quot (1 4 9 16 25 36)))", true),
+		new LispTest("(eq (map (num-seq 1 7) (func (x) (* x x))) '(1 4 9 16 25 36))", true),
+		new LispTest("(eq (map '() (func (x) notReached)) '())", true),
+
+		// first-or-null
+		new LispTest("(eq (first-or-null (num-seq 2 4) num-odd?) 3)", true),
+		new LispTest("(eq (first-or-null (num-seq 3 4) num-odd?) 3)", true),
+		new LispTest("(eq (first-or-null (list 4) num-odd?) null)", true),
+		new LispTest("(eq (first-or-null (list 4 6 8) num-odd?) null)", true),
+		new LispTest("(eq (first-or-null (cons) num-odd?) null)", true),
+		new LispTest("(eq (first-or-null '(3 notReached) num-odd?) 3)", true),
 
 		// quot
 		new LispTest("(quot 5)", 5),
@@ -167,7 +192,7 @@ jsrepl.lisp.runTests = function() {
 		// eval
 		new LispTest("(eval 5)", 5),
 		new LispTest("(eval 2 3 4 5)", 5),
-		new LispTest("(eval (cons (quot *) (quot (2 3))))", 6),
+		new LispTest("(eval (cons '* '(2 3)))", 6),
 		new LispTest("(eval (setl testVar 7) testVar)", 7),
 		new LispTest("(eval (list (func () 12)))", 12),
 
@@ -179,9 +204,9 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(if true (* 4 6) 1)", 24),
 
 		// condf
-		new LispTest("(eq (condf-test 4) (quot (4 lessthan5)))", true),
-		new LispTest("(eq (condf-test 5) (quot (5 equals5)))", true),
-		new LispTest("(eq (condf-test 6) (quot (6 morethan5)))", true),
+		new LispTest("(eq (condf-test 4) '(4 lessthan5))", true),
+		new LispTest("(eq (condf-test 5) '(5 equals5))", true),
+		new LispTest("(eq (condf-test 6) '(6 morethan5))", true),
 
 		// not
 		new LispTest("(not true)",  false),
@@ -206,8 +231,8 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(do (setl x 5) (* x 4))", 20),
 
 		// eval-debug (a macro)
-		new LispTest("(eq (eval-debug (+ 3 4)) (quot ((+ 3 4) = 7) ))", true),
-		new LispTest("(setl x 3)(eq (eval-debug (+ x 4)) (quot ((+ x 4) = 7) ))", true),
+		new LispTest("(eq (eval-debug (+ 3 4)) '((+ 3 4) = 7) )", true),
+		new LispTest("(setl x 3)(eq (eval-debug (+ x 4)) '((+ x 4) = 7) )", true),
 
 		// int-pow-2
 		new LispTest("(int-pow-2 0)",  1),
@@ -222,14 +247,42 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(sqrt-ceil 101)", 11),
 		new LispTest("(sqrt-ceil 16777216)", 4096),
 		new LispTest("(sqrt-ceil 16777217)", 4097),
+		
+		// sum-ints
+		new LispTest("(sum-ints 20)", 210),
+
+		// prime-factors
+		new LispTest("(eq (prime-factors 17) '(17))", true),
+		new LispTest("(eq (prime-factors 30) '(2 3 5))", true),
+		new LispTest("(eq (prime-factors 120) '(2 2 2 3 5))", true),
+		new LispTest("(eq (prime-factors 1) '())", true),
+
+		// ** OO **
+
+		// new
+		new LispTest("(setl r (new 'type)) true", true),
+		// record?
+		new LispTest("(setl r (new 'type))(record? r)", true),
+		new LispTest("(record? '())", false),
+		new LispTest("(record? '(not-a-record () ()))", false),
+		new LispTest("(record? 5)", false),
+
+		// with-values and get-value
+		new LispTestThrows("(setl r (new 'type))(get-value r 'f1)"),
+		new LispTestEq("(setl r (with-values (new 'type) '((f1 boolean true))))(get-value r 'f1)", "'true"),
+		new LispTestThrows("(setl r (with-values (new 'type) '((f1 true))))"),
+		new LispTestThrows("(setl r (with-values (new 'type) '((f1 boolean true extraArg))))"),
+		new LispTestThrows("(setl r (with-values (new 'type) (quot ((17 boolean true)))))"),
+		new LispTestThrows("(setl r (with-values (new 'type) '((f1 17 true))))"),
+		new LispTestEq("(setl r (with-values (new 'type) '((f1 boolean true))))(setl r (with-values r '((f1 boolean false))))(get-value r (quot f1))", "'false"),
+		new LispTestEq("(setl r (with-values (new 'type) '((f1 boolean true))))(setl r (with-values r '((f2 boolean false))))(get-value r 'f1)", "'true"),
+		new LispTestEq("(setl r (with-values (new 'type) '((f1 boolean true))))(setl r (with-values r '((f2 boolean false))))(get-value r 'f2)", "'false"),
 	]; // / lispTests
 
 	function LispTest(lispStr, expectedResult) {
 		function testFunc() {
-			logger.debug("Running lisp code '" + lispStr + "'");
-			
-			var evaluator = ioc.createLispEvaluator();
-			var result = evaluator.readEval(lispStr);
+			var result = runTestLispCode(lispStr);
+
 			jstest.assertEqual(
 				result,
 				expectedResult,
@@ -239,6 +292,58 @@ jsrepl.lisp.runTests = function() {
 		var description =
 			"Lisp code '" + lispStr +
 			"' should return '" + expectedResult + "'";
+
+		return new jstest.Test(testFunc, description);
+	}
+
+	function LispTestEq(lispTestStr, lispExpectedResultStr) {
+		function testFunc() {
+			var lispStr =
+				"(setl __testResult (do " + lispTestStr + "))" +
+				"(setl __testExpected (do " + lispExpectedResultStr + "))" +
+				"(setl __testPassed (eq __testResult __testExpected))" +
+				"(list __testPassed __testResult __testExpected)";
+
+			var resultLispExpr = runTestLispCode(lispStr);
+
+			var resultArray = resultLispExpr.list;
+			var testPassed = resultArray[0];
+
+			if(!testPassed) {
+				var resultStr = resultArray[1].toString();
+				var expectedStr = resultArray[2].toString();
+
+				throw new Error(
+					"Result not eq to expected\r\n" +
+					"    Expected: " + expectedStr + "\r\n" +
+					"    Actual:   " + resultStr);
+			}
+		}
+
+		var description =
+			"Lisp code '" + lispTestStr +
+			"' should return something that eq '" + lispExpectedResultStr + "'";
+
+		return new jstest.Test(testFunc, description);
+	}
+
+	function LispTestThrows(lispStr, expectedResult) {
+		function testFunc() {
+			var result;
+			try {
+				result = runTestLispCode(lispStr);
+			}
+			catch(ex) {
+				logger.debug("Code threw as expected; ex: \r\n" + jsrepl.pp.prettyPrint(ex));
+				return;
+			}
+
+			throw new Error("Lisp code did not throw as expected; returned '" + result + "'.");
+		}
+
+		var description =
+			"Lisp code '" + lispStr +
+			"' should throw.";
 
 		return new jstest.Test(testFunc, description);
 	}

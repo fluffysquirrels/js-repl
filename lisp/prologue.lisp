@@ -1,3 +1,20 @@
+(setg do
+	(macro (*exprs)
+		(cons
+			(cons (quot func)
+			(cons (quot ())
+				  *exprs
+			))
+		)
+	)
+)
+
+(setg null-or-empty-list?
+	(func (a-list)
+		(or (null? a-list)
+			(eq a-list (quot ())))
+	))
+
 (setg condf
 	(func (conds)
 		(if (null? conds)
@@ -88,6 +105,35 @@
 	)
 )
 
+(setg first-proper-prime-factor
+	(func (n)
+		(setl sqrt-n (sqrt-ceil n))
+		(first-or-null
+			(num-seq 2 (+ 1 sqrt-n))
+			(func (d) (eq (mod n d) 0)))
+	)
+)
+
+(setg prime-factors
+	(do
+		(func (n)
+			(if (= n 1)
+				(cons)
+			(do
+				(setl first-factor (first-proper-prime-factor n))
+
+				(if (null? first-factor)
+					(cons n)
+					(cons
+						first-factor
+						(prime-factors (/ n first-factor))
+					)
+				)
+			))
+		)
+	)
+)
+
 (setg list
 	(func (*values)
 		*values
@@ -157,7 +203,7 @@
 ))
 
 (setg filter (func (elts pred)
-		(if (or (null? elts) (eq elts (quot ())))
+		(if (null-or-empty-list? elts)
 			(quot ())
 		(do
 			(setl curr-elt (car elts))
@@ -173,7 +219,7 @@
 )
 
 (setg map (func (elts map-func)
-	(if (null? elts)
+	(if (null-or-empty-list? elts)
 		(quot ())
 	(cons
 		(map-func (car elts))
@@ -181,10 +227,25 @@
 	))
 ))
 
-(setg si (func (x)
+(setg first-or-null
+	(func (elts filter-func)
+		(if (null-or-empty-list? elts)
+			null
+		(do
+			(setl head (car elts))
+			(if (filter-func head)
+				head
+				(first-or-null
+					(cdr elts)
+					filter-func))
+		))
+	)
+)
+
+(setg sum-ints (func (x)
 	(if (= x 1)
 		1
-	(+ x (si (- x 1))))
+	(+ x (sum-ints (- x 1))))
 ))
 
 (setg num-cmp (func (x y)
@@ -196,17 +257,6 @@
 		-1
 		throwError)
 ))))
-
-(setg do
-	(macro (*exprs)
-		(cons
-			(cons (quot func)
-			(cons (quot ())
-				  *exprs
-			))
-		)
-	)
-)
 
 (setg eval-debug
 	(macro (expr)
@@ -279,14 +329,102 @@
 (do
   	(setl it-is-oo-time true)
 
-	(setl type-of-type
-		(quot
-			(record
-				(type-name type)
-				(fields
-					(type-name symbol type)
+	(setg record?
+		(func (rec)
+			(and
+				(and
+					(cons? rec)
+					(sym? (car rec))
 				)
+				(sym= (car rec) 'record)
 			)
+		))
+
+
+	(setg new
+		(func (type-name)
+			(if (not (sym= type-name 'type))
+				throwThisTypeNotYetImplementedException)
+			(new-record-internal type-name '())
+		)
+	)
+
+	(setl new-record-internal
+		(func (type-name fields)
+			(list
+				'record
+				(list 'type-name type-name)
+				(cons 'fields fields)
+			)
+		)
+	)
+
+	(setg get-type-name
+		(func (rec)
+			(setl record-partition
+				(partition rec
+					(is-child-called (quot type-name))))
+			(setl type-name-part
+				(car (car record-partition)))
+			(car (cdr type-name-part))
+		))
+
+	(setg get-value
+		(func (rec field-name)
+			(setl field (get-field rec field-name))
+			(car (cdr (cdr field )))
+		))
+
+	(setl get-field
+		(func (rec field-name)
+			(setl values (get-fields rec))
+			(setl fields-partition
+				(partition values (is-child-called field-name)))
+			(setl ret (car (car fields-partition)))
+			
+			(if (null? ret)
+				throwCouldntGetValueException)
+
+			ret
+		))
+	
+	(setl get-fields
+		(func (rec)
+			(setl record-partition
+				(partition rec
+						(is-child-called (quot fields))))
+		
+			(setl record-fields (cdr (car (car record-partition))))
+			record-fields
+		))
+			
+	(setg partition (func (a-list set1-predicate)
+		(setl set2-predicate
+			(func (elt) (not (set1-predicate elt))))
+
+		(setl set1
+			(filter a-list set1-predicate))
+		(setl set2
+			(filter a-list set2-predicate))
+
+		(list set1 set2)
+	))
+
+	(setl is-child-called
+		(func(child-name)
+			(func (elt)
+				(and
+					(and 	(cons? elt)
+						 	(sym? (car elt)))
+							(sym= (car elt) child-name))			
+			)
+		)
+	)
+
+	(setl type-of-type
+		(new-record-internal
+			(quot type)
+			(quot((type-name symbol type)))
 		)
 	)
 
@@ -296,68 +434,39 @@
 		)
 	)
 
-	(setg new
-		(func (type-name)
-			(if (not (sym= type-name (quot type)))
-				throwThisTypeNotYetImplementedException)
-
-			(list
-				(quot (record))
-				(list (quot type-name) type-name)
-				(quot (fields))
-			)
-		)
-	)
-
 	(setg with-values
 		(do
-			(setg partition (func (a-list set1-predicate)
-				(setl set2-predicate
-					(func (elt) (not (set1-predicate elt))))
-
-				(setl set1
-					(filter a-list set1-predicate))
-				(setl set2
-					(filter a-list set2-predicate))
-
-				(list set1 set2)
-			))
-
-			(setl is-child-called
-				(func(child-name)
-					(func (elt)
-						(and
-							(and 	(cons? elt)
-								 	(sym? (car elt)))
-									(sym= (car elt) child-name))			
-					)
-				)
-			)
-
 			(setl with-value
-				(func (rec field-value)
+				(func (rec field)
+					(setl field-name (car field))
+					(setl field-type (car (cdr field)))
+					(setl field-value (car (cdr (cdr field))))
 					
-					(setl field-name (car field-value))
+					(if (not (null? (cdr (cdr (cdr field)))))
+						throwTooManyValuesInFieldException)
+					(if (not (sym? field-name))
+						throwFirstElementInFieldMustBeSymbolForFieldName)
+					(if (not (sym? field-type))
+						throwSecondElementInFieldMustBeSymbolForTypeName)
 
-					(setl record-partition
-						(partition rec
-							(is-child-called (quot fields))))
-
-					(setl record-fields (cdr (car (car record-partition))))
-					(setl record-others (car (cdr record-partition)))
+					(setl record-fields (get-fields rec))
+					(setl type-name (get-type-name rec))
 					
 					(setl fields-partition
-							(partition record-fields
-								(is-child-called field-name)))
+						(partition
+							record-fields
+							(is-child-called field-name)))
 
 					(setl unmodified-fields
 						(car (cdr fields-partition)))
 					
 					(setl
 						new-record-fields
-						(cons (quot fields) (cons field-value unmodified-fields)))
+						 (cons field unmodified-fields))
 					
-					(push record-others new-record-fields)
+					(new-record-internal
+						type-name
+						new-record-fields)
 				)
 			)
 
