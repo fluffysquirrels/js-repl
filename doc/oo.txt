@@ -1,10 +1,34 @@
+** Todo
+
+* Records
 New functions for records
-	internal - new-record-internal
+	register-type
+	record=
+	eq updates
+
+Add more types
+	primitives - type object and get-type-name impl
+		null
+		number
+		symbol
+		list
+		boolean
+		string
+		func
+		macro
+	play types with only primitive fields (e.g. point, vector)
+	play types with record fields
+
+Verify field names and types when filling records
+Remove types from record field values.
+
+--------
+
+Redefine func to permit type annotations and check them at run-time.
 
 New functions for methods
 	.	-- (. my-method my-obj arg1 arg2 arg3)
 
-Redefine func to permit type annotations and check them at run-time.
 
 Ideas
 	modules

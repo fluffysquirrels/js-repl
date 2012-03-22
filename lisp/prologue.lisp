@@ -9,6 +9,11 @@
 	)
 )
 
+(setg apply
+	(func (a-func args)
+		(eval (cons a-func args))
+	))
+
 (setg null-or-empty-list?
 	(func (a-list)
 		(or (null? a-list)
@@ -342,10 +347,18 @@
 
 
 	(setg new
-		(func (type-name)
-			(if (not (sym= type-name 'type))
-				throwThisTypeNotYetImplementedException)
-			(new-record-internal type-name '())
+		(func (type-name *rest)
+			(if (not (type-exists type-name))
+				throwTypeDoesNotExistException)
+
+			(setl rec (new-record-internal type-name '()))
+
+			(setl optional-field-values (car *rest))
+
+			(if (not (null? optional-field-values))
+				(with-values rec optional-field-values)
+				rec
+			)
 		)
 	)
 
@@ -353,33 +366,84 @@
 		(func (type-name fields)
 			(list
 				'record
-				(list 'type-name type-name)
-				(cons 'fields fields)
+				type-name
+				fields
 			)
-		)
-	)
+		))
 
 	(setg get-type-name
 		(func (rec)
-			(setl record-partition
-				(partition rec
-					(is-child-called 'type-name)))
-			(setl type-name-part
-				(car (car record-partition)))
-			(car (cdr type-name-part))
+			(if (not (record? rec))
+				throwNotARecordException)
+			(car (cdr rec))
+		))
+
+	(setl get-fields
+		(func (rec)
+			(if (not (record? rec))
+				throwNotARecordException)
+
+			(car (cdr (cdr rec)))
+		))
+			
+	(setg get-type
+		(func (type-name)
+			(setl the-type
+				(first-or-null
+					types
+					(func (type-rec)
+						(eq (get-value type-rec 'name)
+							type-name))
+				))
+			the-type
+		))
+
+	(setg type-exists
+		(func (type-name)
+			(setl the-type (get-type type-name))
+			(not (null? the-type))
+		))
+
+	(setg type-of
+		(func (rec)
+			(setl type-name (get-type-name rec))
+			(setl rec-type (get-type type-name))
+
+			(if (null? rec-type)
+				throwCouldntFindTypeForRecord)
+			rec-type
+		))
+
+	(setg get-type-fields
+		(func (type)
+			(setl type-fields (get-value type 'fields))
+			(map type-fields
+				(func (field)
+					(list
+						(get-value field 'type)
+						(get-value field 'name)
+					)
+				)
+			)
+		))
+
+	(setg is-a
+		(func (rec type-name)
+			(setl rec-type-name (get-type-name rec))
+			(sym= rec-type-name type-name)
 		))
 
 	(setg get-value
 		(func (rec field-name)
 			(setl field (get-field rec field-name))
-			(car (cdr (cdr field )))
+			(car (cdr (cdr field)))
 		))
 
 	(setl get-field
 		(func (rec field-name)
-			(setl values (get-fields rec))
+			(setl field-values (get-fields rec))
 			(setl fields-partition
-				(partition values (is-child-called field-name)))
+				(partition field-values (is-child-called field-name)))
 			(setl ret (car (car fields-partition)))
 			
 			(if (null? ret)
@@ -388,17 +452,7 @@
 			ret
 		))
 	
-	(setl get-fields
-		(func (rec)
-			(setl record-partition
-				(partition rec
-						(is-child-called 'fields)))
-		
-			(setl record-fields (cdr (car (car record-partition))))
-			record-fields
-		))
-			
-	(setg partition (func (a-list set1-predicate)
+	(setl partition (func (a-list set1-predicate)
 		(setl set2-predicate
 			(func (elt) (not (set1-predicate elt))))
 
@@ -416,21 +470,51 @@
 				(and
 					(and 	(cons? elt)
 						 	(sym? (car elt)))
-							(sym= (car elt) child-name))			
+							(sym= (car elt) child-name))
 			)
 		)
 	)
 
+	(setg new-type
+		(func (type-name *fields)
+			(new-record-internal
+				'type
+				(list
+				 	(list 'name 'symbol type-name)
+					(list 'fields 'list *fields)
+				)
+			)
+		))
+
+	(setg new-field
+		(func (field-name field-type)
+			(new-record-internal
+				'field
+				(list
+					(list 'name 'symbol field-name)
+					(list 'type 'symbol field-type)
+				)
+			)
+		))
+
 	(setl type-of-type
-		(new-record-internal
+		(new-type
 			'type
-			'((type-name symbol type))
-		)
-	)
+			(new-field 'name 'symbol)
+			(new-field 'fields 'list)
+		))
+
+	(setl type-of-field
+		(new-type
+			'field
+			(new-field 'name 'symbol)
+			(new-field 'type 'symbol)
+		))
 
 	(setl types
 		(list
 			type-of-type
+			type-of-field
 		)
 	)
 
@@ -438,6 +522,9 @@
 		(do
 			(setl with-value
 				(func (rec field)
+					(if (not (record? rec))
+						throwNotARecordException)
+
 					(setl field-name (car field))
 					(setl field-type (car (cdr field)))
 					(setl field-value (car (cdr (cdr field))))

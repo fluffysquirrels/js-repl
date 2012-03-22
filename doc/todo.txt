@@ -1,30 +1,23 @@
 In progress
  - oo
    - records
-     - with-values throws when run on non-record
-     - is-a
-	 - type-of
-     - new takes a values list
-	 - new and with-values are macros so values list doesn't need quoting
 
 Unit tests
  - record functions
-   - new
-   - with-values
-   - get-value
- - '
- - macro
-
-Speed up unit tests by banning setg in them and only running init scripts once.
+   - get-type-name
+   - is-a
+   - type-of
+   - type-exists
+   - get-type
 
 Lisp lib
- - let
- - apply
  - cond
  - data types
-   - dict type -- extract from oo
- - pp
+   - dict type -- for / from oo
+ - fold
  - variadic and, or.
+ - let
+ - pp
 
 Lang
  - quasiquoting
@@ -33,6 +26,8 @@ Lang
  - strings
 
 Future ideas
+ - deconstructing value bind
+ - rebind values
  - debugging -- eval once
  - pure functions
  - static typing

@@ -5,15 +5,12 @@ jsrepl.lisp = jsrepl.lisp || {};
 
 jsrepl.lisp.runTests = function() {
 	var logger = ioc.createLogger("lisp.tests");
-	
-	function runTestLispCode(lispStr) {
-		logger.debug("Running test lisp code '" + lispStr + "'");
-		
-		var evaluator = ioc.createLispEvaluator();
-		result = evaluator.readEval(lispStr);
-		logger.debug("Result: '" + result + "'");
-		return result;
-	}
+
+	// We require that no one modifies global state,
+	// so we can use a shared evaluator and speed up
+	// the tests by not re-running the prologue hundreds
+	// of times.
+	var evaluator = ioc.createLispEvaluator();
 
 	var lispTests = [
 	
@@ -96,7 +93,7 @@ jsrepl.lisp.runTests = function() {
 		new LispTest("(null? null)", 		true),
 
 		// Assignment
-		new LispTest("(setg abra 0)(setg abra 6) abra", 6),
+		// new LispTest("(setg abra 0)(setg abra 6) abra", 6), -- setg is banned; see runTestLispCode for more details.
 		new LispTest("(setl abra 5) abra", 5),
 		
 		// func
@@ -125,6 +122,31 @@ jsrepl.lisp.runTests = function() {
 				"((func (x y *args) (cons (* x y) *args)) 4 5 6 7)" +
 				"'(20 6 7))", true),
 
+		// apply
+		new LispTestEq(
+			"(apply + '(1 2 3))",
+			"6"),
+		new LispTestEq(
+			"(apply (func () 42) '())",
+			"42"),
+		new LispTestEq(
+			"(setl x 21)(setl a-func (func (arg) (* arg 2)))(apply a-func (list x))",
+			"42"),
+
+		// macro
+		new LispTestEq(
+			"(setl get-arg-defns (macro (*arg-defns) (list 'quot *arg-defns)))(get-arg-defns this wouldnt eval)",
+			"'(this wouldnt eval)"),
+		new LispTestEq(
+			"(setl eval-args-in-fn-scope (macro (*arg-defns) *arg-defns))(setl x 21)(eval-args-in-fn-scope * 2 x)",
+			"42"),
+		new LispTestThrows(
+			"(setl eval-args-in-fn-scope (macro (*arg-defns) (setl macro-var 17) *arg-defns))(eval-args-in-fn-scope macro-var)"),
+		new LispTestEq(
+			"(setl eval-args-in-macro-scope (macro (*arg-defns) (setl macro-var 17)(eval *arg-defns)))(eval-args-in-macro-scope eval macro-var)",
+			"17"),
+		new LispTestThrows(
+			"(setl eval-args-in-macro-scope (macro (*arg-defns) (eval *arg-defns)))(do (setl x 21)(eval-args-in-macro-scope * 2 x))"),
 		// car
 		new LispTest("(car '())", null),
 		new LispTest("(car '(2))", 2),
@@ -261,6 +283,7 @@ jsrepl.lisp.runTests = function() {
 
 		// new
 		new LispTest("(setl r (new 'type)) true", true),
+
 		// record?
 		new LispTest("(setl r (new 'type))(record? r)", true),
 		new LispTest("(record? '())", false),
@@ -277,6 +300,14 @@ jsrepl.lisp.runTests = function() {
 		new LispTestEq("(setl r (with-values (new 'type) '((f1 boolean true))))(setl r (with-values r '((f1 boolean false))))(get-value r (quot f1))", "'false"),
 		new LispTestEq("(setl r (with-values (new 'type) '((f1 boolean true))))(setl r (with-values r '((f2 boolean false))))(get-value r 'f1)", "'true"),
 		new LispTestEq("(setl r (with-values (new 'type) '((f1 boolean true))))(setl r (with-values r '((f2 boolean false))))(get-value r 'f2)", "'false"),
+
+		// new with optional values param
+		new LispTestEq("(setl r (new 'type '((f1 boolean true)))) (get-value r 'f1)", "'true"),
+		new LispTestEq("(setl r (new 'type '((f1 boolean true)))) (record? r)", "true"),
+
+		// get-type-name
+		new LispTestEq("(setl r (new 'type))(get-type-name r)", "'type"),
+
 	]; // / lispTests
 
 	function LispTest(lispStr, expectedResult) {
@@ -346,6 +377,18 @@ jsrepl.lisp.runTests = function() {
 			"' should throw.";
 
 		return new jstest.Test(testFunc, description);
+	}
+
+	function runTestLispCode(lispStr) {
+		logger.debug("Running test lisp code '" + lispStr + "'");
+	
+		if(/setg/.test(lispStr)) {
+			throw new Error("Cannot run this test lisp code that will modify global state by using 'setg'. This is to allow optimisation by re-using LispEvaluators.\r\nOffending code: '" + lispStr + "'.");
+		}
+
+		result = evaluator.readEval(lispStr);
+		logger.debug("Result: '" + result + "'");
+		return result;
 	}
 
 	jstest.runTests(lispTests);
