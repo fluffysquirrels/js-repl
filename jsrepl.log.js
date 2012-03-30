@@ -59,5 +59,14 @@ jsrepl.log = function() {
 		return new Logger(componentName);
 	}
 
+	ioc.withErrorHandler = 
+		function() {
+			var errorHandler =
+				new utils.err.ErrorHandler(pub.addOutput);
+			return function(fn) {
+				return errorHandler.withErrorHandler(fn);
+			};
+		}();
+
 	return pub;
 }();

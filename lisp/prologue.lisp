@@ -17,7 +17,14 @@
 (setg null-or-empty-list?
 	(func (a-list)
 		(or (null? a-list)
-			(eq a-list '()))
+			(and
+				(and
+					(cons? a-list)
+					(null? (car a-list))
+				)
+				(null? (cdr a-list))
+			)
+		)
 	))
 
 (setg condf
@@ -35,6 +42,27 @@
 		)
 	)
 )
+(do
+	(setg cond-int
+		(func (clauses)
+			(if (null-or-empty-list? clauses)
+				(list 'throwNoConditionEvaluatedTrue)
+				(do
+					(setl curr-clause (car clauses))
+					(list
+						'if (car curr-clause)
+							(car (cdr curr-clause))
+							(cond-int (cdr clauses))
+					)
+				)
+			)
+		))
+	(setg cond
+		(macro (*clauses)
+			(cond-int *clauses)
+		))
+)
+
 
 (setg condf-test (func (x)
 	(condf
@@ -157,14 +185,18 @@
 
 (setg eq
 	(func (a b)
-		(if (not (sym= (jstypeof a) (jstypeof b)))
-			false
-		(if (cons? a)
-			(listeq a b)
-		(if (sym? a)
-			(sym= a b)
-		(js= a b)
-		)))
+		(cond
+			((not (sym= (jstypeof a) (jstypeof b)))
+				false)
+			((and (record? a) (record? b))
+				(record= a b))
+			((cons? a)
+				(listeq a b))
+			((sym? a)
+				(sym= a b))
+			(true
+				(js= a b))
+		)
 	)
 )
 
@@ -371,11 +403,29 @@
 			)
 		))
 
-	(setg get-type-name
+	(setl get-record-type-name
 		(func (rec)
-			(if (not (record? rec))
-				throwNotARecordException)
 			(car (cdr rec))
+		))
+
+	(setg get-type-name
+		(func (obj)
+			(setl jstype (jstypeof obj))
+
+			(cond
+				((record? obj)
+					(get-record-type-name obj))
+				((null? obj) 'null)
+				((sym= jstype 'number) 			'number)
+				((sym= jstype 'LispExpression) 	'list)
+				((sym= jstype 'LispSymbol) 		'symbol)
+				((sym= jstype 'boolean) 		'bool)
+				((sym= jstype 'LispMacro) 		'macro)
+				((sym= jstype 'LispKeyword) 	'keyword)
+				((sym= jstype 'LispFunction) 	'func)
+				((sym= jstype 'string) 			'string)
+				(true throwObjectNotOfRecognisedTypeException)
+			)
 		))
 
 	(setl get-fields
@@ -511,13 +561,22 @@
 			(new-field 'type 'symbol)
 		))
 
-	(setl types
+	(setg types
 		(list
 			type-of-type
 			type-of-field
+
+			(new-type 'number	'())
+			(new-type 'list		'())
+			(new-type 'symbol	'())
+			(new-type 'bool		'())
+			(new-type 'null		'())
+			(new-type 'macro	'())
+			(new-type 'keyword	'())
+			(new-type 'func		'())
+			(new-type 'string	'())
 		)
 	)
-
 	(setg with-values
 		(do
 			(setl with-value

@@ -2,6 +2,7 @@
 <html>
 <head>
 	<script type="text/javascript" src="utils.js"></script>
+	<script type="text/javascript" src="utils.err.js"></script>
 	<script type="text/javascript" src="ioc.js"></script>
 	<script type="text/javascript" src="jsrepl.log.js"></script>
 	<script type="text/javascript" src="jsrepl.lisp.langTypes.js"></script>
@@ -15,15 +16,18 @@
 	<script type="text/javascript" src="jsrepl.lisp.tests.js"></script>
 	<script type="text/javascript" src="jsrepl.pp.js"></script>
 	<script type="text/javascript" src="jsrepl.cmdhist.js"></script>
-	<script type="text/javascript" src="utils.err.js"></script>
 	<script type="text/javascript" src="jsrepl.main.js"></script>
 
 	<style type="text/css">
+		body {
+			width: 480px;
+		}
 		#inputBox {
 			width: 350px;
 		}
 		#output {
 			clear: both;
+			width: 450px;
 		}
 		#langOptions {
 			float: left;
@@ -47,7 +51,7 @@
 	<div id="customButtons">
 	</div>
 
-	<pre id="output"></pre>
+	<pre id="output" wrap="true"></pre>
 
 	<script type="text/javascript">
 		jsrepl.main.onLoad();

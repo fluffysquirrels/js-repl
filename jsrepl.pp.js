@@ -26,7 +26,7 @@ jsrepl.pp = function() {
 		else {
 			strOutput += "\n" + linePrefix + " = { \n";
 	
-			propertyKeysArray = getObjectPropertyKeysArray(obj);
+			var propertyKeysArray = getObjectPropertyKeysArray(obj);
 
 			for(var ixPropKey = 0; ixPropKey < propertyKeysArray.length; ixPropKey++) {
 				

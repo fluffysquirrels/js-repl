@@ -12,14 +12,7 @@ jsrepl.main = function() {
 	var registerKeyLogHandlers = true;
 	var logger = ioc.createLogger("jsrepl.main");
 	
-	var _withErrorHandler =
-		function() {
-			var errorHandler =
-				new utils.err.ErrorHandler(jsrepl.log.addOutput);
-			return function(fn) {
-				return errorHandler.withErrorHandler(fn);
-			};
-		}();
+	var _withErrorHandler = ioc.withErrorHandler;
 
 	// ** Event handlers **
 
@@ -41,26 +34,10 @@ jsrepl.main = function() {
 
 			// addCustomBtn("var ib = inputBox; var o = { end: ib.selectionEnd, start: ib.selectionStart, length: ib.value.length }; o", "selection");
 			addCustomBtn("__err", "err");
-			addCustomBtn("jsrepl.lisp.runTests()", "lisp.tests");
-
-			utils.beginLoadFile(
-				"lisp/prologue.lisp",
-
-				function(lispStr) {
-					_withErrorHandler(function() {
-						logger.debug("Lisp prologue: \n'" + lispStr + "'");
-						ioc.lispInitScripts = [lispStr];
-						//ioc.lispInitScripts = [];
-
-						ioc.createLispEvaluator = function() {
-							var le = new jsrepl.lisp.LispEvaluator();
-							le.runScripts(ioc.lispInitScripts);
-
-							return le;
-						}
-
-						_lispEvaluator = ioc.createLispEvaluator();
-					});
+			addCustomBtn("jsrepl.lisp.beginRunTests()", "lisp.tests");
+			jsrepl.lisp.beginCreateEvaluator(
+				function(evaluator) {
+					_lispEvaluator = evaluator;
 				});
 
 			jsrepl.log.addOutput("onLoad done");

@@ -3,17 +3,28 @@
 var jsrepl = jsrepl || {};
 jsrepl.lisp = jsrepl.lisp || {};
 
-jsrepl.lisp.runTests = function() {
+jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 	var logger = ioc.createLogger("lisp.tests");
 
 	// We require that no one modifies global state,
 	// so we can use a shared evaluator and speed up
 	// the tests by not re-running the prologue hundreds
 	// of times.
-	var evaluator = ioc.createLispEvaluator();
+	var evaluator;
+
+	function beginRunTests() {
+		jsrepl.lisp.beginCreateEvaluator(
+			function(returnedEvaluator) {
+				evaluator = returnedEvaluator;
+				jstest.runTests(lispTests);
+				if(testsDoneCallback) {
+					testsDoneCallback;
+				}
+			}
+		);
+	}
 
 	var lispTests = [
-	
 		// Parsing basic values
 		new LispTest("hello", "world!"),
 		new LispTest("true",  true),
@@ -391,5 +402,5 @@ jsrepl.lisp.runTests = function() {
 		return result;
 	}
 
-	jstest.runTests(lispTests);
-}
+	beginRunTests();
+};

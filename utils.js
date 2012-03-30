@@ -97,28 +97,35 @@ var utils = function(){
 	}
 
 	pub.beginLoadFile = function(path, callback) {
+		var logger = ioc.createLogger("utils.beginLoadFile").withDebug(true);
+
+		logger.debug("Begin loading '" + path + "'.");
+		
 		if(!/^lisp\/[a-z.0-9]+\.lisp$/.test(path)) {
 			throw new Error("Possibly dodgy path requested: '" + path + "'.");
 		}
 
-		var iframeLoad = function() {
+		var iframeLoaded = function() {
+			logger.debug("In IFrameLoaded callback.");
+
+
 			var pageContent =
 				loaderIFrame.contentDocument.body.innerText;
 			document.body.removeChild(loaderIFrame);
-
+			
+			logger.debug("Calling beginLoadFile callback.");
 			callback(pageContent);
+			logger.debug("Finished beginLoadFile callback.");
+			
 			return;
 		}
 
 		var loaderIFrame = document.createElement("iframe");
 		loaderIFrame.style.display = "none";
-		loaderIFrame.addEventListener("load", iframeLoad);
+		loaderIFrame.addEventListener("load", iframeLoaded);
 		loaderIFrame.src = path;
 	
 		document.body.appendChild(loaderIFrame);
-
-
-		return;
 	}
 
 	return pub;

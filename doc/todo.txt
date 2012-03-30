@@ -1,17 +1,27 @@
 In progress
- - oo
-   - records
+ - fix fucked prologue file loading
+
+Next
+ - type-safe records
+   - verify field names and type on record set
+ - records
+   - record=
+
+oo.txt
 
 Unit tests
+ - cond -- (setl x 5)(cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))
+ - record=
+ - eq on records
  - record functions
    - get-type-name
+     - incl on primitives and records
    - is-a
    - type-of
    - type-exists
    - get-type
 
 Lisp lib
- - cond
  - data types
    - dict type -- for / from oo
  - fold
@@ -19,22 +29,31 @@ Lisp lib
  - let
  - pp
 
+JS lib
+ - LispExpressions require memory allocation to traverse!
+   - Profile to confirm then perhaps switch to real linked lists.
+ - split tests into separate files
+ - macro-expand -- no eval!
+
 Lang
  - quasiquoting
- - load external files
+ - load external files - and split up prologue
  - comments
  - strings
 
+Perf profiling. Unit tests take 20 secs wtf?
+
 Future ideas
  - deconstructing value bind
- - rebind values
  - debugging -- eval once
  - pure functions
+   - bind to values, not scopes?
+ - pre-evaluate macros for a function definition
  - static typing
  - compile to JS
 
 Code puzzles
  - primality tests.
- - Fibonacci with memoization
+ - Fibonacci with memoization.
  - balanced tree data structures.
-
+ - parser.
