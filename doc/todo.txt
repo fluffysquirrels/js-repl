@@ -1,5 +1,4 @@
 In progress
- - fix fucked prologue file loading
 
 Next
  - type-safe records
@@ -30,8 +29,11 @@ Lisp lib
  - pp
 
 JS lib
- - LispExpressions require memory allocation to traverse!
-   - Profile to confirm then perhaps switch to real linked lists.
+ - data types
+   - LispExpressions require memory allocation to traverse!
+     - Profile to confirm speed issue then perhaps switch to real linked lists.
+   - Arrays
+   - Hashes?
  - split tests into separate files
  - macro-expand -- no eval!
 

@@ -101,7 +101,7 @@ var utils = function(){
 
 		logger.debug("Begin loading '" + path + "'.");
 		
-		if(!/^lisp\/[a-z.0-9]+\.lisp$/.test(path)) {
+		if(!/^lisp\/[a-z0-9\-]+\.lisp$/.test(path)) {
 			throw new Error("Possibly dodgy path requested: '" + path + "'.");
 		}
 

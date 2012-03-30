@@ -10,7 +10,15 @@ var jsrepl = jsrepl || {};
 jsrepl.lisp = jsrepl.lisp || {}
 
 jsrepl.lisp.logger = ioc.createLogger("lisp").withDebug(true);
-jsrepl.lisp.initScriptUrls = ["lisp/prologue.lisp"];
+jsrepl.lisp.initScriptUrls =
+	[
+		"lisp/prologue.lisp",
+		"lisp/collections.lisp",
+		"lisp/control-flow.lisp",
+		"lisp/maths.lisp",
+		"lisp/primes.lisp",
+		"lisp/oo.lisp",
+	];
 
 jsrepl.lisp.beginCreateEvaluator =
 function() { // Create new scope.
