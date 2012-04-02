@@ -13,32 +13,44 @@ var jstest = function() {
 	}
 
 	pub.runTests = function(tests) {
+
+		var timeResult = utils.time(
+			function() {
+				return utils.map(
+						tests,
+						runTest);
+			});
+
+		var testResults = timeResult.result;
 		
-		var testResults =
-			utils.map(
-				tests,
-				runTest);
-		
+		logger.info("All tests finished in " + (timeResult.timeMs / 1000).toString() + "s.");
 		printTotals(testResults);
 	}
 
 	function runTest(test) {
 		utils.assertType("test", test, "Test");
+		logger.debug("Running test '" + test.description + "'.");
+
 		var testException = null;
 		
-		try {
-			test.func();
-			logger.debug("Test passed.");
-		}
-		catch (ex) {
-			logger.debug("Test failed");
-			testException = ex;
-		}
+		var timeResult = utils.time(
+			function() {
+				try {
+					test.func();
+					logger.debug("Test passed.");
+				}
+				catch (ex) {
+					logger.debug("Test failed");
+					testException = ex;
+				}
+			});
 
 		var testResult = new TestResult(
 			test,
-			testException);
+			testException,
+			timeResult.timeMs);
 
+		logger.debug("Test finished in " + (timeResult.timeMs / 1000).toString() + "s.");
 		logger.debug("testResult.passed = '" + testResult.passed + "'.");
 
 		if(testResult.passed === false) {
@@ -48,12 +60,13 @@ var jstest = function() {
 		return testResult;
 	}
 
-	function TestResult(test, exception) {
+	function TestResult(test, exception, timeMs) {
 		utils.assertType("test", test, "Test");
 		
 		this.test = test;
 		this.passed = (exception === null);
 		this.exception = exception;
+		this.timeMs = timeMs;
 	}
 	
 	function printTestError(testResult) {

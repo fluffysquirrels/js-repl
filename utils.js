@@ -97,7 +97,7 @@ var utils = function(){
 	}
 
 	pub.beginLoadFile = function(path, callback) {
-		var logger = ioc.createLogger("utils.beginLoadFile").withDebug(true);
+		var logger = ioc.createLogger("utils.beginLoadFile").withDebug(false);
 
 		logger.debug("Begin loading '" + path + "'.");
 		
@@ -126,6 +126,20 @@ var utils = function(){
 		loaderIFrame.src = path;
 	
 		document.body.appendChild(loaderIFrame);
+	}
+
+	pub.time = function(toRun) {
+		var dtBefore = new Date();
+
+		var result = toRun();
+
+		var dtAfter = new Date();
+		var timeMs = dtAfter - dtBefore;
+
+		return {
+				result: result,
+				timeMs: timeMs,
+			};
 	}
 
 	return pub;

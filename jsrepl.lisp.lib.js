@@ -84,7 +84,7 @@ jsrepl.lisp.getLib = function() {
 			execScope.pushFrame(new jsrepl.lisp.LispScopeFrame());
 			argsSpec.bindArgs(execScope, args);
 			
-			return execScope.getEvaluator().eval(funcBody, execScope);
+			return execScope.getEvaluator().eval(execScope, funcBody);
 		};
 
 		return func;
@@ -391,7 +391,7 @@ jsrepl.lisp.getLib = function() {
 	}
 
 	function Lib_eval(scope, args) {
-		var res = scope.getEvaluator().eval(args, scope);
+		var res = scope.getEvaluator().eval(scope, args);
 		return res;
 	}
 

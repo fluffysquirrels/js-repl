@@ -8,16 +8,14 @@ Add more types
 	play types with only primitive fields (e.g. point, vector)
 	play types with record fields
 
+Function / macro bodies available as fields on records.
 Verify field names and types when filling records
 Remove types from record field values.
 
 --------
-* Funcs
-Redefine func to permit type annotations and check them at run-time.
-Inheritance with polymorphism. How the fuck?
-
-New functions for methods
-	.	-- (. my-method my-obj arg1 arg2 arg3)
+* Methods
+Define methods to permit type annotations and check them at run-time.
+Inheritance and polymorphism. How the fuck?
 
 ---
 

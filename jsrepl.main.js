@@ -34,6 +34,7 @@ jsrepl.main = function() {
 
 			// addCustomBtn("var ib = inputBox; var o = { end: ib.selectionEnd, start: ib.selectionStart, length: ib.value.length }; o", "selection");
 			addCustomBtn("__err", "err");
+			addCustomBtn("__err.innerException", "err.inner");
 			addCustomBtn("jsrepl.lisp.beginRunTests()", "lisp.tests");
 			jsrepl.lisp.beginCreateEvaluator(
 				function(evaluator) {

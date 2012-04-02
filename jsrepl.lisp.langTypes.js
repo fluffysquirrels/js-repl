@@ -63,7 +63,7 @@ jsrepl.lisp.LispMacro =
 			var exprsToEval = [codeToEval];
 
 			return scope.getEvaluator().eval(
-										exprsToEval,
-										scope);
+										scope,
+										exprsToEval);
 		}
 	}

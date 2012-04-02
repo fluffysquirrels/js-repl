@@ -29,23 +29,26 @@ Lisp lib
  - pp
 
 JS lib
+ - Use JS prototypes to trim objects
  - data types
-   - LispExpressions require memory allocation to traverse!
-     - Profile to confirm speed issue then perhaps switch to real linked lists.
    - Arrays
-   - Hashes?
+   - Hashes
+   - Strings
  - split tests into separate files
- - macro-expand -- no eval!
 
 Lang
  - quasiquoting
- - load external files - and split up prologue
+ - better parser and tokeniser
  - comments
  - strings
 
-Perf profiling. Unit tests take 20 secs wtf?
+Perf
+ - Profile everything
+ - Unit tests take 20 secs wtf?
+ - Kill debug messages in hot loops
 
 Future ideas
+ - load external files
  - deconstructing value bind
  - debugging -- eval once
  - pure functions
@@ -53,9 +56,14 @@ Future ideas
  - pre-evaluate macros for a function definition
  - static typing
  - compile to JS
+ - exception handling / conditions
+ - tail call elimination
+ - ffi to JavaScript
+ - macro-expand -- no eval!
 
 Code puzzles
  - primality tests.
  - Fibonacci with memoization.
  - balanced tree data structures.
  - parser.
+ - regex.

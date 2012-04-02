@@ -9,7 +9,6 @@
 var jsrepl = jsrepl || {};
 jsrepl.lisp = jsrepl.lisp || {}
 
-jsrepl.lisp.logger = ioc.createLogger("lisp").withDebug(true);
 jsrepl.lisp.initScriptUrls =
 	[
 		"lisp/prologue.lisp",
@@ -23,7 +22,7 @@ jsrepl.lisp.initScriptUrls =
 jsrepl.lisp.beginCreateEvaluator =
 function() { // Create new scope.
 	function beginCreateEvaluator(callback) {
-		var logger = ioc.createLogger("jsrepl.lisp.beginCreateEvaluator").withDebug(true);
+		var logger = ioc.createLogger("jsrepl.lisp.beginCreateEvaluator").withDebug(false);
 
 		logger.debug("Start");
 
@@ -46,25 +45,21 @@ function() { // Create new scope.
 		var _this = this;
 		var _logger =
 			ioc.createLogger(
-				"lisp.LispEvaluator").withDebug(true);
+				"LispEvaluator").withDebug(true);
 	
 		this.readEval = function(cmdString) {
 			var exprs = jsrepl.lisp.parser.read(cmdString);
-			return this.eval(exprs);
+			var scope = createNewScope();
+			return this.eval(scope, exprs);
 		}
 	
-		this.eval = function(exprs, scope) {
+		this.eval = function(scope, exprs) {
 			utils.assertType("exprs", exprs, "Array");
+			utils.assertType("scope", scope, "LispScope");
 			
 			if(exprs.length === 0) {
 				throw new Error("Cannot eval an empty expression.");
 			}
-	
-			if(scope === undefined) {
-				scope = createNewScope();
-			}
-				
-			utils.assertType("scope", scope, "LispScope");
 	
 			var result = undefined;
 			// eval all expressions, keeping last result
@@ -179,7 +174,7 @@ function() { // Create new scope.
 				url,
 				function(lispStr) {
 					ioc.withErrorHandler(function() {
-						_logger.debug("Running Lisp script from URL '" + url + "'.");
+						_logger.info("Running '" + url + "'.");
 						_this.readEval(lispStr);
 						if(callback) {
 							callback();
