@@ -76,8 +76,6 @@ jsrepl.lisp.getLib = function() {
 		var argsSpec = parseArgDefns(argDefns.list);
 
 		var func = function(invocationScope, args) {
-			logger.debug("Running function body expecting '\r\n" + jsrepl.pp.prettyPrint(argDefns.list) + "' with arguments '\r\n" + jsrepl.pp.prettyPrint(args)  + "'.");
-
 			var execScope = defnScope.copy();
 
 			// Push function evaluation scope frame.
@@ -101,6 +99,7 @@ jsrepl.lisp.getLib = function() {
 
 		utils.each(argDefnsArray,
 			function(argDefn, ix) {
+				utils.assertType("argDefn", argDefn, "LispSymbol");
 				var argName = argDefn.name;
 				
 				if(!isVarArgDefn(argName)) {
@@ -138,7 +137,6 @@ jsrepl.lisp.getLib = function() {
 			}
 
 			utils.each(positionalArgs, function(argName, ix) {
-				utils.assertType("argName", argName, "LispSymbol");
 
 				var argValue = args[ix];
 

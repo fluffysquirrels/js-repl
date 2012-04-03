@@ -11,9 +11,9 @@ jsrepl.lisp = jsrepl.lisp || {}
 
 jsrepl.lisp.initScriptUrls =
 	[
+		"lisp/control-flow.lisp",
 		"lisp/prologue.lisp",
 		"lisp/collections.lisp",
-		"lisp/control-flow.lisp",
 		"lisp/maths.lisp",
 		"lisp/primes.lisp",
 		"lisp/oo.lisp",
@@ -73,24 +73,28 @@ function() { // Create new scope.
 		}
 		
 		this.evalOneExpr = function(scope, expr) {
-			var thread;
-	
 			try {
-				thread = scope.getThread();
-				var newStackFrame = new jsrepl.lisp.LispStackFrame(scope, expr);
-				thread.pushFrame(newStackFrame);
-	
 				var result = evalOneExpr_body(scope, expr);
-	
-				thread.popFrame();
 	
 				return result;
 			}
 			catch(ex) {
+				var currLispFrame =
+					new jsrepl.lisp.LispStackFrame(
+						scope, expr);
+
 				if(utils.getTypeOf(ex) === "LispException") {
+					ex.thread.pushFrame(currLispFrame);
+					
 					throw ex;
 				}
-				else {
+				else
+				{
+					var thread =
+						new jsrepl.lisp.LispThread();
+					
+					thread.pushFrame(currLispFrame);
+
 					throw new jsrepl.lisp.LispException(thread, ex);
 				}
 			}
@@ -144,8 +148,7 @@ function() { // Create new scope.
 		}
 		
 		function createNewScope() {
-			var thread = new jsrepl.lisp.LispThread(_this);
-			var scope = new jsrepl.lisp.LispScope(_this, thread);
+			var scope = new jsrepl.lisp.LispScope(_this);
 	
 			scope.pushFrame(_globalScopeFrame);
 			scope.pushFrame(new jsrepl.lisp.LispScopeFrame());

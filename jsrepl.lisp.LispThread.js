@@ -3,9 +3,7 @@ var jsrepl = jsrepl || {};
 jsrepl.lisp = jsrepl.lisp || {};
 
 jsrepl.lisp.LispThread =
-	function LispThread(evaluator) {
-		utils.assertType("evaluator", evaluator, "LispEvaluator");
-
+	function LispThread() {
 		var _logger = ioc.createLogger("lisp.LispThread");
 
 		var _stackFrames = [];
@@ -26,7 +24,6 @@ jsrepl.lisp.LispThread =
 
 		this.toString = function() {
 			var frames = _this.getFrames();
-			frames.reverse();
 
 			var frameStrings =
 				utils.map(frames, function(frame, ix) {
