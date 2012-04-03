@@ -144,7 +144,9 @@ jsrepl.lisp.getLib = function() {
 					throw new Error("Not enough arguments. Expected " + positionalArgs.length + " positional arguments but only got " + args.length + " arguments.");
 				}
 
-				execScope.set(argName.name, argValue);
+				execScope.set(
+					argName.name,
+					argValue);
 			}); // bind each positional argument.
 
 			if(varArgsSymbol !== null) {
@@ -352,14 +354,14 @@ jsrepl.lisp.getLib = function() {
 		return Lib_setInternal(
 				scope,
 				args,
-				scope.setGlobal);
+				scope.setGlobal.bind(scope));
 	}
 
 	function Lib_setLocal(scope, args) {
 		return Lib_setInternal(
 				scope,
 				args,
-				scope.set);
+				scope.set.bind(scope));
 	}
 
 
@@ -397,7 +399,7 @@ jsrepl.lisp.getLib = function() {
 		var numArgs = args.length;
 
 		if(numArgs !== 2 && numArgs !== 3) {
-			throw "Invalid number of arguments for 'if'. Expected 2 or 3 but got " + numArgs + ".";
+			throw new Error("Invalid number of arguments for 'if'. Expected 2 or 3 but got " + numArgs + ".");
 		}
 
 		var condExpr = args[0];
