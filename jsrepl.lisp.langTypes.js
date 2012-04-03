@@ -4,20 +4,23 @@ jsrepl.lisp = jsrepl.lisp || {};
 jsrepl.lisp.LispSymbol =
 	function LispSymbol(name) {
 		this.name = name;
-		this.toString = function() {
-			return name;
-		};
 	}
+jsrepl.lisp.LispSymbol.prototype.toString =
+	function() {
+		return this.name;
+	};
 
 jsrepl.lisp.LispExpression =
 	function LispExpression(list) {
 		this.list = list || [];
-		this.toString = function() {
-			return "(" +
-				utils.join(" ", this.list) +
-				")";
-		}
 	}
+jsrepl.lisp.LispExpression.prototype.toString =
+	this.toString = function() {
+		return "(" +
+			utils.join(" ", this.list) +
+			")";
+	}
+
 
 jsrepl.lisp.LispFunction =
 	function LispFunction(func) {
@@ -27,8 +30,7 @@ jsrepl.lisp.LispFunction =
 		this.evalWithArgDefns = function(scope, argDefns) {
 			var evaluator = scope.getEvaluator();
 			var funcArgs =
-				utils.map(
-					argDefns,
+				argDefns.map(
 					function(exprDefn) {
 						return evaluator.evalOneExpr(
 										scope,

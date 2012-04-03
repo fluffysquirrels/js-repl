@@ -54,8 +54,8 @@ function() { // Create new scope.
 		}
 	
 		this.eval = function(scope, exprs) {
-			utils.assertType("exprs", exprs, "Array");
-			utils.assertType("scope", scope, "LispScope");
+			// utils.assertType("exprs", exprs, "Array");
+			// utils.assertType("scope", scope, "LispScope");
 			
 			if(exprs.length === 0) {
 				throw new Error("Cannot eval an empty expression.");
@@ -63,11 +63,12 @@ function() { // Create new scope.
 	
 			var result = undefined;
 			// eval all expressions, keeping last result
-			for(var ixExpr = 0; ixExpr < exprs.length; ixExpr++) {
-				var currExpr = exprs[ixExpr];
-				var currResult = _this.evalOneExpr(scope, currExpr);
-				result = currResult;
-			}
+			exprs.forEach(
+				function(currExpr) {
+					var currResult = _this.evalOneExpr(scope, currExpr);
+					result = currResult;
+				}
+			);
 	
 			return result;
 		}
@@ -127,20 +128,11 @@ function() { // Create new scope.
 	
 				var firstValue =
 					_this.evalOneExpr(scope, exprArray[0]);
-				var firstType = utils.getTypeOf(firstValue);
 				var argDefns = exprArray.slice(1);
 	
-				if( firstType === "LispKeyword"  ||
-					firstType === "LispFunction" ||
-					firstType === "LispMacro") {
-					return firstValue.evalWithArgDefns(
-								scope,
-								argDefns);
-				}
-				else
-				{
-					throw new Error("Cannot evaluate LispExpression with first value '" + firstValue + "' of unknown type " + firstType + ".");
-				}
+				return firstValue.evalWithArgDefns(
+							scope,
+							argDefns);
 			}
 			else {
 				throw "Cannot eval object '" + expr + "' of unknown type " + utils.getTypeOf(expr);

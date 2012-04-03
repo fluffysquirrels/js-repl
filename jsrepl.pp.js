@@ -60,11 +60,13 @@ jsrepl.pp = function() {
 	}
 
 	function getObjectPropertyKeysArray(obj) {
-		var keys = new Array;
+		// var keys = new Array;
 
-		for(propKey in obj) {
-			keys.push(propKey);
-		}
+		// for(propKey in obj) {
+		// 	keys.push(propKey);
+		// }
+		//
+		var keys = Object.getOwnPropertyNames(obj);
 
 		keys.sort();
 

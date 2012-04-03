@@ -19,6 +19,10 @@ jsrepl.lisp.LispScope.prototype.pushFrame =
 
 		this._frames.push(frame);
 	};
+jsrepl.lisp.LispScope.prototype.popFrame =
+	function() {
+		this._frames.pop();
+	};
 jsrepl.lisp.LispScope.prototype.copy =
 	function() {
 		var ret = new jsrepl.lisp.LispScope(this._evaluator);

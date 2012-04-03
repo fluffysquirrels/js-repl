@@ -97,7 +97,7 @@ jsrepl.lisp.getLib = function() {
 		var positionalArgs = [];
 		var varArgsSymbol = null;
 
-		utils.each(argDefnsArray,
+		argDefnsArray.forEach(
 			function(argDefn, ix) {
 				utils.assertType("argDefn", argDefn, "LispSymbol");
 				var argName = argDefn.name;
@@ -136,7 +136,8 @@ jsrepl.lisp.getLib = function() {
 				throw new Error("Too many arguments passed to non-variadic function. Expected " + positionalArgs.length + " positional arguments but got " + args.length + " arguments.");
 			}
 
-			utils.each(positionalArgs, function(argName, ix) {
+			positionalArgs.forEach(
+				function(argName, ix) {
 
 				var argValue = args[ix];
 
@@ -166,7 +167,7 @@ jsrepl.lisp.getLib = function() {
 	function Lib_plus(scope, args) {
 		var ret = 0;
 
-		utils.each(args, function(elt) {
+		args.forEach(function(elt) {
 			utils.assertType("argument for +", elt, "number");
 			ret += elt;
 		});
@@ -183,7 +184,7 @@ jsrepl.lisp.getLib = function() {
 	function Lib_multiply(scope, args) {
 		var ret = 1;
 
-		utils.each(args, function(elt) {
+		args.forEach(function(elt) {
 			utils.assertType("argument for *", elt, "number");
 			ret *= elt;
 		});
@@ -332,13 +333,7 @@ jsrepl.lisp.getLib = function() {
 				throw new Error("Using cons with a tail that is not a LispExpression is not currently supported. cons received a tail of type " + tailType + ".");
 			}
 
-			var retArray = [head];
-
-			utils.each(
-				tail.list,
-				function(tailElt) {
-					retArray.push(tailElt);
-				});
+			var retArray = [head].concat(tail.list);
 
 			var retExpr =
 				new jsrepl.lisp.LispExpression(retArray);

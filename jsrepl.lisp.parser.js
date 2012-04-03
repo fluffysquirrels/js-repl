@@ -11,7 +11,7 @@ jsrepl.lisp.parser = function() {
 	pub.read = function(str) {
 		var tokens = tokenise(str);
 
-		var nestLevels = [new jsrepl.lisp.LispExpression()];
+		var nestLevels = [{expr: new jsrepl.lisp.LispExpression()}];
 
 		function pushToTopLevel(elt) {
 			if(getPrevTokenOnThisLevelWasQuote()) {
@@ -23,7 +23,7 @@ jsrepl.lisp.parser = function() {
 				pushToTopLevel(quotExpr);
 			}
 			else {
-				getTopLevel().list.push(elt);
+				getTopLevel().expr.list.push(elt);
 			}
 		}
 
@@ -48,7 +48,7 @@ jsrepl.lisp.parser = function() {
 			var currToken = tokens[ixToken];
 
 			if(currToken === "(") {
-				nestLevels.push(new jsrepl.lisp.LispExpression());
+				nestLevels.push({expr: new jsrepl.lisp.LispExpression()});
 			}
 			else if(currToken === ")") {
 				if(nestLevels.length === 1) {
@@ -57,7 +57,7 @@ jsrepl.lisp.parser = function() {
 
 				var doneLevel = nestLevels.pop();
 
-				pushToTopLevel(doneLevel);
+				pushToTopLevel(doneLevel.expr);
 			}
 			else if(getPrevTokenOnThisLevelWasQuote() || currToken !== "'") {
 				// Not a special token
@@ -77,7 +77,7 @@ jsrepl.lisp.parser = function() {
 
 		// Total hack: unwrap the top-level LispExpression
 		// into an array.
-		var exprs = nestLevels[0].list;
+		var exprs = nestLevels[0].expr.list;
 
 		_logger.debug("parsed: " + exprs.toString());
 
