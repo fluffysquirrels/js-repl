@@ -49,3 +49,23 @@
 	)
 )
 
+
+(do
+  (setl reverse-int
+    (func (a-list acc)
+	  (if (null-or-empty-list? a-list)
+        acc
+		(reverse-int
+		  (cdr a-list) 
+		  (cons (car a-list) acc)
+		)
+      )
+    )
+  )
+  (setg reverse
+    (func (a-list)
+      (reverse-int a-list '())
+	) 
+  )
+)
+

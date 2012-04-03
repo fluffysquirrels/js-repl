@@ -194,10 +194,16 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(eq (push (list 1 2) 8) '(1 2 8))", true),
 
 		// num-seq
-		new LispTest("(eq (num-seq 5 8) '(5 6 7))", true),
-		new LispTest("(eq (num-seq 5 6) '(5))", true),
-		new LispTest("(eq (num-seq 5 5) '())", true),
-		new LispTest("(eq (num-seq 5 4) '())", true),
+		new LispTestEq("(num-seq 5 8)", "'(5 6 7)"),
+		new LispTestEq("(num-seq 5 6)", "'(5)"),
+		new LispTestEq("(num-seq 5 5)", "'()"),
+		new LispTestEq("(num-seq 5 4)", "'()"),
+
+		// reverse
+		new LispTestEq("(reverse '())",      "'()"),
+		new LispTestEq("(reverse '(1))",     "'(1)"),
+		new LispTestEq("(reverse '(1 2))",   "'(2 1)"),
+		new LispTestEq("(reverse '(1 2 3))", "'(3 2 1)"),
 
 		// filter on numerical sequences
 		new LispTest("(eq (filter (num-seq 5 9) num-even?) '(6 8))", true),
@@ -235,6 +241,8 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(if true 5 (throwError))", 5),
 		new LispTest("(if false (throwError) 6)", 6),
 		new LispTest("(if true (* 4 6) 1)", 24),
+		new LispTest("(if (eq 5 (+ 3 2)) 10 12)", 10),
+		new LispTest("(if (eq 0 (+ 3 2)) 10 12)", 12),
 
 		// condf
 		new LispTest("(eq (condf-test 4) '(4 lessthan5))", true),
