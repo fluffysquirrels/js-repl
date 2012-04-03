@@ -52,23 +52,19 @@ jsrepl.lisp.LispScope.prototype.__assertHasFrames =
 
 jsrepl.lisp.LispScope.prototype.lookUp =
 	function(varName) {
-		var ret;
+		for(var ix = this._frames.length-1;
+			ix >= 0;
+			ix--) {
+			
+			var frame = this._frames[ix];
 
-		// Take the value from each frame, hence
-		// finishing with the value from the top frame
-		// that contains the variable.
-		utils.each(this._frames, function(frame) {
 			var frameVar = frame.vars[varName];
 			if(frameVar !== undefined) {
-				ret = frameVar;
+				return frameVar;
 			}
-		});
-
-		if(ret === undefined) {
-			throw "Couldn't find variable '" + varName + "'.";
 		}
 
-		return ret;
+		throw "Couldn't find variable '" + varName + "'.";
 	};
 
 jsrepl.lisp.LispScopeFrame =

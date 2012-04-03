@@ -21,7 +21,6 @@ jsrepl.lisp.LispExpression.prototype.toString =
 			")";
 	}
 
-
 jsrepl.lisp.LispFunction =
 	function LispFunction(func) {
 		utils.assertType("func", func, "function");
