@@ -11,12 +11,12 @@ jsrepl.lisp = jsrepl.lisp || {}
 
 jsrepl.lisp.initScriptUrls =
 	[
-		"lisp/control-flow.lisp",
-		"lisp/prologue.lisp",
-		"lisp/collections.lisp",
-		"lisp/maths.lisp",
-		"lisp/primes.lisp",
-		"lisp/oo.lisp",
+		"src/jslisp/lisp/control-flow.lisp",
+		"src/jslisp/lisp/prologue.lisp",
+		"src/jslisp/lisp/collections.lisp",
+		"src/jslisp/lisp/maths.lisp",
+		"src/jslisp/lisp/primes.lisp",
+		"src/jslisp/lisp/oo.lisp",
 	];
 
 jsrepl.lisp.beginCreateEvaluator =
