@@ -9,7 +9,6 @@ Next
 oo.txt
 
 Unit tests
- - cond -- (setl x 5)(cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))
  - record=
  - eq on records
  - record functions
@@ -42,6 +41,7 @@ Lang
  - comments
  - strings
  - parse floats
+ - optional args
 
 Code puzzles
  - primality tests.

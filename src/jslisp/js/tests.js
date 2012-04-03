@@ -80,6 +80,7 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(js= true true)", true),
 		new LispTest("(js= 5 false)", false),
 		new LispTest("(js= 'a 'a)", false),
+		new LispTest("(js= '() '())", false),
 
 		// jstypeof
 		new LispTest("(sym= (jstypeof 5) 'number)", true),
@@ -104,7 +105,7 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(null? null)", 		true),
 
 		// Assignment
-		// new LispTest("(setg abra 0)(setg abra 6) abra", 6), -- setg is banned; see runTestLispCode for more details.
+		// new LispTest("(setg abra 0)(setg abra 6) abra", 6), -- setg is banned in tests; see runTestLispCode for more details.
 		new LispTest("(setl abra 5) abra", 5),
 		
 		// func
@@ -171,8 +172,8 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(cdr (cdr '(1 2)))", null),
 
 		// cons
-		new LispTest("(eq (cons) '())", true),
-		new LispTest("(eq (cons 1) '(1))", true),
+		new LispTestEq("(cons)",   "'()"),
+		new LispTestEq("(cons 1)", "'(1)"),
 
 		new LispTest("(car      (cons 1 '(2)))", 1),
 		new LispTest("(car (cdr (cons 1 '(2))))", 2),
@@ -186,9 +187,9 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(cdr (cons))", null),
 
 		// list
-		new LispTest("(eq (list)     '())", true),
-		new LispTest("(eq (list 1)   '(1))", true),
-		new LispTest("(eq (list 1 2) '(1 2))", true),
+		new LispTestEq("(list)    ", "'()"),
+		new LispTestEq("(list 1)  ", "'(1)"),
+		new LispTestEq("(list 1 2)", "'(1 2)"),
 
 		// push
 		new LispTest("(eq (push (list 1 2) 8) '(1 2 8))", true),
@@ -248,6 +249,24 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(eq (condf-test 4) '(4 lessthan5))", true),
 		new LispTest("(eq (condf-test 5) '(5 equals5))", true),
 		new LispTest("(eq (condf-test 6) '(6 morethan5))", true),
+
+		// cond
+        new LispTestEq(
+			"(setl cond-test (func (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
+			"(cond-test -5)",
+			"-1"),
+        new LispTestEq(
+			"(setl cond-test (func (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
+			"(cond-test 5)",
+			"1"),
+        new LispTestEq(
+			"(setl cond-test (func (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
+			"(cond-test 0)",
+			"0"),
+        new LispTestEq(
+			"(setl cond-test (func (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
+			"(cond-test 'one)",
+			"'notanum"),
 
 		// not
 		new LispTest("(not true)",  false),
