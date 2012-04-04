@@ -199,15 +199,15 @@
 			type-of-type
 			type-of-field
 
-			(new-type 'number	'())
-			(new-type 'list		'())
-			(new-type 'symbol	'())
-			(new-type 'bool		'())
-			(new-type 'null		'())
-			(new-type 'macro	'())
-			(new-type 'keyword	'())
-			(new-type 'func		'())
-			(new-type 'string	'())
+			(new-type 'number	)
+			(new-type 'list		)
+			(new-type 'symbol	)
+			(new-type 'bool		)
+			(new-type 'null		)
+			(new-type 'macro	)
+			(new-type 'keyword	)
+			(new-type 'func		)
+			(new-type 'string	)
 		)
 	)
 	(setg with-values

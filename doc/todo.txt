@@ -26,6 +26,7 @@ Lisp lib
  - variadic and, or.
  - let
  - pp
+ - switch
 
 JS lib
  - data types
