@@ -9,6 +9,7 @@ oo.txt
 Unit tests
  - record=
  - eq on records
+ - add-type
 
 Lisp lib
  - data types
@@ -43,6 +44,7 @@ Code puzzles
  - regex.
 
 Future ideas
+ - mutable private data; start with the types list.
  - load external files
  - deconstructing value bind
  - debugging -- eval once

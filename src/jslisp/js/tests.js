@@ -421,7 +421,11 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		// get-type
 		new LispTestEq("(setl t (get-type 'number))(record? t)", 	 "true"),
 		new LispTestEq("(setl t (get-type 'number))(get-value t 'name)", 	 "'number"),
-		new LispTestEq("(get-type 'this-is-not-a-type-name)", 	 "null"),
+		new LispTestThrows("(get-type 'this-is-not-a-type-name)"),
+
+		// tryget-type
+		new LispTestEq("(get-type 'number)", "(tryget-type 'number)"),
+		new LispTestEq("(tryget-type 'this-is-not-a-type-name)", 	 "null"),
 	
 	]; // / lispTests
 

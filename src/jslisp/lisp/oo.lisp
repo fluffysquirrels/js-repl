@@ -72,32 +72,11 @@
 			(car (cdr (cdr rec)))
 		))
 			
-	(setg get-type
-		(func (type-name)
-			(setl the-type
-				(first-or-null
-					types
-					(func (type-rec)
-						(eq (get-value type-rec 'name)
-							type-name))
-				))
-			the-type
-		))
-
-	(setg type-exists
-		(func (type-name)
-			(setl the-type (get-type type-name))
-			(not (null? the-type))
-		))
-
 	(setg type-of
 		(func (rec)
 			(setl type-name (get-type-name rec))
-			(setl rec-type (get-type type-name))
-
-			(if (null? rec-type)
-				throwCouldntFindTypeForRecord)
-			rec-type
+			
+			(get-type type-name)
 		))
 
 	(setg get-type-fields
@@ -130,7 +109,6 @@
 			(setl field-values (get-fields rec))
 			(dict.get field-values field-name)
 		))
-	
 
 	(setg new-type
 		(func (type-name *fields)
@@ -172,22 +150,54 @@
 			(new-field 'type 'symbol)
 		))
 
-	(setg types
-		(list
-			type-of-type
-			type-of-field
+	(setg get-type
+		(func (type-name)
+			(dict.get types type-name)
+		))
 
-			(new-type 'number	)
-			(new-type 'list		)
-			(new-type 'symbol	)
-			(new-type 'bool		)
-			(new-type 'null		)
-			(new-type 'macro	)
-			(new-type 'keyword	)
-			(new-type 'func		)
-			(new-type 'string	)
-		)
+	(setg tryget-type
+		(func (type-name)
+			(dict.tryget types type-name)
+		))
+
+	(setg add-type
+		(func (*new-types)
+			(setl map-type-to-kv
+				(func (curr-type)
+					(list
+						(get-value curr-type 'name)
+						curr-type
+					)
+				))
+			(setg types
+				(dict.with-values
+					types
+					(map *new-types map-type-to-kv)
+				))
+		))
+
+	(setg type-exists
+		(func (type-name)
+			(dict.has? types type-name)
+		))
+
+	(setg types (dict.new))
+
+	(add-type
+		type-of-type
+		type-of-field
+
+		(new-type 'number	)
+		(new-type 'list		)
+		(new-type 'symbol	)
+		(new-type 'bool		)
+		(new-type 'null		)
+		(new-type 'macro	)
+		(new-type 'keyword	)
+		(new-type 'func		)
+		(new-type 'string	)
 	)
+
 	(do
 	  	(setg with-values (func (rec field-values)
 			(cond
