@@ -1,8 +1,4 @@
 In progress
- - unit tests
-   - let
-
-Next
  - type-safe records
    - verify field names and type on record set
  - records
@@ -13,11 +9,6 @@ oo.txt
 Unit tests
  - record=
  - eq on records
- - record functions
-   - is-a
-   - type-of
-   - type-exists
-   - get-type
 
 Lisp lib
  - data types

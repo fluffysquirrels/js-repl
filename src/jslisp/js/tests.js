@@ -107,7 +107,11 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		// Assignment
 		// new LispTest("(setg abra 0)(setg abra 6) abra", 6), -- setg is banned in tests; see runTestLispCode for more details.
 		new LispTest("(setl abra 5) abra", 5),
-		
+
+		// let
+		new LispTestEq("(let (x 5) x)", 5),
+		new LispTestEq("(let (x 5) 'other 'expressions (+ x 12))", 17),
+
 		// func
 		new LispTest("((func () 27))", 27),
 		new LispTest("((func (x) x) 27)", 27),
@@ -402,6 +406,23 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTestEq("(get-type-name eq)", 		 "'func"),
 		new LispTestEq("(get-type-name hello)", 	 "'string"),
 
+		// is-a
+		new LispTestEq("(is-a 17 'number)", 		 "true"),
+		new LispTestEq("(is-a (new 'type) 'type)", 	 "true"),
+
+		// type-exists
+		new LispTestEq("(type-exists 'number)", 	 "true"),
+		new LispTestEq("(type-exists 'this-is-not-a-real-type-name)", 	 "false"),
+
+		// type-of
+		new LispTestEq("(setl t (type-of 17))(record? t)", 	 "true"),
+		new LispTestEq("(setl t (type-of 17))(get-value t 'name)", 	 "'number"),
+
+		// get-type
+		new LispTestEq("(setl t (get-type 'number))(record? t)", 	 "true"),
+		new LispTestEq("(setl t (get-type 'number))(get-value t 'name)", 	 "'number"),
+		new LispTestEq("(get-type 'this-is-not-a-type-name)", 	 "null"),
+	
 	]; // / lispTests
 
 	function LispTest(lispStr, expectedResult) {
