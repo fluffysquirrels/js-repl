@@ -141,6 +141,16 @@ var utils = function(){
 				timeMs: timeMs,
 			};
 	}
+	pub.nullableToString = function(obj) {
+		if(	obj === undefined ||
+			obj === null) {
+			return "[" + obj + "]";
+		}
+		else
+		{
+			return "'" + obj + "'";
+		}
+	}
 
 	return pub;
 }();

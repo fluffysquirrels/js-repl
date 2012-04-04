@@ -42,7 +42,7 @@ jsrepl.pp = function() {
 				}
 
 				if(recDepthLeft <= 0) {
-					strOutput += linePrefix + indent + "'" + propKey + "' = '" + asString(propValue).substring(0, propValueMaxChars).replace(/\n/g, "\n" + linePrefix + indent + indent) + "' is " + utils.getTypeOf(propValue) + "\n";
+					strOutput += linePrefix + indent + "'" + propKey + "' = " + utils.nullableToString(propValue).substring(0, propValueMaxChars).replace(/\n/g, "\n" + linePrefix + indent + indent) + " is " + utils.getTypeOf(propValue) + "\n";
 				}
 				else {
 					strOutput += linePrefix + indent + propKey + " = \n" + prettyPrintInternal(propValue, linePrefix + indent + indent, recDepthLeft - 1);
@@ -53,10 +53,6 @@ jsrepl.pp = function() {
 		}
 
 		return strOutput;
-	}
-
-	function asString(obj) {
-		return "" + obj;
 	}
 
 	function getObjectPropertyKeysArray(obj) {

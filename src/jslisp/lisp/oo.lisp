@@ -16,7 +16,7 @@
 			(if (not (type-exists type-name))
 				throwTypeDoesNotExistException)
 
-			(setl rec (new-record-internal type-name (ListDict.new)))
+			(setl rec (new-record-internal type-name (dict.new)))
 
 			(setl optional-field-values (car *rest))
 
@@ -29,8 +29,8 @@
 
 	(setl new-record-internal
 		(func (type-name fields)
-			(if (not (ListDict.is? fields))
-				throw-fieldsMustBeAListDict)
+			(if (not (dict.is? fields))
+				throw-fieldsMustBeADict)
 			(list
 				'record
 				type-name
@@ -51,7 +51,7 @@
 				((record? obj)
 					(get-record-type-name obj))
 				((null? obj) 'null)
-				((ListDict.is? obj)				'dict)
+				((dict.is? obj)					'dict)
 				((sym= jstype 'number) 			'number)
 				((sym= jstype 'LispExpression) 	'list)
 				((sym= jstype 'LispSymbol) 		'symbol)
@@ -128,7 +128,7 @@
 	(setl get-field
 		(func (rec field-name)
 			(setl field-values (get-fields rec))
-			(ListDict.get field-values field-name)
+			(dict.get field-values field-name)
 		))
 	
 
@@ -136,7 +136,7 @@
 		(func (type-name *fields)
 			(new-record-internal
 				'type
-				(ListDict.new
+				(dict.new
 				  	(list
 				 		(list 'name (list 'symbol type-name))
 						(list 'fields (list 'list *fields))
@@ -149,7 +149,7 @@
 		(func (field-name field-type)
 			(new-record-internal
 				'field
-				(ListDict.new
+				(dict.new
 					(list
 						(list 'name (list 'symbol field-name))
 						(list 'type (list 'symbol field-type))
@@ -223,7 +223,7 @@
 				(setl type-name (get-type-name rec))
 			
 				(setl new-record-fields
-					(ListDict.with-value
+					(dict.with-value
 					    record-fields
 						field-name
 						(cdr field)))

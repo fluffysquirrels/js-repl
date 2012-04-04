@@ -222,12 +222,15 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTestThrows("(ListDict.get (ListDict.new '((k v)(k2 v2))) 'x)"),
 		
 		// tryget
-		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'k)",   "'v"),
-		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'k2)",   "'v2"),
-		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'x)", "'null"),
+		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'k)",  "'v"),
+		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'k2)", "'v2"),
+		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'x)",  "null"),
 
 		// keys
 		new LispTestEq("(ListDict.keys (ListDict.new '((k v)(k2 v2))))", "'(k2 k)"),
+		
+		// ** / ListDict **
+
 
 		// push
 		new LispTest("(eq (push (list 1 2) 8) '(1 2 8))", true),
@@ -355,8 +358,6 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(eq (prime-factors 120) '(2 2 2 3 5))", true),
 		new LispTest("(eq (prime-factors 1) '())", true),
 
-		// ** ListDict **
-
 		// ** OO **
 
 		// new
@@ -385,6 +386,16 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 
 		// get-type-name
 		new LispTestEq("(setl r (new 'type))(get-type-name r)", "'type"),
+		new LispTestEq("(get-type-name null)", 		 "'null"),
+		new LispTestEq("(get-type-name (dict.new))", "'dict"),
+		new LispTestEq("(get-type-name 17)", 		 "'number"),
+		new LispTestEq("(get-type-name '())", 		 "'list"),
+		new LispTestEq("(get-type-name 'hai)", 		 "'symbol"),
+		new LispTestEq("(get-type-name true)", 		 "'bool"),
+		new LispTestEq("(get-type-name do)", 		 "'macro"),
+		new LispTestEq("(get-type-name quot)", 		 "'keyword"),
+		new LispTestEq("(get-type-name eq)", 		 "'func"),
+		new LispTestEq("(get-type-name hello)", 	 "'string"),
 
 	]; // / lispTests
 
@@ -419,13 +430,13 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 			var testPassed = resultArray[0];
 
 			if(!testPassed) {
-				var resultStr = resultArray[1].toString();
-				var expectedStr = resultArray[2].toString();
+				var result = resultArray[1];
+				var expected = resultArray[2];
 
 				throw new Error(
 					"Result not eq to expected\r\n" +
-					"    Expected: " + expectedStr + "\r\n" +
-					"    Actual:   " + resultStr);
+					"    Expected: " + utils.nullableToString(expected) + "\r\n" +
+					"    Actual:   " + utils.nullableToString(result));
 			}
 		}
 

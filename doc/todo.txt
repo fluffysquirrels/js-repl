@@ -1,10 +1,7 @@
 In progress
  - unit tests
-   - ListDict - 1 still failing.
-   - oo type of ListDict is dict
    - append
    - let
- - add dict interface, currently implemented by ListDict
 
 Next
  - type-safe records
@@ -18,8 +15,6 @@ Unit tests
  - record=
  - eq on records
  - record functions
-   - get-type-name
-     - incl on primitives and records
    - is-a
    - type-of
    - type-exists
