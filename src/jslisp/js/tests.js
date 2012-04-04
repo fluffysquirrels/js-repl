@@ -190,6 +190,44 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTestEq("(list)    ", "'()"),
 		new LispTestEq("(list 1)  ", "'(1)"),
 		new LispTestEq("(list 1 2)", "'(1 2)"),
+		
+		// second
+		new LispTestEq("(second '(1 2))",   "2"),
+		new LispTestEq("(second '(1 2 3))", "2"),
+		new LispTestEq("(second '(1 3))",   "3"),
+		new LispTestThrows("(second '(1))"),
+		new LispTestThrows("(second '())"),
+		new LispTestThrows("(second 'notAList)"),
+
+		// ** ListDict **
+
+		// new up various ListDict's and check output lists
+		new LispTestEq("(ListDict.new)",   "'(dict)"),
+		new LispTestEq("(ListDict.with-value (ListDict.new) 'k 'v)",   "'(dict (k v))"),
+		new LispTestEq("(ListDict.with-values (ListDict.new) '((k v)(k2 v2)))",   "'(dict (k2 v2)(k v))"),
+		new LispTestEq("(ListDict.new '((k v)(k2 v2)))",   "'(dict (k2 v2)(k v))"),
+
+		// is?
+		new LispTestEq("(ListDict.is? (ListDict.new '((k v)(k2 v2))))",   "true"),
+		new LispTestEq("(ListDict.is? (ListDict.new))",   "true"),
+		
+		// has?
+		new LispTestEq("(ListDict.has? (ListDict.new '((k v)(k2 v2))) 'k)",   "true"),
+		new LispTestEq("(ListDict.has? (ListDict.new '((k v)(k2 v2))) 'k2)",   "true"),
+		new LispTestEq("(ListDict.has? (ListDict.new '((k v)(k2 v2))) 'x)",   "false"),
+
+		// get
+		new LispTestEq("(ListDict.get (ListDict.new '((k v)(k2 v2))) 'k)",   "'v"),
+		new LispTestEq("(ListDict.get (ListDict.new '((k v)(k2 v2))) 'k2)",   "'v2"),
+		new LispTestThrows("(ListDict.get (ListDict.new '((k v)(k2 v2))) 'x)"),
+		
+		// tryget
+		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'k)",   "'v"),
+		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'k2)",   "'v2"),
+		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'x)", "'null"),
+
+		// keys
+		new LispTestEq("(ListDict.keys (ListDict.new '((k v)(k2 v2))))", "'(k2 k)"),
 
 		// push
 		new LispTest("(eq (push (list 1 2) 8) '(1 2 8))", true),
@@ -316,6 +354,8 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(eq (prime-factors 30) '(2 3 5))", true),
 		new LispTest("(eq (prime-factors 120) '(2 2 2 3 5))", true),
 		new LispTest("(eq (prime-factors 1) '())", true),
+
+		// ** ListDict **
 
 		// ** OO **
 

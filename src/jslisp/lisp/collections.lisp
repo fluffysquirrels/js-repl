@@ -49,6 +49,16 @@
 	)
 )
 
+(setg append
+	(func (list-1 list-2)
+		(if (null-or-empty-list? list-1)
+			list-2
+			(cons
+				(car list-1)
+				(append (cdr list-1) list-2)
+			)
+		)
+	))
 
 (do
   (setl reverse-int
@@ -69,3 +79,21 @@
   )
 )
 
+
+(setg partition
+	(func (a-list set1-predicate)
+		(setl set2-predicate
+			(func (elt) (not (set1-predicate elt))))
+
+		(setl set1
+			(filter a-list set1-predicate))
+		(setl set2
+			(filter a-list set2-predicate))
+
+		(list set1 set2)
+	))
+
+(setg second
+  (func (a-list)
+    (car (cdr a-list))
+  ))

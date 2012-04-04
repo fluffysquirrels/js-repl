@@ -16,6 +16,7 @@ jsrepl.lisp.initScriptUrls =
 		"src/jslisp/lisp/collections.lisp",
 		"src/jslisp/lisp/maths.lisp",
 		"src/jslisp/lisp/primes.lisp",
+		"src/jslisp/lisp/ListDict.lisp",
 		"src/jslisp/lisp/oo.lisp",
 	];
 

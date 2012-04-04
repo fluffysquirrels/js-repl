@@ -16,7 +16,7 @@
 			(if (not (type-exists type-name))
 				throwTypeDoesNotExistException)
 
-			(setl rec (new-record-internal type-name '()))
+			(setl rec (new-record-internal type-name (ListDict.new)))
 
 			(setl optional-field-values (car *rest))
 
@@ -29,6 +29,8 @@
 
 	(setl new-record-internal
 		(func (type-name fields)
+			(if (not (ListDict.is? fields))
+				throw-fieldsMustBeAListDict)
 			(list
 				'record
 				type-name
@@ -49,6 +51,7 @@
 				((record? obj)
 					(get-record-type-name obj))
 				((null? obj) 'null)
+				((ListDict.is? obj)				'dict)
 				((sym= jstype 'number) 			'number)
 				((sym= jstype 'LispExpression) 	'list)
 				((sym= jstype 'LispSymbol) 		'symbol)
@@ -119,52 +122,25 @@
 	(setg get-value
 		(func (rec field-name)
 			(setl field (get-field rec field-name))
-			(car (cdr (cdr field)))
+			(car (cdr field))
 		))
 
 	(setl get-field
 		(func (rec field-name)
 			(setl field-values (get-fields rec))
-			(setl fields-partition
-				(partition field-values (is-child-called field-name)))
-			(setl ret (car (car fields-partition)))
-			
-			(if (null? ret)
-				throwCouldntGetValueException)
-
-			ret
+			(ListDict.get field-values field-name)
 		))
 	
-	(setl partition (func (a-list set1-predicate)
-		(setl set2-predicate
-			(func (elt) (not (set1-predicate elt))))
-
-		(setl set1
-			(filter a-list set1-predicate))
-		(setl set2
-			(filter a-list set2-predicate))
-
-		(list set1 set2)
-	))
-
-	(setl is-child-called
-		(func(child-name)
-			(func (elt)
-				(and
-					(and 	(cons? elt)
-						 	(sym? (car elt)))
-							(sym= (car elt) child-name))
-			)
-		)
-	)
 
 	(setg new-type
 		(func (type-name *fields)
 			(new-record-internal
 				'type
-				(list
-				 	(list 'name 'symbol type-name)
-					(list 'fields 'list *fields)
+				(ListDict.new
+				  	(list
+				 		(list 'name (list 'symbol type-name))
+						(list 'fields (list 'list *fields))
+					)
 				)
 			)
 		))
@@ -173,9 +149,11 @@
 		(func (field-name field-type)
 			(new-record-internal
 				'field
-				(list
-					(list 'name 'symbol field-name)
-					(list 'type 'symbol field-type)
+				(ListDict.new
+					(list
+						(list 'name (list 'symbol field-name))
+						(list 'type (list 'symbol field-type))
+					)
 				)
 			)
 		))
@@ -210,49 +188,12 @@
 			(new-type 'string	)
 		)
 	)
-	(setg with-values
-		(do
-			(setl with-value
-				(func (rec field)
-					(if (not (record? rec))
-						throwNotARecordException)
-
-					(setl field-name (car field))
-					(setl field-type (car (cdr field)))
-					(setl field-value (car (cdr (cdr field))))
-					
-					(if (not (null? (cdr (cdr (cdr field)))))
-						throwTooManyValuesInFieldException)
-					(if (not (sym? field-name))
-						throwFirstElementInFieldMustBeSymbolForFieldName)
-					(if (not (sym? field-type))
-						throwSecondElementInFieldMustBeSymbolForTypeName)
-
-					(setl record-fields (get-fields rec))
-					(setl type-name (get-type-name rec))
-					
-					(setl fields-partition
-						(partition
-							record-fields
-							(is-child-called field-name)))
-
-					(setl unmodified-fields
-						(car (cdr fields-partition)))
-					
-					(setl
-						new-record-fields
-						 (cons field unmodified-fields))
-					
-					(new-record-internal
-						type-name
-						new-record-fields)
-				)
-			)
-
-		  	(func (rec field-values)
-				(if (null? field-values)
-					rec
-				(do
+	(do
+	  	(setg with-values (func (rec field-values)
+			(cond
+				((null? field-values)
+				rec)
+				(true (do
 					(setl rec-one-changed
 						(with-value rec (car field-values)))
 
@@ -260,6 +201,36 @@
 						rec-one-changed
 						(cdr field-values))
 				))
+			)
+		))
+		(setl with-value
+			(func (rec field)
+				(if (not (record? rec))
+					throwNotARecordException)
+
+				(setl field-name (car field))
+				(setl field-type (car (cdr field)))
+				(setl field-value (car (cdr (cdr field))))
+				
+				(if (not (null? (cdr (cdr (cdr field)))))
+					throwTooManyValuesInFieldException)
+				(if (not (sym? field-name))
+					throwFirstElementInFieldMustBeSymbolForFieldName)
+				(if (not (sym? field-type))
+					throwSecondElementInFieldMustBeSymbolForTypeName)
+
+				(setl record-fields (get-fields rec))
+				(setl type-name (get-type-name rec))
+			
+				(setl new-record-fields
+					(ListDict.with-value
+					    record-fields
+						field-name
+						(cdr field)))
+				
+				(new-record-internal
+					type-name
+					new-record-fields)
 			)
 		)
 	)

@@ -9,6 +9,24 @@
 	)
 )
 
+(setg let
+	(macro (set-pair *exprs)
+		(list
+			(append
+				(list
+					'func
+					'()
+					(list
+						'setl
+						(car set-pair)
+						(second set-pair)
+					)
+				)
+				*exprs
+			)
+		)
+	))
+
 (setg apply
 	(func (a-func args)
 		(eval (cons a-func args))
