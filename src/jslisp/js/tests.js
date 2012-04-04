@@ -233,7 +233,12 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 
 
 		// push
-		new LispTest("(eq (push (list 1 2) 8) '(1 2 8))", true),
+		new LispTestEq("(push (list 1 2) 8)", "'(1 2 8)"),
+
+		// append
+		new LispTestEq("(append '(1 2) '(3 4))", "'(1 2 3 4)"),
+		new LispTestEq("(append '(1 2) '())",    "'(1 2)"),
+		new LispTestEq("(append '()    '(3 4))", "'(3 4)"),
 
 		// num-seq
 		new LispTestEq("(num-seq 5 8)", "'(5 6 7)"),

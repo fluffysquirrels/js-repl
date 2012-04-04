@@ -1,6 +1,5 @@
 In progress
  - unit tests
-   - append
    - let
 
 Next
