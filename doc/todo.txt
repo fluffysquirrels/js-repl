@@ -14,8 +14,6 @@ In progress
 oo.txt
 
 Unit tests
- - add-type
- - parse floats
  - vec2
  - sqrt
  - square

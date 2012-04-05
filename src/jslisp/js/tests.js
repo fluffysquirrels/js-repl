@@ -29,7 +29,10 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("hello", "world!"),
 		new LispTest("true",  true),
 		new LispTest("false", false),
-		new LispTest("5", 5),
+		new LispTest("5",     5),
+		new LispTest("5.6",   5.6),
+		new LispTest("-5.6", -5.6),
+		new LispTest("+5.6",  5.6),
 		new LispTest("null", null),
 		
 		// Parsing '
