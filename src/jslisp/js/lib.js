@@ -44,7 +44,7 @@ jsrepl.lisp.getLib = function() {
 
 		"setg":		new jsrepl.lisp.LispKeyword(Lib_setGlobal),
 		"setl":		new jsrepl.lisp.LispKeyword(Lib_setLocal),
-		"quot":		new jsrepl.lisp.LispKeyword(Lib_quot),
+		"quote":	new jsrepl.lisp.LispKeyword(Lib_quote),
 		"eval":		new jsrepl.lisp.LispFunction(Lib_eval),
 		"func":		new jsrepl.lisp.LispKeyword(Lib_function),
 		"macro":	new jsrepl.lisp.LispKeyword(Lib_macro),
@@ -380,7 +380,7 @@ jsrepl.lisp.getLib = function() {
 		return varValue;
 	}
 
-	function Lib_quot(scope, args) {
+	function Lib_quote(scope, args) {
 		utils.assertNumArgs(args, 1);
 		return args[0];
 	}

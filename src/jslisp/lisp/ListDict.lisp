@@ -9,7 +9,7 @@
             (func (clause)
               (list
                 'list
-                (list 'quot (car clause))
+                (list 'quote (car clause))
                 (second clause)
               )
             )

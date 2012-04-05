@@ -33,10 +33,10 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("null", null),
 		
 		// Parsing '
-		new LispTestEq("'true", "(quot true)"),
-		new LispTestEq("'()", "(quot ())"),
-		new LispTestEq("'(1 2 3)", "(quot (1 2 3))"),
-		new LispTestEq("'(1 (2 3) 4)", "(quot (1 (2 3) 4))"),
+		new LispTestEq("'true", "(quote true)"),
+		new LispTestEq("'()", "(quote ())"),
+		new LispTestEq("'(1 2 3)", "(quote (1 2 3))"),
+		new LispTestEq("'(1 (2 3) 4)", "(quote (1 (2 3) 4))"),
 		new LispTestEq("'(1 (2 3) 4)", "(list 1 (list 2 3) 4)"),
 
 		// Arithmetic
@@ -151,7 +151,7 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 
 		// macro
 		new LispTestEq(
-			"(setl get-arg-defns (macro (*arg-defns) (list 'quot *arg-defns)))(get-arg-defns this wouldnt eval)",
+			"(setl get-arg-defns (macro (*arg-defns) (list 'quote *arg-defns)))(get-arg-defns this wouldnt eval)",
 			"'(this wouldnt eval)"),
 		new LispTestEq(
 			"(setl eval-args-in-fn-scope (macro (*arg-defns) *arg-defns))(setl x 21)(eval-args-in-fn-scope * 2 x)",
@@ -165,7 +165,7 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 			"(setl eval-args-in-macro-scope (macro (*arg-defns) (eval *arg-defns)))(do (setl x 21)(eval-args-in-macro-scope * 2 x))"),
 
 		// macrotest
-		new LispTestEq("( (macrotest (expr) (list 'setl '(quot my-expr) (list expr expr))) (* x y))", "'(setl 'my-expr ( (* x y) (* x y) ))"),
+		new LispTestEq("( (macrotest (expr) (list 'setl '(quote my-expr) (list expr expr))) (* x y))", "'(setl 'my-expr ( (* x y) (* x y) ))"),
 		// car
 		new LispTest("(car '())", null),
 		new LispTest("(car '(2))", 2),
@@ -283,10 +283,10 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(eq (first-or-null (cons) num-odd?) null)", true),
 		new LispTest("(eq (first-or-null '(3 notReached) num-odd?) 3)", true),
 
-		// quot
-		new LispTest("(quot 5)", 5),
-		new LispTest("(eval (quot (+ 2 3)))", 5), // incl eval
-		new LispTest("(car (quot (2 3 4)))", 2),
+		// quote
+		new LispTest("(quote 5)", 5),
+		new LispTest("(eval (quote (+ 2 3)))", 5), // incl eval
+		new LispTest("(car (quote (2 3 4)))", 2),
 
 		// eval
 		new LispTest("(eval 5)", 5),
@@ -392,8 +392,8 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(get-value r 'f1)", "'true"),
 		new LispTestThrows("(setl r (with-values (new 'type) '((f1))))"),
 		new LispTestThrows("(setl r (with-values (new 'type) '((f1 true extraArg))))"),
-		new LispTestThrows("(setl r (with-values (new 'type) (quot ((17 true)))))"),
-		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(setl r (with-values r '((f1 false))))(get-value r (quot f1))", "'false"),
+		new LispTestThrows("(setl r (with-values (new 'type) (quote ((17 true)))))"),
+		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(setl r (with-values r '((f1 false))))(get-value r (quote f1))", "'false"),
 		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(setl r (with-values r '((f2 false))))(get-value r 'f1)", "'true"),
 		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(setl r (with-values r '((f2 false))))(get-value r 'f2)", "'false"),
 
@@ -410,7 +410,7 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTestEq("(get-type-name 'hai)", 		 "'symbol"),
 		new LispTestEq("(get-type-name true)", 		 "'bool"),
 		new LispTestEq("(get-type-name do)", 		 "'macro"),
-		new LispTestEq("(get-type-name quot)", 		 "'keyword"),
+		new LispTestEq("(get-type-name quote)", 		 "'keyword"),
 		new LispTestEq("(get-type-name eq)", 		 "'func"),
 		new LispTestEq("(get-type-name hello)", 	 "'string"),
 

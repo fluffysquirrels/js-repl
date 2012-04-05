@@ -107,8 +107,8 @@
 	(macro (expr)
 		(list
 			'list
-			(list 'quot expr)
-			'(quot =)
+			(list 'quote expr)
+			'(quote =)
 			expr
 		)
 	))
@@ -128,7 +128,7 @@
       )
       (list
         'list
-        '(quot quot)
+        '(quote quote)
         '__macrotest-result
       )
     )

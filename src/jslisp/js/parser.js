@@ -17,7 +17,7 @@ jsrepl.lisp.parser = function() {
 			if(getPrevTokenOnThisLevelWasQuote()) {
 				var quotExpr = new jsrepl.lisp.LispExpression();
 				quotExpr.list.push(
-					new jsrepl.lisp.LispSymbol("quot"));
+					new jsrepl.lisp.LispSymbol("quote"));
 				quotExpr.list.push(elt);
 				removePrevTokenOnThisLevelWasQuote();
 				pushToTopLevel(quotExpr);
