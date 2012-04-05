@@ -209,29 +209,29 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTestEq("(ListDict.new)",   "'(dict)"),
 		new LispTestEq("(ListDict.with-value (ListDict.new) 'k 'v)",   "'(dict (k v))"),
 		new LispTestEq("(ListDict.with-values (ListDict.new) '((k v)(k2 v2)))",   "'(dict (k2 v2)(k v))"),
-		new LispTestEq("(ListDict.new '((k v)(k2 v2)))",   "'(dict (k2 v2)(k v))"),
+		new LispTestEq("(ListDict.new (k v)(k2 v2))",   "'(dict (k2 v2)(k v))"),
 
 		// is?
-		new LispTestEq("(ListDict.is? (ListDict.new '((k v)(k2 v2))))",   "true"),
+		new LispTestEq("(ListDict.is? (ListDict.new (k v)(k2 v2)))",   "true"),
 		new LispTestEq("(ListDict.is? (ListDict.new))",   "true"),
 		
 		// has?
-		new LispTestEq("(ListDict.has? (ListDict.new '((k v)(k2 v2))) 'k)",   "true"),
-		new LispTestEq("(ListDict.has? (ListDict.new '((k v)(k2 v2))) 'k2)",   "true"),
-		new LispTestEq("(ListDict.has? (ListDict.new '((k v)(k2 v2))) 'x)",   "false"),
+		new LispTestEq("(ListDict.has? (ListDict.new (k v)(k2 v2)) 'k)",   "true"),
+		new LispTestEq("(ListDict.has? (ListDict.new (k v)(k2 v2)) 'k2)",   "true"),
+		new LispTestEq("(ListDict.has? (ListDict.new (k v)(k2 v2)) 'x)",   "false"),
 
 		// get
-		new LispTestEq("(ListDict.get (ListDict.new '((k v)(k2 v2))) 'k)",   "'v"),
-		new LispTestEq("(ListDict.get (ListDict.new '((k v)(k2 v2))) 'k2)",   "'v2"),
-		new LispTestThrows("(ListDict.get (ListDict.new '((k v)(k2 v2))) 'x)"),
+		new LispTestEq("(ListDict.get (ListDict.new (k v)(k2 v2)) 'k)",   "'v"),
+		new LispTestEq("(ListDict.get (ListDict.new (k v)(k2 v2)) 'k2)",   "'v2"),
+		new LispTestThrows("(ListDict.get (ListDict.new (k v)(k2 v2)) 'x)"),
 		
 		// tryget
-		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'k)",  "'v"),
-		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'k2)", "'v2"),
-		new LispTestEq("(ListDict.tryget (ListDict.new '((k v)(k2 v2))) 'x)",  "null"),
+		new LispTestEq("(ListDict.tryget (ListDict.new (k v)(k2 v2)) 'k)",  "'v"),
+		new LispTestEq("(ListDict.tryget (ListDict.new (k v)(k2 v2)) 'k2)", "'v2"),
+		new LispTestEq("(ListDict.tryget (ListDict.new (k v)(k2 v2)) 'x)",  "null"),
 
 		// keys
-		new LispTestEq("(ListDict.keys (ListDict.new '((k v)(k2 v2))))", "'(k2 k)"),
+		new LispTestEq("(ListDict.keys (ListDict.new (k v)(k2 v2)))", "'(k2 k)"),
 		
 		// ** / ListDict **
 
@@ -380,18 +380,17 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 
 		// with-values and get-value
 		new LispTestThrows("(setl r (new 'type))(get-value r 'f1)"),
-		new LispTestEq("(setl r (with-values (new 'type) '((f1 boolean true))))(get-value r 'f1)", "'true"),
-		new LispTestThrows("(setl r (with-values (new 'type) '((f1 true))))"),
-		new LispTestThrows("(setl r (with-values (new 'type) '((f1 boolean true extraArg))))"),
-		new LispTestThrows("(setl r (with-values (new 'type) (quot ((17 boolean true)))))"),
-		new LispTestThrows("(setl r (with-values (new 'type) '((f1 17 true))))"),
-		new LispTestEq("(setl r (with-values (new 'type) '((f1 boolean true))))(setl r (with-values r '((f1 boolean false))))(get-value r (quot f1))", "'false"),
-		new LispTestEq("(setl r (with-values (new 'type) '((f1 boolean true))))(setl r (with-values r '((f2 boolean false))))(get-value r 'f1)", "'true"),
-		new LispTestEq("(setl r (with-values (new 'type) '((f1 boolean true))))(setl r (with-values r '((f2 boolean false))))(get-value r 'f2)", "'false"),
+		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(get-value r 'f1)", "'true"),
+		new LispTestThrows("(setl r (with-values (new 'type) '((f1))))"),
+		new LispTestThrows("(setl r (with-values (new 'type) '((f1 true extraArg))))"),
+		new LispTestThrows("(setl r (with-values (new 'type) (quot ((17 true)))))"),
+		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(setl r (with-values r '((f1 false))))(get-value r (quot f1))", "'false"),
+		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(setl r (with-values r '((f2 false))))(get-value r 'f1)", "'true"),
+		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(setl r (with-values r '((f2 false))))(get-value r 'f2)", "'false"),
 
 		// new with optional values param
-		new LispTestEq("(setl r (new 'type '((f1 boolean true)))) (get-value r 'f1)", "'true"),
-		new LispTestEq("(setl r (new 'type '((f1 boolean true)))) (record? r)", "true"),
+		new LispTestEq("(setl r (new 'type '((f1 true)))) (get-value r 'f1)", "'true"),
+		new LispTestEq("(setl r (new 'type '((f1 true)))) (record? r)", "true"),
 
 		// get-type-name
 		new LispTestEq("(setl r (new 'type))(get-type-name r)", "'type"),

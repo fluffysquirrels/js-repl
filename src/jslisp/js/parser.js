@@ -92,8 +92,8 @@ jsrepl.lisp.parser = function() {
 		function pushCurrToken() {
 			var tokenObject;
 			
-			if(utils.isIntegerString(currToken)) {
-				tokenObject = parseInt(currToken);
+			if(utils.isFloatString(currToken)) {
+				tokenObject = parseFloat(currToken);
 			}
 			else if(isSymbolString(currToken)) {
 				tokenObject = new jsrepl.lisp.LispSymbol(currToken);

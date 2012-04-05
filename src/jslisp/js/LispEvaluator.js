@@ -19,6 +19,7 @@ jsrepl.lisp.initScriptUrls =
 		"src/jslisp/lisp/ListDict.lisp",
 		"src/jslisp/lisp/dict-is-ListDict.lisp",
 		"src/jslisp/lisp/oo.lisp",
+		"src/jslisp/lisp/geometry.lisp",
 	];
 
 jsrepl.lisp.beginCreateEvaluator =

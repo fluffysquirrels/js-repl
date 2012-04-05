@@ -103,7 +103,6 @@
 	)
 ))
 
-
 (setg eval-debug
 	(macro (expr)
 		(list
@@ -112,6 +111,25 @@
 			'(quot =)
 			expr
 		)
-	)
-)
+	))
 
+(setg macrotest
+  (macro (arg-defns *body-exprs)
+    (list
+      'macro
+      arg-defns
+      (list
+        'setl
+        '__macrotest-result
+        (cons
+          'do
+          *body-exprs
+        )
+      )
+      (list
+        'list
+        '(quot quot)
+        '__macrotest-result
+      )
+    )
+  ))

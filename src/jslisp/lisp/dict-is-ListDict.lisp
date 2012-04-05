@@ -1,4 +1,5 @@
 (setg dict.new         ListDict.new         )
+(setg dict.from-list   ListDict.from-list   )
 (setg dict.is?         ListDict.is?         )
 (setg dict.has?        ListDict.has?        )
 (setg dict.get         ListDict.get         )

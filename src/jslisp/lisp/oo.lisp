@@ -10,7 +10,6 @@
 			)
 		))
 
-
 	(setg new
 		(func (type-name *rest)
 			(if (not (type-exists type-name))
@@ -100,12 +99,6 @@
 
 	(setg get-value
 		(func (rec field-name)
-			(setl field (get-field rec field-name))
-			(car (cdr field))
-		))
-
-	(setl get-field
-		(func (rec field-name)
 			(setl field-values (get-fields rec))
 			(dict.get field-values field-name)
 		))
@@ -114,10 +107,10 @@
 		(func (type-name *fields)
 			(new-record-internal
 				'type
-				(dict.new
+				(dict.from-list
 				  	(list
-				 		(list 'name (list 'symbol type-name))
-						(list 'fields (list 'list *fields))
+				 		(list 'name type-name)
+						(list 'fields *fields)
 					)
 				)
 			)
@@ -127,10 +120,10 @@
 		(func (field-name field-type)
 			(new-record-internal
 				'field
-				(dict.new
+				(dict.from-list
 					(list
-						(list 'name (list 'symbol field-name))
-						(list 'type (list 'symbol field-type))
+						(list 'name field-name)
+						(list 'type field-type)
 					)
 				)
 			)
@@ -160,19 +153,38 @@
 			(dict.tryget types type-name)
 		))
 
+	(setl convert-type-to-kv
+		(func (curr-type)
+			(if (not
+				(sym=
+					(get-type-name curr-type)
+					'type))
+				throw-cannotAddTypeThatIsNotAType)
+			(list
+				(get-value curr-type 'name)
+				curr-type
+			)
+		))
+
+	(setl convert-field-to-kv
+		(func (curr-field)
+			(if (not
+				(sym=
+					(get-type-name curr-type)
+					'field))
+				throw-cannotAddFieldThatIsNotAField)
+			(list
+				(get-value curr-field 'name)
+				curr-field
+			)
+		))
+
 	(setg add-type
 		(func (*new-types)
-			(setl map-type-to-kv
-				(func (curr-type)
-					(list
-						(get-value curr-type 'name)
-						curr-type
-					)
-				))
 			(setg types
 				(dict.with-values
 					types
-					(map *new-types map-type-to-kv)
+					(map *new-types convert-type-to-kv)
 				))
 		))
 
@@ -202,7 +214,7 @@
 	  	(setg with-values (func (rec field-values)
 			(cond
 				((null? field-values)
-				rec)
+					rec)
 				(true (do
 					(setl rec-one-changed
 						(with-value rec (car field-values)))
@@ -213,21 +225,19 @@
 				))
 			)
 		))
+
 		(setl with-value
 			(func (rec field)
 				(if (not (record? rec))
 					throwNotARecordException)
 
 				(setl field-name (car field))
-				(setl field-type (car (cdr field)))
-				(setl field-value (car (cdr (cdr field))))
+				(setl field-value (second field))
 				
-				(if (not (null? (cdr (cdr (cdr field)))))
-					throwTooManyValuesInFieldException)
+				(if (not (null? (cdr (cdr field))))
+					throw-tooManyValuesInFieldException)
 				(if (not (sym? field-name))
-					throwFirstElementInFieldMustBeSymbolForFieldName)
-				(if (not (sym? field-type))
-					throwSecondElementInFieldMustBeSymbolForTypeName)
+					throw-firstElementInFieldMustBeSymbolForFieldName)
 
 				(setl record-fields (get-fields rec))
 				(setl type-name (get-type-name rec))
@@ -236,7 +246,7 @@
 					(dict.with-value
 					    record-fields
 						field-name
-						(cdr field)))
+						field-value))
 				
 				(new-record-internal
 					type-name

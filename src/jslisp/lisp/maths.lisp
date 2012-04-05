@@ -40,6 +40,18 @@
 	)
 )
 
+(setg square
+  (func (x)
+    (* x x)
+  ))
+
+(setg sqrt
+  (func (x)
+    (setl jumbo-factor 100)
+    (setl jumbo-x (* x jumbo-factor jumbo-factor))
+    (setl jumbo-sqrt-x (sqrt-ceil jumbo-x))
+    (/ jumbo-sqrt-x jumbo-factor)
+  ))
 
 (setg sqrt-ceil (func (n)
 	(setl is-pos-and-square-greater-than-n

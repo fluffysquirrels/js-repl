@@ -90,6 +90,10 @@ var utils = function(){
 		return /^(\+|\-)?[0-9]+$/.test(str);
 	};
 
+	pub.isFloatString = function(str) {
+		return /^(\+|\-)?[0-9]+(\.[0-9]+)?$/.test(str);
+	};
+
 	pub.assertNumArgs = function(args, numArgsRequired) {
 		if(numArgsRequired !== args.length) {
 			throw new Error("Function required " + numArgsRequired + " args but received " + args.length + " args.");
