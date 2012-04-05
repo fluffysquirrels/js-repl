@@ -22,8 +22,6 @@
 		(cond
 			((not (sym= (jstypeof a) (jstypeof b)))
 				false)
-			((and (record? a) (record? b))
-				(record= a b))
 			((cons? a)
 				(listeq a b))
 			((sym? a)

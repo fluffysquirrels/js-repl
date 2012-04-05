@@ -1,23 +1,19 @@
 In progress
- - ListDict.new as macro
- - fix ListDict.from-list
- - macrotest
  - geometry.lisp incl vec2 as trial for type-safe records.
- - dict=
 
  - type-safe records
    - verify field names and type on record set
    - remove 2nd field value (type name)
- - records
-   - record=
+ - record=
+   - called from eq
+   - unit tests
+ - dict=
+   - called from eq
+   - unit tests
 
 oo.txt
 
 Unit tests
- - ListDict.new, ListDict.from-list
- - macrotest
- - record=
- - eq on records
  - add-type
  - parse floats
  - vec2
@@ -25,7 +21,6 @@ Unit tests
  - square
 
 Lisp lib
- - macrotest -- creates a new macro that returns the list that would be executed if this definition was created as a macro. e.g. ( (macrotest (expr) (list 'setl 'my-expr expr)) (* x y)) returns '(setl my-expr (* x y))
  - fold
  - variadic and, or.
  - pp

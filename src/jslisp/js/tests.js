@@ -163,6 +163,9 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 			"17"),
 		new LispTestThrows(
 			"(setl eval-args-in-macro-scope (macro (*arg-defns) (eval *arg-defns)))(do (setl x 21)(eval-args-in-macro-scope * 2 x))"),
+
+		// macrotest
+		new LispTestEq("( (macrotest (expr) (list 'setl '(quot my-expr) (list expr expr))) (* x y))", "'(setl 'my-expr ( (* x y) (* x y) ))"),
 		// car
 		new LispTest("(car '())", null),
 		new LispTest("(car '(2))", 2),
@@ -207,34 +210,40 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 
 		// new up various ListDict's and check output lists
 		new LispTestEq("(ListDict.new)",   "'(dict)"),
-		new LispTestEq("(ListDict.with-value (ListDict.new) 'k 'v)",   "'(dict (k v))"),
-		new LispTestEq("(ListDict.with-values (ListDict.new) '((k v)(k2 v2)))",   "'(dict (k2 v2)(k v))"),
-		new LispTestEq("(ListDict.new (k v)(k2 v2))",   "'(dict (k2 v2)(k v))"),
+		new LispTestEq("(setl v 10)(ListDict.with-value (ListDict.new) 'k v)",   "'(dict (k 10))"),
+		new LispTestEq("(ListDict.with-values (ListDict.new) '((k 10)(k2 20)))", "'(dict (k2 20)(k 10))"),
+		new LispTestEq("(ListDict.with-values (ListDict.new) (list (list 'k (* 10 1))(list 'k2 (* 10 2))))", "'(dict (k2 20)(k 10))"),
+		new LispTestEq("(ListDict.new (k 10)(k2 20))",   "'(dict (k2 20)(k 10))"),
+		new LispTestEq("(ListDict.new (k1 (* 10 1)) (k2 (* 10 2)))",   "'(dict (k2 20)(k1 10))"),
+
+		// from-list
+		new LispTestEq("(ListDict.from-list '( (k v)(k2 v2) ) )", "'(dict (k2 v2)(k v))"),
+		new LispTestEq("(ListDict.from-list (list (list 'k1 (* 10 1))(list 'k2 (* 10 2)) ))", "'(dict (k2 20)(k1 10))"),
+
 
 		// is?
-		new LispTestEq("(ListDict.is? (ListDict.new (k v)(k2 v2)))",   "true"),
+		new LispTestEq("(ListDict.is? (ListDict.new (k 10)(k2 20)))",   "true"),
 		new LispTestEq("(ListDict.is? (ListDict.new))",   "true"),
 		
 		// has?
-		new LispTestEq("(ListDict.has? (ListDict.new (k v)(k2 v2)) 'k)",   "true"),
-		new LispTestEq("(ListDict.has? (ListDict.new (k v)(k2 v2)) 'k2)",   "true"),
-		new LispTestEq("(ListDict.has? (ListDict.new (k v)(k2 v2)) 'x)",   "false"),
+		new LispTestEq("(ListDict.has? (ListDict.new (k 10)(k2 20)) 'k)",   "true"),
+		new LispTestEq("(ListDict.has? (ListDict.new (k 10)(k2 20)) 'k2)",   "true"),
+		new LispTestEq("(ListDict.has? (ListDict.new (k 10)(k2 20)) 'x)",   "false"),
 
 		// get
-		new LispTestEq("(ListDict.get (ListDict.new (k v)(k2 v2)) 'k)",   "'v"),
-		new LispTestEq("(ListDict.get (ListDict.new (k v)(k2 v2)) 'k2)",   "'v2"),
-		new LispTestThrows("(ListDict.get (ListDict.new (k v)(k2 v2)) 'x)"),
+		new LispTestEq("(ListDict.get (ListDict.new (k 10)(k2 20)) 'k)",   "10"),
+		new LispTestEq("(ListDict.get (ListDict.new (k 10)(k2 20)) 'k2)",  "20"),
+		new LispTestThrows("(ListDict.get (ListDict.new (k 10)(k2 20)) 'x)"),
 		
 		// tryget
-		new LispTestEq("(ListDict.tryget (ListDict.new (k v)(k2 v2)) 'k)",  "'v"),
-		new LispTestEq("(ListDict.tryget (ListDict.new (k v)(k2 v2)) 'k2)", "'v2"),
-		new LispTestEq("(ListDict.tryget (ListDict.new (k v)(k2 v2)) 'x)",  "null"),
+		new LispTestEq("(ListDict.tryget (ListDict.new (k 10)(k2 20)) 'k)",  "10"),
+		new LispTestEq("(ListDict.tryget (ListDict.new (k 10)(k2 20)) 'k2)", "20"),
+		new LispTestEq("(ListDict.tryget (ListDict.new (k 10)(k2 20)) 'x)",  "null"),
 
 		// keys
-		new LispTestEq("(ListDict.keys (ListDict.new (k v)(k2 v2)))", "'(k2 k)"),
+		new LispTestEq("(ListDict.keys (ListDict.new (k 10)(k2 20)))", "'(k2 k)"),
 		
 		// ** / ListDict **
-
 
 		// push
 		new LispTestEq("(push (list 1 2) 8)", "'(1 2 8)"),
