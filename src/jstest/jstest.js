@@ -13,6 +13,7 @@ var jstest = function() {
 	}
 
 	pub.runTests = function(tests) {
+		logger.info("Running " + tests.length + " tests...");
 
 		var timeResult = utils.time(
 			function() {
@@ -23,6 +24,7 @@ var jstest = function() {
 
 		var testResults = timeResult.result;
 		
+		printSlowTests(testResults);
 		logger.info("All tests finished in " + (timeResult.timeMs / 1000).toString() + "s.");
 		printTotals(testResults);
 	}
@@ -50,7 +52,7 @@ var jstest = function() {
 			testException,
 			timeResult.timeMs);
 
-		logger.debug("Test finished in " + (timeResult.timeMs / 1000).toString() + "s.");
+		logger.debug("Test finished in " + msToTimeString(timeResult.timeMs) + ".");
 		logger.debug("testResult.passed = '" + testResult.passed + "'.");
 
 		if(testResult.passed === false) {
@@ -105,6 +107,36 @@ var jstest = function() {
 
 		logger.info("Tests passed: " + passed);
 		logger.info("Tests failed: " + failed);
+	}
+	function printSlowTests(testResults) {
+		var resultsSlowestFirst =
+			testResults.slice(0).sort(
+				function (resultA, resultB) {
+					// If A took longer we return a negative
+					// number, indicating resultA < resultB
+					// for the sort, hence resultA comes
+					// first in the result.
+					return resultB.timeMs - resultA.timeMs;
+				});
+
+		var maxSlowTests = 10;
+
+		logger.info(maxSlowTests + " slowest tests:");
+
+		for(var ixResult = 0,
+		       len = Math.min(maxSlowTests, resultsSlowestFirst.length);
+			ixResult < len;
+			ixResult++) {
+
+			var result = resultsSlowestFirst[ixResult];
+			logger.info(
+				msToTimeString(result.timeMs) + " : '" +
+				result.test.description + "'");
+		}
+	}
+
+	function msToTimeString(ms) {
+		return (ms / 1000).toString() + "s";
 	}
 
 	pub.assertEqual = function(

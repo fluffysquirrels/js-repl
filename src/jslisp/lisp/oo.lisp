@@ -11,6 +11,16 @@
 		))
 
 	(setg new
+		(macro (type-name *field-value-clauses)
+			(list
+				'new-with-values-list
+				type-name
+				(get-macro-value-list-from-value-clauses
+				  *field-value-clauses)
+			)
+		))
+
+	(setg new-with-values-list
 		(func (type-name *rest)
 			(if (not (type-exists type-name))
 				throwTypeDoesNotExistException)
@@ -20,7 +30,7 @@
 			(setl optional-field-values (car *rest))
 
 			(if (not (null? optional-field-values))
-				(with-values rec optional-field-values)
+				(with-values-list rec optional-field-values)
 				rec
 			)
 		)
@@ -105,14 +115,30 @@
 
 	(setg new-type
 		(func (type-name *fields)
+			(setl fields-kv (map *fields convert-field-to-kv))
+			(setl fields-dict (dict.from-list fields-kv))
+
 			(new-record-internal
 				'type
 				(dict.from-list
 				  	(list
 				 		(list 'name type-name)
-						(list 'fields *fields)
+						(list 'fields fields-dict)
 					)
 				)
+			)
+		))
+
+	(setl convert-field-to-kv
+		(func (curr-field)
+			(if (not
+				(sym=
+					(get-type-name curr-field)
+					'field))
+				throw-cannotAddFieldThatIsNotAField)
+			(list
+				(get-value curr-field 'name)
+				curr-field
 			)
 		))
 
@@ -133,7 +159,7 @@
 		(new-type
 			'type
 			(new-field 'name 'symbol)
-			(new-field 'fields 'list)
+			(new-field 'fields 'dict)
 		))
 
 	(setl type-of-field
@@ -141,16 +167,6 @@
 			'field
 			(new-field 'name 'symbol)
 			(new-field 'type 'symbol)
-		))
-
-	(setg get-type
-		(func (type-name)
-			(dict.get types type-name)
-		))
-
-	(setg tryget-type
-		(func (type-name)
-			(dict.tryget types type-name)
 		))
 
 	(setl convert-type-to-kv
@@ -166,17 +182,14 @@
 			)
 		))
 
-	(setl convert-field-to-kv
-		(func (curr-field)
-			(if (not
-				(sym=
-					(get-type-name curr-type)
-					'field))
-				throw-cannotAddFieldThatIsNotAField)
-			(list
-				(get-value curr-field 'name)
-				curr-field
-			)
+	(setg get-type
+		(func (type-name)
+			(dict.get types type-name)
+		))
+
+	(setg tryget-type
+		(func (type-name)
+			(dict.tryget types type-name)
 		))
 
 	(setg add-type
@@ -211,15 +224,24 @@
 	)
 
 	(do
-	  	(setg with-values (func (rec field-values)
+	    (setg with-values
+			(macro (rec *field-value-clauses)
+				(list
+					'with-values-list
+					rec
+					(get-macro-value-list-from-value-clauses
+					  *field-value-clauses)
+				)
+			))
+	  	(setg with-values-list (func (rec field-values)
 			(cond
-				((null? field-values)
+				((null-or-empty-list? field-values)
 					rec)
 				(true (do
 					(setl rec-one-changed
 						(with-value rec (car field-values)))
 
-				  	(with-values
+				  	(with-values-list
 						rec-one-changed
 						(cdr field-values))
 				))
@@ -241,7 +263,17 @@
 
 				(setl record-fields (get-fields rec))
 				(setl type-name (get-type-name rec))
-			
+				(setl rec-type (type-of rec))
+
+				(setl type-fields (get-value rec-type 'fields))
+				(setl type-field  (dict.get type-fields field-name))
+				(if (not (sym=
+						   (get-type-name field-value)
+						   (get-value type-field 'type)
+					))
+					throw-valueTypeNameDoesNotMuchFieldTypeName
+				)
+
 				(setl new-record-fields
 					(dict.with-value
 					    record-fields

@@ -133,3 +133,20 @@
       )
     )
   ))
+
+(setg get-macro-value-list-from-value-clauses
+  (func (value-clauses)
+    (cons 'list
+      (map value-clauses
+        (func (clause)
+          (if (not (null? (cdr (cdr clause))))
+            throw-tooManyValuesInClause)
+          (list
+            'list
+            (list 'quote (car clause))
+            (second clause)
+          )
+        )
+      )
+    )
+  ))

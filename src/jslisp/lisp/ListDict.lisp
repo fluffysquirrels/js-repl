@@ -3,18 +3,8 @@
     (macro (*initial-value-clauses)
       (list
         'ListDict.from-list
-        (cons
-          'list
-          (map *initial-value-clauses
-            (func (clause)
-              (list
-                'list
-                (list 'quote (car clause))
-                (second clause)
-              )
-            )
-          )
-        )
+        (get-macro-value-list-from-value-clauses
+          *initial-value-clauses)
       )
     ))
   (setg ListDict.from-list

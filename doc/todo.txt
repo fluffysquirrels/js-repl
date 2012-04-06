@@ -1,9 +1,4 @@
 In progress
- - geometry.lisp incl vec2 as trial for type-safe records.
-
- - type-safe records
-   - verify field names and type on record set
-   - remove 2nd field value (type name)
  - record=
    - called from eq
    - unit tests
@@ -14,7 +9,6 @@ In progress
 oo.txt
 
 Unit tests
- - vec2
  - sqrt
  - square
 
@@ -37,7 +31,7 @@ Lang
  - better parser and tokeniser
  - comments
  - strings
- - optional args
+ - optional args, keyword args, bind value clauses
 
 Code puzzles
  - primality tests.
@@ -46,7 +40,8 @@ Code puzzles
  - parser.
  - regex.
 
-Future ideas
+Future Ideas
+ - pattern matching.
  - mutable private data; start with the types list.
  - load external files
  - deconstructing value bind

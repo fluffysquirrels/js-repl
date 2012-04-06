@@ -382,30 +382,41 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		// ** OO **
 
 		// new
-		new LispTest("(setl r (new 'type)) true", true),
+		new LispTest("(setl r (new 'vec2)) true", true),
 
 		// record?
-		new LispTest("(setl r (new 'type))(record? r)", true),
+		new LispTest("(setl r (new 'vec2))(record? r)", true),
 		new LispTest("(record? '())", false),
 		new LispTest("(record? '(not-a-record () ()))", false),
 		new LispTest("(record? 5)", false),
 
 		// with-values and get-value
-		new LispTestThrows("(setl r (new 'type))(get-value r 'f1)"),
-		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(get-value r 'f1)", "'true"),
-		new LispTestThrows("(setl r (with-values (new 'type) '((f1))))"),
-		new LispTestThrows("(setl r (with-values (new 'type) '((f1 true extraArg))))"),
-		new LispTestThrows("(setl r (with-values (new 'type) (quote ((17 true)))))"),
-		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(setl r (with-values r '((f1 false))))(get-value r (quote f1))", "'false"),
-		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(setl r (with-values r '((f2 false))))(get-value r 'f1)", "'true"),
-		new LispTestEq("(setl r (with-values (new 'type) '((f1 true))))(setl r (with-values r '((f2 false))))(get-value r 'f2)", "'false"),
+		new LispTestEq("(setl r (with-values (new 'vec2) (x 17)))(get-value r 'x)", "17"),
+		new LispTestThrows("(setl r (new 'vec2))(get-value r 'x)"),
+		new LispTestThrows("(setl r (with-values (new 'vec2) (x)))"),
+		new LispTestThrows("(setl r (with-values (new 'vec2) (x 17 extraArg)))"),
+		new LispTestThrows("(setl r (with-values (new 'vec2) ('notAFieldName 17)))"),
+		new LispTestThrows("(setl r (with-values (new 'vec2) ('x 'fieldValueWithBadType)))"),
 
-		// new with optional values param
-		new LispTestEq("(setl r (new 'type '((f1 true)))) (get-value r 'f1)", "'true"),
-		new LispTestEq("(setl r (new 'type '((f1 true)))) (record? r)", "true"),
+		// get-value after multiple sets
+		new LispTestEq("(setl r (with-values (new 'vec2) (x 17)))(setl r (with-values r (x 25)))(get-value r 'x)", "25"),
+		new LispTestEq("(setl r (with-values (new 'vec2) (x 17)))(setl r (with-values r (y 25)))(get-value r 'x)", "17"),
+		new LispTestEq("(setl r (with-values (new 'vec2) (x 17)))(setl r (with-values r (y 25)))(get-value r 'y)", "25"),
+
+		// new with optional values params
+		new LispTestEq("(setl r (new 'vec2 (x 17))) (get-value r 'x)", "17"),
+		new LispTestEq("(setl r (new 'vec2 (x (+ 10 7)))) (get-value r 'x)", "17"),
+		new LispTestEq("(setl r (new 'vec2 (x 17)(y 25))) (get-value r 'x)", "17"),
+		new LispTestEq("(setl r (new 'vec2 (x 17)(y 25))) (get-value r 'y)", "25"),
+		new LispTestEq("(setl r (new 'vec2 (x 17))) (record? r)", "true"),
+
+		// equivalence of various record setters
+		new LispTestEq("(new-with-values-list 'vec2 '((x 17)(y 25)) )",  "(new 'vec2 (x 17)(y 25))"),
+		new LispTestEq("(with-values      (new 'vec2)   (x 17)(y 25))",  "(new 'vec2 (x 17)(y 25))"),
+		new LispTestEq("(with-values-list (new 'vec2) '((x 17)(y 25)))", "(new 'vec2 (x 17)(y 25))"),
 
 		// get-type-name
-		new LispTestEq("(setl r (new 'type))(get-type-name r)", "'type"),
+		new LispTestEq("(setl r (new 'vec2))(get-type-name r)", "'vec2"),
 		new LispTestEq("(get-type-name null)", 		 "'null"),
 		new LispTestEq("(get-type-name (dict.new))", "'dict"),
 		new LispTestEq("(get-type-name 17)", 		 "'number"),
@@ -413,13 +424,13 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTestEq("(get-type-name 'hai)", 		 "'symbol"),
 		new LispTestEq("(get-type-name true)", 		 "'bool"),
 		new LispTestEq("(get-type-name do)", 		 "'macro"),
-		new LispTestEq("(get-type-name quote)", 		 "'keyword"),
+		new LispTestEq("(get-type-name quote)", 	 "'keyword"),
 		new LispTestEq("(get-type-name eq)", 		 "'func"),
 		new LispTestEq("(get-type-name hello)", 	 "'string"),
 
 		// is-a
 		new LispTestEq("(is-a 17 'number)", 		 "true"),
-		new LispTestEq("(is-a (new 'type) 'type)", 	 "true"),
+		new LispTestEq("(is-a (new 'vec2) 'vec2)", 	 "true"),
 
 		// type-exists
 		new LispTestEq("(type-exists 'number)", 	 "true"),
@@ -437,6 +448,12 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		// tryget-type
 		new LispTestEq("(get-type 'number)", "(tryget-type 'number)"),
 		new LispTestEq("(tryget-type 'this-is-not-a-type-name)", 	 "null"),
+
+		// ** / OO **
+	
+		// vec2
+		new LispTestEq("(vec2.len (new 'vec2 (x 3)(y 4)))", "5"),
+		new LispTestEq("(vec2.add (new 'vec2 (x 1)(y 2)) (new 'vec2 (x 300)(y 400)))", "(new 'vec2 (x 301)(y 402))"),
 	
 	]; // / lispTests
 

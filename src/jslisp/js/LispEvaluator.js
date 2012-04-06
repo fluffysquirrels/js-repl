@@ -48,7 +48,7 @@ function() { // Create new scope.
 		var _this = this;
 		var _logger =
 			ioc.createLogger(
-				"LispEvaluator").withDebug(true);
+				"LispEvaluator").withDebug(false);
 	
 		this.readEval = function(cmdString) {
 			var exprs = jsrepl.lisp.parser.read(cmdString);
@@ -172,7 +172,7 @@ function() { // Create new scope.
 				url,
 				function(lispStr) {
 					ioc.withErrorHandler(function() {
-						_logger.info("Running '" + url + "'.");
+						_logger.debug("Running '" + url + "'.");
 						_this.readEval(lispStr);
 						if(callback) {
 							callback();

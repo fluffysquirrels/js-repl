@@ -9,8 +9,8 @@
   (func (v1 v2)
     (setl newx (+ (get-value v1 'x) (get-value v2 'x)))
     (setl newy (+ (get-value v1 'y) (get-value v2 'y)))
-    (new 'vec2
-      (dict.new
+    (new-with-values-list 'vec2
+      (list
 		(list 'x newx)
         (list 'y newy)
 	  )
