@@ -1,12 +1,13 @@
 In progress
+ - slow tests histogram.
+
+OO
  - record=
    - called from eq
    - unit tests
  - dict=
    - called from eq
    - unit tests
-
-oo.txt
 
 Unit tests
  - sqrt
@@ -16,7 +17,6 @@ Lisp lib
  - fold
  - variadic and, or.
  - pp
- - switch
 
 JS lib
  - data types
@@ -27,6 +27,11 @@ JS lib
  - split tests into separate files
 
 Lang
+ - Refined variable setters:
+   - defn, def -- new (setg 'x (func ...)), (setg 'x ...)
+   - var -- new variable in local scope
+   - setvar -- find existing variable in local scope and set its value; throw if not found.
+ - fn
  - quasiquoting
  - better parser and tokeniser
  - comments
@@ -40,7 +45,7 @@ Code puzzles
  - parser.
  - regex.
 
-Future Ideas
+Future ideas
  - pattern matching.
  - mutable private data; start with the types list.
  - load external files
@@ -55,4 +60,3 @@ Future Ideas
  - tail call elimination
  - ffi to JavaScript
  - macro-expand -- no eval!
-

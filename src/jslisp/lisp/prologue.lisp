@@ -1,5 +1,5 @@
 (setg null-or-empty-list?
-	(func (a-list)
+	(fn (a-list)
 		(or (null? a-list)
 			(and
 				(and
@@ -12,13 +12,13 @@
 	))
 
 (setg list
-	(func (*values)
+	(fn (*values)
 		*values
 	)
 )
 
 (setg eq
-	(func (a b)
+	(fn (a b)
 		(cond
 			((not (sym= (jstypeof a) (jstypeof b)))
 				false)
@@ -33,7 +33,7 @@
 )
 
 (setg listeq
-	(func (a b) 
+	(fn (a b) 
 		(if (eq (car a) (car b))
 			(if(eq (cdr a) null)
 				(eq (cdr b) null)

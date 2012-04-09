@@ -92,7 +92,7 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(sym= (jstypeof null) 'null)", true),
 		new LispTest("(sym= (jstypeof 'somesymbol) 'LispSymbol)", true),
 		new LispTest("(sym= (jstypeof '(1 2 3)) 'LispExpression)", true),
-		new LispTest("(sym= (jstypeof (func () true)) 'LispFunction)", true),
+		new LispTest("(sym= (jstypeof (fn () true)) 'LispFunction)", true),
 
 		// sym=
 		new LispTest("(sym= 'a 'a)", true),
@@ -102,7 +102,7 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(cons? '())", 		true),
 		new LispTest("(num?  5)", 			true),
 		new LispTest("(sym?  'a)", 			true),
-		new LispTest("(func? (func () 6))", true),
+		new LispTest("(fn? (fn () 6))", true),
 		new LispTest("(bool? true)", 		true),
 		new LispTest("(null? (cdr '()))", 	true),
 		new LispTest("(null? null)", 		true),
@@ -115,30 +115,30 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTestEq("(let (x 5) x)", 5),
 		new LispTestEq("(let (x 5) 'other 'expressions (+ x 12))", 17),
 
-		// func
-		new LispTest("((func () 27))", 27),
-		new LispTest("((func (x) x) 27)", 27),
-		new LispTest("((func (x y) (* x y)) 4 5)", 20),
-		new LispTest("(setl myfunc (func (x y) (* x y)))(myfunc 4 5)", 20),
+		// fn
+		new LispTest("((fn () 27))", 27),
+		new LispTest("((fn (x) x) 27)", 27),
+		new LispTest("((fn (x y) (* x y)) 4 5)", 20),
+		new LispTest("(setl myfunc (fn (x y) (* x y)))(myfunc 4 5)", 20),
 		
-		// func - variable capture in lexical scope
-		new LispTest("((do (setl x 5)(func () x)))", 5),
+		// fn - variable capture in lexical scope
+		new LispTest("((do (setl x 5)(fn () x)))", 5),
 
-		// func with varags
-		new LispTest("((func (x y *args) (* x y)) 4 5)", 20),
-		new LispTest("((func (x y *args) (* x y)) 4 5 6)", 20),
-		new LispTest("((func (x y *args) (* x y)) 4 5 6 7)", 20),
+		// fn with varags
+		new LispTest("((fn (x y *args) (* x y)) 4 5)", 20),
+		new LispTest("((fn (x y *args) (* x y)) 4 5 6)", 20),
+		new LispTest("((fn (x y *args) (* x y)) 4 5 6 7)", 20),
 		new LispTest(
 			"(eq " +
-				"((func (x y *args) (cons (* x y) *args)) 4 5)" +
+				"((fn (x y *args) (cons (* x y) *args)) 4 5)" +
 				"'(20))", true),
 		new LispTest(
 			"(eq " +
-				"((func (x y *args) (cons (* x y) *args)) 4 5 6)" +
+				"((fn (x y *args) (cons (* x y) *args)) 4 5 6)" +
 				"'(20 6))", true),
 		new LispTest(
 			"(eq " +
-				"((func (x y *args) (cons (* x y) *args)) 4 5 6 7)" +
+				"((fn (x y *args) (cons (* x y) *args)) 4 5 6 7)" +
 				"'(20 6 7))", true),
 
 		// apply
@@ -146,10 +146,10 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 			"(apply + '(1 2 3))",
 			"6"),
 		new LispTestEq(
-			"(apply (func () 42) '())",
+			"(apply (fn () 42) '())",
 			"42"),
 		new LispTestEq(
-			"(setl x 21)(setl a-func (func (arg) (* arg 2)))(apply a-func (list x))",
+			"(setl x 21)(setl a-fn (fn (arg) (* arg 2)))(apply a-fn (list x))",
 			"42"),
 
 		// macro
@@ -275,8 +275,8 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(eq (filter '(1 3 5) num-even?) '())", true),
 
 		// map on numerical sequences
-		new LispTest("(eq (map (num-seq 1 7) (func (x) (* x x))) '(1 4 9 16 25 36))", true),
-		new LispTest("(eq (map '() (func (x) notReached)) '())", true),
+		new LispTest("(eq (map (num-seq 1 7) (fn (x) (* x x))) '(1 4 9 16 25 36))", true),
+		new LispTest("(eq (map '() (fn (x) notReached)) '())", true),
 
 		// first-or-null
 		new LispTest("(eq (first-or-null (num-seq 2 4) num-odd?) 3)", true),
@@ -296,7 +296,7 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTest("(eval 2 3 4 5)", 5),
 		new LispTest("(eval (cons '* '(2 3)))", 6),
 		new LispTest("(eval (setl testVar 7) testVar)", 7),
-		new LispTest("(eval (list (func () 12)))", 12),
+		new LispTest("(eval (list (fn () 12)))", 12),
 
 		// if
 		new LispTest("(if true 5 6)", 5),
@@ -314,19 +314,19 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 
 		// cond
         new LispTestEq(
-			"(setl cond-test (func (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
+			"(setl cond-test (fn (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
 			"(cond-test -5)",
 			"-1"),
         new LispTestEq(
-			"(setl cond-test (func (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
+			"(setl cond-test (fn (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
 			"(cond-test 5)",
 			"1"),
         new LispTestEq(
-			"(setl cond-test (func (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
+			"(setl cond-test (fn (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
 			"(cond-test 0)",
 			"0"),
         new LispTestEq(
-			"(setl cond-test (func (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
+			"(setl cond-test (fn (x) (cond ((not(num? x)) 'notanum) ((< x 0) -1) ((> x 0) +1) (true 0))))" +
 			"(cond-test 'one)",
 			"'notanum"),
 
@@ -425,7 +425,7 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 		new LispTestEq("(get-type-name true)", 		 "'bool"),
 		new LispTestEq("(get-type-name do)", 		 "'macro"),
 		new LispTestEq("(get-type-name quote)", 	 "'keyword"),
-		new LispTestEq("(get-type-name eq)", 		 "'func"),
+		new LispTestEq("(get-type-name eq)", 		 "'fn"),
 		new LispTestEq("(get-type-name hello)", 	 "'string"),
 
 		// is-a

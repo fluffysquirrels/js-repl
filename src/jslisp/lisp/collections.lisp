@@ -1,9 +1,9 @@
-(setg filter (func (elts pred)
+(setg filter (fn (elts pred)
 		(if (null-or-empty-list? elts)
 			'()
 		(do
 			(setl curr-elt (car elts))
-			(setl get-rest (func ()
+			(setl get-rest (fn ()
 				(filter (cdr elts) pred)
 			))
 			(if (pred curr-elt)
@@ -14,33 +14,33 @@
 	)
 )
 
-(setg map (func (elts map-func)
+(setg map (fn (elts map-fn)
 	(if (null-or-empty-list? elts)
 		'()
 	(cons
-		(map-func (car elts))
-		(map (cdr elts) map-func)
+		(map-fn (car elts))
+		(map (cdr elts) map-fn)
 	))
 ))
 
 (setg first-or-null
-	(func (elts filter-func)
+	(fn (elts filter-fn)
 		(if (null-or-empty-list? elts)
 			null
 		(do
 			(setl head (car elts))
-			(if (filter-func head)
+			(if (filter-fn head)
 				head
 				(first-or-null
 					(cdr elts)
-					filter-func))
+					filter-fn))
 		))
 	)
 )
 
 
 (setg push
-	(func (a-list elt)
+	(fn (a-list elt)
 		(if (null? a-list)
 			(cons elt)
 			(cons 	(car a-list)
@@ -50,7 +50,7 @@
 )
 
 (setg append
-	(func (list-1 list-2)
+	(fn (list-1 list-2)
 		(if (null-or-empty-list? list-1)
 			list-2
 			(cons
@@ -62,7 +62,7 @@
 
 (do
   (setl reverse-int
-    (func (a-list acc)
+    (fn (a-list acc)
 	  (if (null-or-empty-list? a-list)
         acc
 		(reverse-int
@@ -73,7 +73,7 @@
     )
   )
   (setg reverse
-    (func (a-list)
+    (fn (a-list)
       (reverse-int a-list '())
 	) 
   )
@@ -81,9 +81,9 @@
 
 
 (setg partition
-	(func (a-list set1-predicate)
+	(fn (a-list set1-predicate)
 		(setl set2-predicate
-			(func (elt) (not (set1-predicate elt))))
+			(fn (elt) (not (set1-predicate elt))))
 
 		(setl set1
 			(filter a-list set1-predicate))
@@ -94,6 +94,6 @@
 	))
 
 (setg second
-  (func (a-list)
+  (fn (a-list)
     (car (cdr a-list))
   ))

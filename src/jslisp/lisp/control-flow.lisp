@@ -1,7 +1,7 @@
 (setg do
 	(macro (*exprs)
 		(cons
-			(cons 'func
+			(cons 'fn
 			(cons '()
 				  *exprs
 			))
@@ -14,7 +14,7 @@
 		(list
 			(append
 				(list
-					'func
+					'fn
 					'()
 					(list
 						'setl
@@ -28,13 +28,13 @@
 	))
 
 (setg apply
-	(func (a-func args)
-		(eval (cons a-func args))
+	(fn (a-fn args)
+		(eval (cons a-fn args))
 	))
 
 (do
 	(setg cond-int
-		(func (clauses)
+		(fn (clauses)
 			(if (null-or-empty-list? clauses)
 				(list 'throwNoConditionEvaluatedTrue)
 				(do
@@ -53,7 +53,7 @@
 		))
 )
 
-(setg not (func (x)
+(setg not (fn (x)
 	(if x
 		false
 		true
@@ -78,7 +78,7 @@
 
 
 (setg condf
-	(func (conds)
+	(fn (conds)
 		(if (null? conds)
 			throwNoCondHitError)
 		
@@ -93,12 +93,12 @@
 	)
 )
 
-(setg condf-test (func (x)
+(setg condf-test (fn (x)
 	(condf
 		(list
-			(list (func () (< x 5)) (func () (list x 'lessthan5)))
-			(list (func () (> x 5)) (func () (list x 'morethan5)))
-			(list (func () true) (func () (list x 'equals5)))
+			(list (fn () (< x 5)) (fn () (list x 'lessthan5)))
+			(list (fn () (> x 5)) (fn () (list x 'morethan5)))
+			(list (fn () true) (fn () (list x 'equals5)))
 		)
 	)
 ))
@@ -135,10 +135,10 @@
   ))
 
 (setg get-macro-value-list-from-value-clauses
-  (func (value-clauses)
+  (fn (value-clauses)
     (cons 'list
       (map value-clauses
-        (func (clause)
+        (fn (clause)
           (if (not (null? (cdr (cdr clause))))
             throw-tooManyValuesInClause)
           (list

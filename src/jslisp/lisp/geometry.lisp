@@ -6,7 +6,7 @@
 )
 
 (setg vec2.add
-  (func (v1 v2)
+  (fn (v1 v2)
     (setl newx (+ (get-value v1 'x) (get-value v2 'x)))
     (setl newy (+ (get-value v1 'y) (get-value v2 'y)))
     (new-with-values-list 'vec2
@@ -18,7 +18,7 @@
   ))
 
 (setg vec2.len
-  (func (vec)
+  (fn (vec)
     (setl len-squared
       (+ (square (get-value vec 'x))
          (square (get-value vec 'y))

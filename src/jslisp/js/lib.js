@@ -34,7 +34,7 @@ jsrepl.lisp.getLib = function() {
 		"cons?":	new jsrepl.lisp.LispFunction(Lib_is_cons),
 		"num?":		new jsrepl.lisp.LispFunction(Lib_is_num),
 		"sym?":		new jsrepl.lisp.LispFunction(Lib_is_sym),
-		"func?":	new jsrepl.lisp.LispFunction(Lib_is_func),
+		"fn?":		new jsrepl.lisp.LispFunction(Lib_is_func),
 		"bool?":	new jsrepl.lisp.LispFunction(Lib_is_bool),
 		"null?":	new jsrepl.lisp.LispFunction(Lib_is_null),
 
@@ -46,7 +46,7 @@ jsrepl.lisp.getLib = function() {
 		"setl":		new jsrepl.lisp.LispKeyword(Lib_setLocal),
 		"quote":	new jsrepl.lisp.LispKeyword(Lib_quote),
 		"eval":		new jsrepl.lisp.LispFunction(Lib_eval),
-		"func":		new jsrepl.lisp.LispKeyword(Lib_function),
+		"fn":		new jsrepl.lisp.LispKeyword(Lib_function),
 		"macro":	new jsrepl.lisp.LispKeyword(Lib_macro),
 		"if":		new jsrepl.lisp.LispKeyword(Lib_if)
 	};};

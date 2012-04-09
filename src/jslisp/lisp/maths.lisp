@@ -1,8 +1,8 @@
 
 (setg divrem
-	(func (a b)
+	(fn (a b)
 		(setl divrem-internal
-			(func 	(a
+			(fn 	(a
 					curr-divisor
 					curr-divisor-multiplier)
 				(if (< a curr-divisor)
@@ -34,28 +34,28 @@
 )
 
 (setg mod
-	(func (a b)
+	(fn (a b)
 		(setl divrem-result (divrem a b))
 		(car (cdr divrem-result))
 	)
 )
 
 (setg square
-  (func (x)
+  (fn (x)
     (* x x)
   ))
 
 (setg sqrt
-  (func (x)
+  (fn (x)
     (setl jumbo-factor 100)
     (setl jumbo-x (* x jumbo-factor jumbo-factor))
     (setl jumbo-sqrt-x (sqrt-ceil jumbo-x))
     (/ jumbo-sqrt-x jumbo-factor)
   ))
 
-(setg sqrt-ceil (func (n)
+(setg sqrt-ceil (fn (n)
 	(setl is-pos-and-square-greater-than-n
-		(func (x)
+		(fn (x)
 			(and
 				(>= x 0)
 				(>= (* x x) n)
@@ -66,12 +66,12 @@
 ))
 
 (setg int-range-infimum
-	(func (predicate)
+	(fn (predicate)
 		(setl init-max-range (int-pow-2 24))
 		(setl init-min-range (- 0 init-max-range))
 
 		(setl find-infimum
-			(func (min-range max-range)
+			(fn (min-range max-range)
 				(if (predicate min-range)
 					(throwMinPassedPredicate))
 				(if (not (predicate max-range))
@@ -102,7 +102,7 @@
 )
 
 (setg int-pow-2
-	(func (n)
+	(fn (n)
 		(if (<= n 0)
 			1
 			(* 2 (int-pow-2 (- n 1)))
@@ -112,7 +112,7 @@
 
 
 (setg num-seq
-	(func (min upper-bound)
+	(fn (min upper-bound)
 		(if (>= min upper-bound)
 			'()
 			(cons
@@ -125,23 +125,23 @@
 		)
 ))
 
-(setg num-odd? (func (n)
+(setg num-odd? (fn (n)
 	(setl mod2 (mod n 2))
 	(= mod2 1)
 ))
 	
-(setg num-even? (func (n)
+(setg num-even? (fn (n)
 	(setl mod2 (mod n 2))
 	(= mod2 0)
 ))
 
-(setg sum-ints (func (x)
+(setg sum-ints (fn (x)
 	(if (= x 1)
 		1
 	(+ x (sum-ints (- x 1))))
 ))
 
-(setg num-cmp (func (x y)
+(setg num-cmp (fn (x y)
 	(if (= x y)
 		0
 	(if (> x y)

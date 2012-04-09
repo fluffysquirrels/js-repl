@@ -1,16 +1,12 @@
 ** Todo
 * Records
 New functions for records
-	add-type
 	record=
 
 Add more types
-	play types with only primitive fields (e.g. point, vector)
 	play types with record fields
 
 Function / macro bodies available as fields on records.
-Verify field names and types when filling records
-Remove types from record field values.
 
 --------
 * Methods

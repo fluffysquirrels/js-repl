@@ -1,15 +1,15 @@
 (setg first-proper-prime-factor
-	(func (n)
+	(fn (n)
 		(setl sqrt-n (sqrt-ceil n))
 		(first-or-null
 			(num-seq 2 (+ 1 sqrt-n))
-			(func (d) (eq (mod n d) 0)))
+			(fn (d) (eq (mod n d) 0)))
 	)
 )
 
 (setg prime-factors
 	(do
-		(func (n)
+		(fn (n)
 			(if (= n 1)
 				(cons)
 			(do

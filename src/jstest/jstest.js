@@ -15,18 +15,28 @@ var jstest = function() {
 	pub.runTests = function(tests) {
 		logger.info("Running " + tests.length + " tests...");
 
-		var timeResult = utils.time(
-			function() {
-				return utils.map(
-						tests,
-						runTest);
-			});
+		function doIt() {
+			var timeResult = utils.time(
+				function() {
+					return utils.map(
+							tests,
+							runTest);
+				});
 
-		var testResults = timeResult.result;
-		
-		printSlowTests(testResults);
-		logger.info("All tests finished in " + (timeResult.timeMs / 1000).toString() + "s.");
-		printTotals(testResults);
+			var testResults = timeResult.result;
+			
+			printSlowTestsReport(testResults);
+
+			logger.info("");
+			logger.info("All tests finished in " + (timeResult.timeMs / 1000).toString() + "s.");
+			printTotals(testResults);
+		}
+
+		// Run the tests in a timeout callback, so the
+		// "Running *$# tests..." line is displayed before
+		// the tests are started and the browser blocked by
+		// JavaScript processing.
+		setTimeout(doIt, 0);
 	}
 
 	function runTest(test) {
@@ -108,7 +118,7 @@ var jstest = function() {
 		logger.info("Tests passed: " + passed);
 		logger.info("Tests failed: " + failed);
 	}
-	function printSlowTests(testResults) {
+	function printSlowTestsReport(testResults) {
 		var resultsSlowestFirst =
 			testResults.slice(0).sort(
 				function (resultA, resultB) {
@@ -119,7 +129,12 @@ var jstest = function() {
 					return resultB.timeMs - resultA.timeMs;
 				});
 
-		var maxSlowTests = 10;
+		printNSlowestTests(resultsSlowestFirst, 10);
+		printSlowTestsHistogram(resultsSlowestFirst);
+	}
+	
+	function printNSlowestTests(
+		resultsSlowestFirst, maxSlowTests) {
 
 		logger.info(maxSlowTests + " slowest tests:");
 
@@ -133,6 +148,10 @@ var jstest = function() {
 				msToTimeString(result.timeMs) + " : '" +
 				result.test.description + "'");
 		}
+	}
+
+	function printSlowTestsHistogram(resultsSlowestFirst) {
+
 	}
 
 	function msToTimeString(ms) {

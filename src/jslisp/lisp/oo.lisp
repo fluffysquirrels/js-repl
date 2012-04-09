@@ -1,6 +1,6 @@
 (do
 	(setg record?
-		(func (rec)
+		(fn (rec)
 			(and
 				(and
 					(cons? rec)
@@ -21,7 +21,7 @@
 		))
 
 	(setg new-with-values-list
-		(func (type-name *rest)
+		(fn (type-name *rest)
 			(if (not (type-exists type-name))
 				throwTypeDoesNotExistException)
 
@@ -37,7 +37,7 @@
 	)
 
 	(setl new-record-internal
-		(func (type-name fields)
+		(fn (type-name fields)
 			(if (not (dict.is? fields))
 				throw-fieldsMustBeADict)
 			(list
@@ -48,12 +48,12 @@
 		))
 
 	(setl get-record-type-name
-		(func (rec)
+		(fn (rec)
 			(car (cdr rec))
 		))
 
 	(setg get-type-name
-		(func (obj)
+		(fn (obj)
 			(setl jstype (jstypeof obj))
 
 			(cond
@@ -67,14 +67,14 @@
 				((sym= jstype 'boolean) 		'bool)
 				((sym= jstype 'LispMacro) 		'macro)
 				((sym= jstype 'LispKeyword) 	'keyword)
-				((sym= jstype 'LispFunction) 	'func)
+				((sym= jstype 'LispFunction) 	'fn)
 				((sym= jstype 'string) 			'string)
 				(true throwObjectNotOfRecognisedTypeException)
 			)
 		))
 
 	(setl get-fields
-		(func (rec)
+		(fn (rec)
 			(if (not (record? rec))
 				throwNotARecordException)
 
@@ -82,17 +82,17 @@
 		))
 			
 	(setg type-of
-		(func (rec)
+		(fn (rec)
 			(setl type-name (get-type-name rec))
 			
 			(get-type type-name)
 		))
 
 	(setg get-type-fields
-		(func (type)
+		(fn (type)
 			(setl type-fields (get-value type 'fields))
 			(map type-fields
-				(func (field)
+				(fn (field)
 					(list
 						(get-value field 'type)
 						(get-value field 'name)
@@ -102,19 +102,19 @@
 		))
 
 	(setg is-a
-		(func (rec type-name)
+		(fn (rec type-name)
 			(setl rec-type-name (get-type-name rec))
 			(sym= rec-type-name type-name)
 		))
 
 	(setg get-value
-		(func (rec field-name)
+		(fn (rec field-name)
 			(setl field-values (get-fields rec))
 			(dict.get field-values field-name)
 		))
 
 	(setg new-type
-		(func (type-name *fields)
+		(fn (type-name *fields)
 			(setl fields-kv (map *fields convert-field-to-kv))
 			(setl fields-dict (dict.from-list fields-kv))
 
@@ -130,7 +130,7 @@
 		))
 
 	(setl convert-field-to-kv
-		(func (curr-field)
+		(fn (curr-field)
 			(if (not
 				(sym=
 					(get-type-name curr-field)
@@ -143,7 +143,7 @@
 		))
 
 	(setg new-field
-		(func (field-name field-type)
+		(fn (field-name field-type)
 			(new-record-internal
 				'field
 				(dict.from-list
@@ -170,7 +170,7 @@
 		))
 
 	(setl convert-type-to-kv
-		(func (curr-type)
+		(fn (curr-type)
 			(if (not
 				(sym=
 					(get-type-name curr-type)
@@ -183,17 +183,17 @@
 		))
 
 	(setg get-type
-		(func (type-name)
+		(fn (type-name)
 			(dict.get types type-name)
 		))
 
 	(setg tryget-type
-		(func (type-name)
+		(fn (type-name)
 			(dict.tryget types type-name)
 		))
 
 	(setg add-type
-		(func (*new-types)
+		(fn (*new-types)
 			(setg types
 				(dict.with-values
 					types
@@ -202,7 +202,7 @@
 		))
 
 	(setg type-exists
-		(func (type-name)
+		(fn (type-name)
 			(dict.has? types type-name)
 		))
 
@@ -219,7 +219,7 @@
 		(new-type 'null		)
 		(new-type 'macro	)
 		(new-type 'keyword	)
-		(new-type 'func		)
+		(new-type 'fn		)
 		(new-type 'string	)
 	)
 
@@ -233,7 +233,7 @@
 					  *field-value-clauses)
 				)
 			))
-	  	(setg with-values-list (func (rec field-values)
+	  	(setg with-values-list (fn (rec field-values)
 			(cond
 				((null-or-empty-list? field-values)
 					rec)
@@ -249,7 +249,7 @@
 		))
 
 		(setl with-value
-			(func (rec field)
+			(fn (rec field)
 				(if (not (record? rec))
 					throwNotARecordException)
 

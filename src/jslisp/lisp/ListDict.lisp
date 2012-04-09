@@ -8,7 +8,7 @@
       )
     ))
   (setg ListDict.from-list
-    (func (initial-values)
+    (fn (initial-values)
       (if (null-or-empty-list? initial-values)
           '(dict)
         (ListDict.with-values
@@ -18,7 +18,7 @@
     ))
 
   (setg ListDict.is?
-    (func (obj)
+    (fn (obj)
       (cond
         ((not (cons? obj)) false)
         ((not (sym? (car obj))) false)
@@ -27,13 +27,13 @@
       )
     ))
   (setg ListDict.has?
-    (func (ldict key)
+    (fn (ldict key)
       (setl value
         (ListDict.tryget ldict key))
       (not (null? value))
     ))
   (setg ListDict.get
-    (func (ldict key)
+    (fn (ldict key)
       (setl value
         (ListDict.tryget ldict key))
       (if (null? value)
@@ -43,11 +43,11 @@
     ))
   (do
     (setg ListDict.tryget
-        (func (ldict key)
+        (fn (ldict key)
         (tryget-int (cdr ldict) key)
         ))
     (setl tryget-int
-      (func (pairs key)
+      (fn (pairs key)
         (if (null-or-empty-list? pairs)
           null
           (let (curr-pair (car pairs))
@@ -60,17 +60,17 @@
       ))
   )
   (setg ListDict.keys
-    (func (ldict)
+    (fn (ldict)
       (setl pairs (cdr ldict))
       (map pairs car)
     ))
   (setg ListDict.with-value
-    (func (ldict key value)
+    (fn (ldict key value)
     (setl pairs (cdr ldict))
       (setl unmodified-pairs
       (filter
         pairs
-          (func (pair)
+          (fn (pair)
         (not
             (sym= (car pair) key)
         ))
@@ -80,7 +80,7 @@
     (cons 'dict (cons new-pair unmodified-pairs))
   ))
   (setg ListDict.with-values
-    (func (ldict kv-pairs)
+    (fn (ldict kv-pairs)
       (if (null-or-empty-list? kv-pairs)
         ldict
         (do
