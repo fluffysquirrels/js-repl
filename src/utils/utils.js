@@ -156,5 +156,9 @@ var utils = function(){
 		}
 	}
 
+	pub.msToTimeString = function(ms) {
+		return (ms / 1000).toString() + "s";
+	}
+
 	return pub;
 }();

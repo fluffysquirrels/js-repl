@@ -1,8 +1,6 @@
+var jslisp = jslisp || {};
 
-var jsrepl = jsrepl || {};
-jsrepl.lisp = jsrepl.lisp || {};
-
-jsrepl.lisp.LispThread =
+jslisp.LispThread =
 	function LispThread() {
 		var _logger = ioc.createLogger("lisp.LispThread");
 
@@ -34,7 +32,7 @@ jsrepl.lisp.LispThread =
 		}
 	};
 
-jsrepl.lisp.LispStackFrame =
+jslisp.LispStackFrame =
 	function LispStackFrame(scope, expr) {
 		this.getScope = function() {
 			return scope;

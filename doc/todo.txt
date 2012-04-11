@@ -1,4 +1,5 @@
 In progress
+ - JS dict type.
  - slow tests histogram.
 
 OO
@@ -21,7 +22,6 @@ Lisp lib
 JS lib
  - data types
    - Arrays
-   - Hashes
    - Date
    - Strings
  - split tests into separate files
@@ -31,7 +31,6 @@ Lang
    - defn, def -- new (setg 'x (func ...)), (setg 'x ...)
    - var -- new variable in local scope
    - setvar -- find existing variable in local scope and set its value; throw if not found.
- - fn
  - quasiquoting
  - better parser and tokeniser
  - comments

@@ -1,27 +1,27 @@
-var jsrepl = jsrepl || {};
-jsrepl.lisp = jsrepl.lisp || {};
+var jslisp = jslisp || {};
+jslisp.lang = jslisp.lang || {};
 
-jsrepl.lisp.LispSymbol =
+jslisp.lang.LispSymbol =
 	function LispSymbol(name) {
 		this.name = name;
 	}
-jsrepl.lisp.LispSymbol.prototype.toString =
+jslisp.lang.LispSymbol.prototype.toString =
 	function() {
 		return this.name;
 	};
 
-jsrepl.lisp.LispExpression =
+jslisp.lang.LispExpression =
 	function LispExpression(list) {
 		this.list = list || [];
 	}
-jsrepl.lisp.LispExpression.prototype.toString =
+jslisp.lang.LispExpression.prototype.toString =
 	this.toString = function() {
 		return "(" +
 			utils.join(" ", this.list) +
 			")";
 	}
 
-jsrepl.lisp.LispFunction =
+jslisp.lang.LispFunction =
 	function LispFunction(func) {
 		utils.assertType("func", func, "function");
 		var _func = func;
@@ -42,7 +42,7 @@ jsrepl.lisp.LispFunction =
 		}
 	}
 
-jsrepl.lisp.LispKeyword =
+jslisp.lang.LispKeyword =
 	function LispKeyword(func) {
 		utils.assertType("func", func, "function");
 		var _func = func;
@@ -53,7 +53,7 @@ jsrepl.lisp.LispKeyword =
 		}
 	}
 
-jsrepl.lisp.LispMacro =
+jslisp.lang.LispMacro =
 	function LispMacro(func) {
 		utils.assertType("func", func, "function");
 		var _func = func;

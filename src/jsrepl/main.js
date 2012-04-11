@@ -1,10 +1,3 @@
-//
-// Required : "jsrepl.log.js"
-// Required : "jsrepl.pp.js"
-// Required : "jsrepl.cmdhist.js"
-// Required : "utils.err.js"
-// Required : "jsrepl.lisp.js"
-
 var jsrepl = jsrepl || {};
 
 jsrepl.main = function() {
@@ -35,8 +28,8 @@ jsrepl.main = function() {
 			// addCustomBtn("var ib = inputBox; var o = { end: ib.selectionEnd, start: ib.selectionStart, length: ib.value.length }; o", "selection");
 			addCustomBtn("__err", "err");
 			addCustomBtn("__err.innerException", "err.inner");
-			addCustomBtn("jsrepl.lisp.beginRunTests()", "lisp.tests");
-			jsrepl.lisp.beginCreateEvaluator(
+			addCustomBtn("jslisp.beginRunTests()", "lisp.tests");
+			jslisp.beginCreateEvaluator(
 				function(evaluator) {
 					_lispEvaluator = evaluator;
 				});
@@ -61,8 +54,17 @@ jsrepl.main = function() {
 			jsrepl.cmdhist.resetHistoryIndex();
 
 			var evaluator = getEvaluator();
-			var output = evaluator.readEval(input);
+
+			var timeResult =
+				utils.time(
+					function() {
+						return evaluator.readEval(input);
+					});
+			var output = timeResult.result;
+
 			__last = output;
+
+			jsrepl.log.addOutput("eval done in " + utils.msToTimeString(timeResult.timeMs) + ".");
 
 			var outputString = jsrepl.pp.prettyPrint(output);
 			jsrepl.log.addOutput(outputString);

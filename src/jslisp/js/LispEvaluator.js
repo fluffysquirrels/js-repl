@@ -1,15 +1,6 @@
-// Required : "utils.js"
-// Required : "ioc.js"
-// Required : "jsrepl.pp.js"
-// Required : "jsrepl.lisp.langTypes.js"
-// Required : "jsrepl.lisp.scopeTypes.js"
-// Required : "jsrepl.lisp.parser.js"
-// Required : "jsrepl.lisp.lib.js"
+var jslisp = jslisp || {}
 
-var jsrepl = jsrepl || {};
-jsrepl.lisp = jsrepl.lisp || {}
-
-jsrepl.lisp.initScriptUrls =
+jslisp.initScriptUrls =
 	[
 		"src/jslisp/lisp/control-flow.lisp",
 		"src/jslisp/lisp/prologue.lisp",
@@ -22,15 +13,15 @@ jsrepl.lisp.initScriptUrls =
 		"src/jslisp/lisp/geometry.lisp",
 	];
 
-jsrepl.lisp.beginCreateEvaluator =
+jslisp.beginCreateEvaluator =
 function() { // Create new scope.
 	function beginCreateEvaluator(callback) {
-		var logger = ioc.createLogger("jsrepl.lisp.beginCreateEvaluator").withDebug(false);
+		var logger = ioc.createLogger("jslisp.beginCreateEvaluator").withDebug(false);
 
 		logger.debug("Start");
 
 		var evaluator = new LispEvaluator();
-		evaluator.beginRunUrls(jsrepl.lisp.initScriptUrls,
+		evaluator.beginRunUrls(jslisp.initScriptUrls,
 			function() {
 				logger.debug("In beginRunUrls callback.");
 				logger.debug("Running beginCreateEvaluator callback.");
@@ -43,15 +34,15 @@ function() { // Create new scope.
 	function LispEvaluator() {
 		// << Vars
 		
-		var _globalScopeFrame = new jsrepl.lisp.LispScopeFrame(); 
-		_globalScopeFrame.vars = jsrepl.lisp.getLib();
+		var _globalScopeFrame = new jslisp.LispScopeFrame(); 
+		_globalScopeFrame.vars = jslisp.getLib();
 		var _this = this;
 		var _logger =
 			ioc.createLogger(
 				"LispEvaluator").withDebug(false);
 	
 		this.readEval = function(cmdString) {
-			var exprs = jsrepl.lisp.parser.read(cmdString);
+			var exprs = jslisp.parser.read(cmdString);
 			var scope = createNewScope();
 			return this.eval(scope, exprs);
 		}
@@ -84,7 +75,7 @@ function() { // Create new scope.
 			}
 			catch(ex) {
 				var currLispFrame =
-					new jsrepl.lisp.LispStackFrame(
+					new jslisp.LispStackFrame(
 						scope, expr);
 
 				if(utils.getTypeOf(ex) === "LispException") {
@@ -95,11 +86,11 @@ function() { // Create new scope.
 				else
 				{
 					var thread =
-						new jsrepl.lisp.LispThread();
+						new jslisp.LispThread();
 					
 					thread.pushFrame(currLispFrame);
 
-					throw new jsrepl.lisp.LispException(thread, ex);
+					throw new jslisp.LispException(thread, ex);
 				}
 			}
 		}
@@ -143,10 +134,10 @@ function() { // Create new scope.
 		}
 		
 		function createNewScope() {
-			var scope = new jsrepl.lisp.LispScope(_this);
+			var scope = new jslisp.LispScope(_this);
 	
 			scope.pushFrame(_globalScopeFrame);
-			scope.pushFrame(new jsrepl.lisp.LispScopeFrame());
+			scope.pushFrame(new jslisp.LispScopeFrame());
 	
 			return scope;
 		}

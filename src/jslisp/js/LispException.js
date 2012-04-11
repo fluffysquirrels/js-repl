@@ -1,7 +1,6 @@
-var jsrepl = jsrepl || {};
-jsrepl.lisp = jsrepl.lisp || {};
+var jslisp = jslisp || {};
 
-jsrepl.lisp.LispException =
+jslisp.LispException =
 	function LispException(thread, innerException) {
 		utils.assertType("thread", thread, "LispThread");
 

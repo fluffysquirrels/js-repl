@@ -1,7 +1,6 @@
-var jsrepl = jsrepl || {};
-jsrepl.lisp = jsrepl.lisp || {};
+var jslisp = jslisp || {};
 
-jsrepl.lisp.LispScope =
+jslisp.LispScope =
 	function LispScope(evaluator) {
 		utils.assertType("evaluator", evaluator, "LispEvaluator");
 
@@ -9,48 +8,48 @@ jsrepl.lisp.LispScope =
 		this._frames = [];
 	};
 
-jsrepl.lisp.LispScope.prototype.getEvaluator =
+jslisp.LispScope.prototype.getEvaluator =
 	function() {
 		return this._evaluator;
 	}
-jsrepl.lisp.LispScope.prototype.pushFrame =
+jslisp.LispScope.prototype.pushFrame =
 	function(frame) {
 		utils.assertType("frame", frame, "LispScopeFrame");
 
 		this._frames.push(frame);
 	};
-jsrepl.lisp.LispScope.prototype.popFrame =
+jslisp.LispScope.prototype.popFrame =
 	function() {
 		this._frames.pop();
 	};
-jsrepl.lisp.LispScope.prototype.copy =
+jslisp.LispScope.prototype.copy =
 	function() {
-		var ret = new jsrepl.lisp.LispScope(this._evaluator);
+		var ret = new jslisp.LispScope(this._evaluator);
 
 		ret._frames = this._frames.slice(0);
 
 		return ret;
 	};
-jsrepl.lisp.LispScope.prototype.set =
+jslisp.LispScope.prototype.set =
 	function(varName, varValue) {
 		this.__assertHasFrames();
 		var topFrame = this._frames[this._frames.length - 1];
 		topFrame.vars[varName] = varValue;
 	};
-jsrepl.lisp.LispScope.prototype.setGlobal =
+jslisp.LispScope.prototype.setGlobal =
 	function(varName, varValue) {
 		this.__assertHasFrames();
 		var bottomFrame = this._frames[0];
 		bottomFrame.vars[varName] = varValue;
 	};
-jsrepl.lisp.LispScope.prototype.__assertHasFrames =
+jslisp.LispScope.prototype.__assertHasFrames =
 	function() {
 		if(this._frames.length === 0) {
 			throw "Cannot set variable in a scope with no frames.";
 		}
 	}
 
-jsrepl.lisp.LispScope.prototype.lookUp =
+jslisp.LispScope.prototype.lookUp =
 	function(varName) {
 		for(var ix = this._frames.length-1;
 			ix >= 0;
@@ -67,7 +66,7 @@ jsrepl.lisp.LispScope.prototype.lookUp =
 		throw "Couldn't find variable '" + varName + "'.";
 	};
 
-jsrepl.lisp.LispScopeFrame =
+jslisp.LispScopeFrame =
 	function LispScopeFrame() {
 		this.vars = {};
 	}

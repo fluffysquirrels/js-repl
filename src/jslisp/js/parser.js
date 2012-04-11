@@ -1,9 +1,6 @@
-// Required : jsrepl.lisp.langTypes.js
+var jslisp = jslisp || {};
 
-var jsrepl = jsrepl || {};
-jsrepl.lisp = jsrepl.lisp || {};
-
-jsrepl.lisp.parser = function() {
+jslisp.parser = function() {
 	var pub = {};
 
 	var _logger = ioc.createLogger("lisp.parser").withDebug(false);
@@ -11,13 +8,13 @@ jsrepl.lisp.parser = function() {
 	pub.read = function(str) {
 		var tokens = tokenise(str);
 
-		var nestLevels = [{expr: new jsrepl.lisp.LispExpression()}];
+		var nestLevels = [{expr: new jslisp.lang.LispExpression()}];
 
 		function pushToTopLevel(elt) {
 			if(getPrevTokenOnThisLevelWasQuote()) {
-				var quotExpr = new jsrepl.lisp.LispExpression();
+				var quotExpr = new jslisp.lang.LispExpression();
 				quotExpr.list.push(
-					new jsrepl.lisp.LispSymbol("quote"));
+					new jslisp.lang.LispSymbol("quote"));
 				quotExpr.list.push(elt);
 				removePrevTokenOnThisLevelWasQuote();
 				pushToTopLevel(quotExpr);
@@ -48,7 +45,7 @@ jsrepl.lisp.parser = function() {
 			var currToken = tokens[ixToken];
 
 			if(currToken === "(") {
-				nestLevels.push({expr: new jsrepl.lisp.LispExpression()});
+				nestLevels.push({expr: new jslisp.lang.LispExpression()});
 			}
 			else if(currToken === ")") {
 				if(nestLevels.length === 1) {
@@ -96,7 +93,7 @@ jsrepl.lisp.parser = function() {
 				tokenObject = parseFloat(currToken);
 			}
 			else if(isSymbolString(currToken)) {
-				tokenObject = new jsrepl.lisp.LispSymbol(currToken);
+				tokenObject = new jslisp.lang.LispSymbol(currToken);
 			}
 			else {
 				throw "Unrecognised token: '" + currToken + "'";

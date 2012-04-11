@@ -1,7 +1,6 @@
-var jsrepl = jsrepl || {};
-jsrepl.lisp = jsrepl.lisp || {};
+var jslisp = jslisp || {};
 
-jsrepl.lisp.getLib = function() {
+jslisp.getLib = function() {
 	var logger = ioc.createLogger("lisp.lib").withDebug(false);
 	
 	var lib;
@@ -15,52 +14,52 @@ jsrepl.lisp.getLib = function() {
 		"null":		null,
 		"undefined":undefined,
 
-		"+": 		new jsrepl.lisp.LispFunction(Lib_plus),
-		"-": 		new jsrepl.lisp.LispFunction(Lib_minus),
-		"*": 		new jsrepl.lisp.LispFunction(Lib_multiply),
-		"/": 		new jsrepl.lisp.LispFunction(Lib_divide),
+		"+": 		new jslisp.lang.LispFunction(Lib_plus),
+		"-": 		new jslisp.lang.LispFunction(Lib_minus),
+		"*": 		new jslisp.lang.LispFunction(Lib_multiply),
+		"/": 		new jslisp.lang.LispFunction(Lib_divide),
 
-		"=":		new jsrepl.lisp.LispFunction(Lib_num_eq),
-		"<=":		new jsrepl.lisp.LispFunction(Lib_num_le),
-		">=":		new jsrepl.lisp.LispFunction(Lib_num_ge),
-		"<":		new jsrepl.lisp.LispFunction(Lib_num_lt),
-		">":		new jsrepl.lisp.LispFunction(Lib_num_gt),
+		"=":		new jslisp.lang.LispFunction(Lib_num_eq),
+		"<=":		new jslisp.lang.LispFunction(Lib_num_le),
+		">=":		new jslisp.lang.LispFunction(Lib_num_ge),
+		"<":		new jslisp.lang.LispFunction(Lib_num_lt),
+		">":		new jslisp.lang.LispFunction(Lib_num_gt),
 
-		"js=":		new jsrepl.lisp.LispFunction(Lib_js_eq),
-		"jstypeof":	new jsrepl.lisp.LispFunction(Lib_js_typeof),
+		"js=":		new jslisp.lang.LispFunction(Lib_js_eq),
+		"jstypeof":	new jslisp.lang.LispFunction(Lib_js_typeof),
 
-		"sym=":		new jsrepl.lisp.LispFunction(Lib_sym_eq),
+		"sym=":		new jslisp.lang.LispFunction(Lib_sym_eq),
 
-		"cons?":	new jsrepl.lisp.LispFunction(Lib_is_cons),
-		"num?":		new jsrepl.lisp.LispFunction(Lib_is_num),
-		"sym?":		new jsrepl.lisp.LispFunction(Lib_is_sym),
-		"fn?":		new jsrepl.lisp.LispFunction(Lib_is_func),
-		"bool?":	new jsrepl.lisp.LispFunction(Lib_is_bool),
-		"null?":	new jsrepl.lisp.LispFunction(Lib_is_null),
+		"cons?":	new jslisp.lang.LispFunction(Lib_is_cons),
+		"num?":		new jslisp.lang.LispFunction(Lib_is_num),
+		"sym?":		new jslisp.lang.LispFunction(Lib_is_sym),
+		"fn?":		new jslisp.lang.LispFunction(Lib_is_func),
+		"bool?":	new jslisp.lang.LispFunction(Lib_is_bool),
+		"null?":	new jslisp.lang.LispFunction(Lib_is_null),
 
-		"car":		new jsrepl.lisp.LispFunction(Lib_arrayCar),
-		"cdr":		new jsrepl.lisp.LispFunction(Lib_arrayCdr),
-		"cons":		new jsrepl.lisp.LispFunction(Lib_arrayCons),
+		"car":		new jslisp.lang.LispFunction(Lib_arrayCar),
+		"cdr":		new jslisp.lang.LispFunction(Lib_arrayCdr),
+		"cons":		new jslisp.lang.LispFunction(Lib_arrayCons),
 
-		"setg":		new jsrepl.lisp.LispKeyword(Lib_setGlobal),
-		"setl":		new jsrepl.lisp.LispKeyword(Lib_setLocal),
-		"quote":	new jsrepl.lisp.LispKeyword(Lib_quote),
-		"eval":		new jsrepl.lisp.LispFunction(Lib_eval),
-		"fn":		new jsrepl.lisp.LispKeyword(Lib_function),
-		"macro":	new jsrepl.lisp.LispKeyword(Lib_macro),
-		"if":		new jsrepl.lisp.LispKeyword(Lib_if)
+		"setg":		new jslisp.lang.LispKeyword(Lib_setGlobal),
+		"setl":		new jslisp.lang.LispKeyword(Lib_setLocal),
+		"quote":	new jslisp.lang.LispKeyword(Lib_quote),
+		"eval":		new jslisp.lang.LispFunction(Lib_eval),
+		"fn":		new jslisp.lang.LispKeyword(Lib_function),
+		"macro":	new jslisp.lang.LispKeyword(Lib_macro),
+		"if":		new jslisp.lang.LispKeyword(Lib_if)
 	};};
 
 	function Lib_function(defnScope, args) {
 		var func = createFunctionBody(defnScope, args);
 
-		return new jsrepl.lisp.LispFunction(func);
+		return new jslisp.lang.LispFunction(func);
 	}
 
 	function Lib_macro(defnScope, args) {
 		var func = createFunctionBody(defnScope, args);
 
-		return new jsrepl.lisp.LispMacro(func);
+		return new jslisp.lang.LispMacro(func);
 	}
 
 	function createFunctionBody(defnScope, args) {
@@ -79,7 +78,7 @@ jsrepl.lisp.getLib = function() {
 			var execScope = defnScope.copy();
 
 			// Push function evaluation scope frame.
-			execScope.pushFrame(new jsrepl.lisp.LispScopeFrame());
+			execScope.pushFrame(new jslisp.LispScopeFrame());
 			argsSpec.bindArgs(execScope, args);
 			
 			return execScope.getEvaluator().eval(execScope, funcBody);
@@ -154,7 +153,7 @@ jsrepl.lisp.getLib = function() {
 				var varArgsArray =
 					args.slice(positionalArgs.length);
 				var varArgsValue =
-					new jsrepl.lisp.LispExpression(varArgsArray);
+					new jslisp.lang.LispExpression(varArgsArray);
 				execScope.set(
 					varArgsSymbol.name,
 					varArgsValue);
@@ -244,7 +243,7 @@ jsrepl.lisp.getLib = function() {
 		utils.assertNumArgs(args, 1);
 
 		var typeString = utils.getTypeOf(args[0]);
-		var typeSym = new jsrepl.lisp.LispSymbol(typeString);
+		var typeSym = new jslisp.lang.LispSymbol(typeString);
 
 		return typeSym;
 	}
@@ -309,15 +308,15 @@ jsrepl.lisp.getLib = function() {
 			return null;
 		}
 
-		return new jsrepl.lisp.LispExpression(arr.slice(1));
+		return new jslisp.lang.LispExpression(arr.slice(1));
 	}
 	
 	function Lib_arrayCons(scope, args) {
 		if(args.length === 0) {
-			return new jsrepl.lisp.LispExpression([]);
+			return new jslisp.lang.LispExpression([]);
 		}
 		else if(args.length === 1) {
-			return new jsrepl.lisp.LispExpression([args[0]]);
+			return new jslisp.lang.LispExpression([args[0]]);
 		}
 		else if(args.length === 2) {
 			var head = args[0];
@@ -336,7 +335,7 @@ jsrepl.lisp.getLib = function() {
 			var retArray = [head].concat(tail.list);
 
 			var retExpr =
-				new jsrepl.lisp.LispExpression(retArray);
+				new jslisp.lang.LispExpression(retArray);
 
 			return retExpr;
 		}

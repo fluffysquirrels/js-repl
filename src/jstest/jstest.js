@@ -62,7 +62,7 @@ var jstest = function() {
 			testException,
 			timeResult.timeMs);
 
-		logger.debug("Test finished in " + msToTimeString(timeResult.timeMs) + ".");
+		logger.debug("Test finished in " + utils.msToTimeString(timeResult.timeMs) + ".");
 		logger.debug("testResult.passed = '" + testResult.passed + "'.");
 
 		if(testResult.passed === false) {
@@ -145,17 +145,13 @@ var jstest = function() {
 
 			var result = resultsSlowestFirst[ixResult];
 			logger.info(
-				msToTimeString(result.timeMs) + " : '" +
+				utils.msToTimeString(result.timeMs) + " : '" +
 				result.test.description + "'");
 		}
 	}
 
 	function printSlowTestsHistogram(resultsSlowestFirst) {
 
-	}
-
-	function msToTimeString(ms) {
-		return (ms / 1000).toString() + "s";
 	}
 
 	pub.assertEqual = function(

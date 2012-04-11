@@ -1,9 +1,6 @@
-// Requires: jstest.js
+var jslisp = jslisp || {};
 
-var jsrepl = jsrepl || {};
-jsrepl.lisp = jsrepl.lisp || {};
-
-jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
+jslisp.beginRunTests = function(testsDoneCallback) {
 	var logger = ioc.createLogger("lisp.tests");
 
 	// We require that no one modifies global state,
@@ -13,7 +10,7 @@ jsrepl.lisp.beginRunTests = function(testsDoneCallback) {
 	var evaluator;
 
 	function beginRunTests() {
-		jsrepl.lisp.beginCreateEvaluator(
+		jslisp.beginCreateEvaluator(
 			function(returnedEvaluator) {
 				evaluator = returnedEvaluator;
 				jstest.runTests(lispTests);
