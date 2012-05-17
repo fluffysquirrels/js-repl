@@ -8,7 +8,8 @@ jslisp.initScriptUrls =
 		"src/jslisp/lisp/maths.lisp",
 		"src/jslisp/lisp/primes.lisp",
 		"src/jslisp/lisp/ListDict.lisp",
-		"src/jslisp/lisp/dict-is-ListDict.lisp",
+		// "src/jslisp/lisp/dict-is-ListDict.lisp",
+		"src/jslisp/lisp/dict-is-JsDict.lisp",
 		"src/jslisp/lisp/oo.lisp",
 		"src/jslisp/lisp/geometry.lisp",
 	];

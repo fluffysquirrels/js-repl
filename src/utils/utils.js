@@ -160,5 +160,17 @@ var utils = function(){
 		return (ms / 1000).toString() + "s";
 	}
 
+	pub.createObjectWithEnumerablePropertiesFrom =
+	function(obj) {
+		var ret = {};
+
+		Object.keys(obj).forEach(
+		function(key) {
+			ret[key] = obj[key];
+		});
+
+		return ret;
+	};
+
 	return pub;
 }();

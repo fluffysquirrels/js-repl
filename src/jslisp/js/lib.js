@@ -5,7 +5,8 @@ jslisp.getLib = function() {
 	
 	var lib;
 
-	function createLib(){ return {
+	function createLib(){
+		var lib = {
 		"hello": 	"world!",
 
 		"true":		true,
@@ -48,7 +49,11 @@ jslisp.getLib = function() {
 		"fn":		new jslisp.lang.LispKeyword(Lib_function),
 		"macro":	new jslisp.lang.LispKeyword(Lib_macro),
 		"if":		new jslisp.lang.LispKeyword(Lib_if)
-	};};
+	};
+
+		jslisp.lang.Dict.LispFunctions.addToLib(lib);
+		return lib;
+	};
 
 	function Lib_function(defnScope, args) {
 		var func = createFunctionBody(defnScope, args);
