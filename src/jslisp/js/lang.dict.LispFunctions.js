@@ -28,7 +28,7 @@ jslisp.lang.Dict.LispFunctions = (function() {
     lib["JsDict.has?"] = 
     new jslisp.lang.LispFunction(function(scope, args) {
 	  var dict = args[0];
-	  var key = args[1];
+	  var key = args[1].name;
 
 	  return dict.hasKey(key);
 	});
@@ -36,7 +36,7 @@ jslisp.lang.Dict.LispFunctions = (function() {
     lib["JsDict.get"] = 
     new jslisp.lang.LispFunction(function(scope, args) {
 	  var dict = args[0];
-	  var key = args[1];
+	  var key = args[1].name;
 
 	  return dict.get(key);
 	});
@@ -44,7 +44,7 @@ jslisp.lang.Dict.LispFunctions = (function() {
     lib["JsDict.tryget"] = 
     new jslisp.lang.LispFunction(function(scope, args) {
 	  var dict = args[0];
-	  var key = args[1];
+	  var key = args[1].name;
 
 	  return dict.tryGet(key);
 	});
@@ -59,7 +59,7 @@ jslisp.lang.Dict.LispFunctions = (function() {
     lib["JsDict.with-value"] = 
     new jslisp.lang.LispFunction(function(scope, args) {
 	  var dict  = args[0];
-	  var key   = args[1];
+	  var key   = args[1].name;
 	  var value = args[2];
 
 	  return dict.withValue(key, value);

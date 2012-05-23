@@ -1,5 +1,6 @@
 In progress
  - JS dict type.
+  - eq. 
  - slow tests histogram.
 
 OO
