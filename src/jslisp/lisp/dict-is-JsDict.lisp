@@ -7,3 +7,4 @@
 (setg dict.keys        JsDict.keys        )
 (setg dict.with-value  JsDict.with-value  )
 (setg dict.with-values JsDict.with-values )
+(setg dict.=           JsDict.=           )

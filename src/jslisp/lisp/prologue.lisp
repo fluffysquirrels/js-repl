@@ -26,8 +26,17 @@
 				(listeq a b))
 			((sym? a)
 				(sym= a b))
-			(true
+			((dict.is? a)
+				(dict.= a b))
+			((num? a)
 				(js= a b))
+			((bool? a)
+				(js= a b))
+			((null? a)
+				(js= a b))
+  
+			(true
+				throw-cannotCompareUnknownTypes)
 		)
 	)
 )

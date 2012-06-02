@@ -72,6 +72,14 @@ jslisp.lang.Dict.LispFunctions = (function() {
 
 	  return dict.withValueExpressions(kvPairs);
 	});
+
+    lib["JsDict.="] = 
+    new jslisp.lang.LispFunction(function(scope, args) {
+	  var a    = args[0];
+	  var b    = args[1];
+
+      return a.equals(b);
+	});
   };
 
   return pub;

@@ -25,6 +25,8 @@ jslisp.lang = jslisp.lang || {};
 	_dictType.isA =
 	function(obj) {
 		return 	typeof(obj) === "object" &&
+		        obj !== null &&
+		        obj.constructor.Name != "Array" &&
 				Object.getPrototypeOf(obj) ===
 					_dictType.prototype;
 	};
@@ -118,4 +120,37 @@ jslisp.lang = jslisp.lang || {};
 
 		return ret;
 	}
+
+	_dictType.prototype.equals =
+	function(obj) {
+		if(!_dictType.isA(obj)) {
+			return false;
+		}
+
+		var myKeys = this.keys();
+
+		var allMyValuesEqualObjectValues = true;
+
+		myKeys.forEach(function(key) {
+			if(this.tryGet(key) !== obj.tryGet(key)) {
+				allMyValuesEqualObjectValues = false;
+			}
+		});
+
+		if(!allMyValuesEqualObjectValues) {
+			return false;
+		}
+
+		var objKeys = obj.keys();
+
+		var allObjKeysAreMyKeys = true;
+
+		objKeys.forEach(function(key) {
+			if(!this.hasKey(key)) {
+				allObjKeysAreMyKeys = false;
+			}
+		});
+
+		return allObjKeysAreMyKeys;
+	};
 })();

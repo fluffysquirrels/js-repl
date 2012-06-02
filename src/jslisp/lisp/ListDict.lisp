@@ -94,4 +94,8 @@
         )
       )
     ))
+  (setg ListDict.=
+    (fn (a b)
+      (listeq a b)
+	))
 )

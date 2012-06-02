@@ -15,7 +15,7 @@ jslisp.lang.LispExpression =
 		this.list = list || [];
 	}
 jslisp.lang.LispExpression.prototype.toString =
-	this.toString = function() {
+	function toString() {
 		return "(" +
 			utils.join(" ", this.list) +
 			")";

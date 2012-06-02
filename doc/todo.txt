@@ -1,4 +1,5 @@
 In progress
+ - Fail fast when comparing unknown js types.
  - JS dict type.
   - eq. 
  - slow tests histogram.

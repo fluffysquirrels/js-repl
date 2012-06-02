@@ -7,3 +7,4 @@
 (setg dict.keys        ListDict.keys        )
 (setg dict.with-value  ListDict.with-value  )
 (setg dict.with-values ListDict.with-values )
+(setg dict.=           ListDict.=           )
